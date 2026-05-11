@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="DadFit Posts - Fitness insights, tips, and stories for Indian dads on their fitness journey.">
+    <meta name="keywords" content="fitness posts, fitness tips, dad fitness, workout advice, fitness journey">
+    <meta name="author" content="DAD FIT">
+    
+    <!-- Open Graph meta tags for social sharing -->
+    <meta property="og:title" content="DAD FIT - Fitness Posts & Insights">
+    <meta property="og:description" content="Read the latest fitness insights, tips, and stories from DadFit's journey.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="#">
+    <meta property="og:image" content="images/Dadfit logo.jpg">
+    
+    <!-- Theme color for mobile browsers -->
+    <meta name="theme-color" content="#34C363">
+    <meta name="msapplication-navbutton-color" content="#34C363">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Favicon (1).png">
+    
+    <title>Posts - DAD FIT</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Zoho PageSense Tracking -->
+    <script src="https://cdn-in.pagesense.io/js/dadfitin/c77d1e3929134d1faab48d5f738e4489.js"></script>
+    
+    <style>
+        /* Posts Page Specific Styles */
+        .posts-hero {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #2a2a2a 100%);
+            padding: 160px 0 80px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .posts-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at top right, rgba(52, 195, 99, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .posts-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .posts-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary-white);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        
+        .posts-hero p {
+            font-size: 1.25rem;
+            color: var(--primary-gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .posts-section {
+            background-color: var(--primary-dark);
+            padding: 80px 0;
+            min-height: 60vh;
+        }
+        
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .post-card {
+            background: linear-gradient(145deg, #252525 0%, #1a1a1a 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .post-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(52, 195, 99, 0.15);
+            border-color: rgba(52, 195, 99, 0.3);
+        }
+        
+        .post-card-image {
+            width: 100%;
+            height: 240px;
+            background: linear-gradient(135deg, #34C363 0%, #2aa052 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .post-card-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(30, 30, 30, 0.3) 100%);
+        }
+        
+        .post-card-content {
+            padding: 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .post-card-date {
+            color: var(--primary-green);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .post-card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-white);
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+        
+        .post-card-excerpt {
+            color: var(--primary-gray);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            flex: 1;
+        }
+        
+        .post-card-link {
+            color: var(--primary-green);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        
+        .post-card-link:hover {
+            color: var(--primary-white);
+            transform: translateX(4px);
+        }
+        
+        .post-card-link::after {
+            content: '→';
+            margin-left: 0.5rem;
+            transition: margin-left 0.2s ease;
+        }
+        
+        .post-card-link:hover::after {
+            margin-left: 0.75rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        
+        .empty-state-icon {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+            opacity: 0.3;
+        }
+        
+        .empty-state h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-white);
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state p {
+            font-size: 1.125rem;
+            color: var(--primary-gray);
+            max-width: 500px;
+            margin: 0 auto 2rem;
+        }
+        
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+        
+        .filter-tag {
+            padding: 0.5rem 1.5rem;
+            background: rgba(52, 195, 99, 0.1);
+            border: 1px solid rgba(52, 195, 99, 0.3);
+            border-radius: 50px;
+            color: var(--primary-green);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-tag:hover,
+        .filter-tag.active {
+            background: var(--primary-green);
+            color: var(--primary-white);
+            border-color: var(--primary-green);
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .posts-hero {
+                padding: 140px 0 60px;
+                min-height: 300px;
+            }
+            
+            .posts-hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .posts-hero p {
+                font-size: 1.125rem;
+            }
+            
+            .posts-section {
+                padding: 60px 0;
+            }
+            
+            .posts-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .post-card-image {
+                height: 200px;
+            }
+            
+            .empty-state {
+                padding: 60px 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .posts-hero h1 {
+                font-size: 2rem;
+            }
+            
+            .post-card-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.html">
+                <img src="images/logo.svg" alt="DAD FIT" height="16" class="me-2">
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#about">My Story</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#package">Package</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#faq">FAQ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="resources.html">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="posts.html">Posts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="coffee.html">Coffee</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="posts-hero">
+        <div class="container">
+            <div class="posts-hero-content text-center">
+                <h1>Fitness Posts & Insights</h1>
+                <p>Stories, tips, and practical advice from the DadFit journey. Learn, grow, and get stronger together.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Posts Section -->
+    <section class="posts-section">
+        <div class="container">
+            <!-- Filter Tags (can be activated later) -->
+            <!-- <div class="filter-tags">
+                <span class="filter-tag active">All</span>
+                <span class="filter-tag">Workouts</span>
+                <span class="filter-tag">Nutrition</span>
+                <span class="filter-tag">Mindset</span>
+                <span class="filter-tag">Recovery</span>
+            </div> -->
+            
+            <!-- Posts Grid (will be populated with actual posts) -->
+            <div class="posts-grid" id="postsGrid">
+                <article class="post-card">
+                    <div class="post-card-image">
+                        💪🔄
+                    </div>
+                    <div class="post-card-content">
+                        <div class="post-card-date">Feb 22, 2026</div>
+                        <h2 class="post-card-title">The 2-Day Dad Protocol: Complete Training System</h2>
+                        <p class="post-card-excerpt">
+                            Complete 2-day training system with workout details, exercise science on eccentric/isometric/concentric phases, 
+                            and recovery protocols. Build strength without destroying your joints.
+                        </p>
+                        <a href="posts/2-day-dad-protocol.html" class="post-card-link">
+                            Read More
+                        </a>
+                    </div>
+                </article>
+                
+                <article class="post-card">
+                    <div class="post-card-image">
+                        🏠🏋️
+                    </div>
+                    <div class="post-card-content">
+                        <div class="post-card-date">Feb 15, 2026</div>
+                        <h2 class="post-card-title">Dumbbell-Only Home Workouts: Hypercircuit Programs</h2>
+                        <p class="post-card-excerpt">
+                            Four complete dumbbell programs from beginner to advanced. Build muscle, burn fat, 
+                            and get stronger with just dumbbells and 30 minutes, 3 days a week.
+                        </p>
+                        <a href="posts/dumbbell-workouts.html" class="post-card-link">
+                            Read More
+                        </a>
+                    </div>
+                </article>
+                
+                <article class="post-card">
+                    <div class="post-card-image">
+                        🥗
+                    </div>
+                    <div class="post-card-content">
+                        <div class="post-card-date">Feb 8, 2026</div>
+                        <h2 class="post-card-title">High-Volume Low-Calorie Foods Guide</h2>
+                        <p class="post-card-excerpt">
+                            Smart food choices that maximize satiety while minimizing calories. Complete guide to Indian vegetables, 
+                            fruits, and snacks—plus the high-calorie foods to limit.
+                        </p>
+                        <a href="posts/high-volume-low-calorie-foods.html" class="post-card-link">
+                            Read More
+                        </a>
+                    </div>
+                </article>
+                
+                <article class="post-card">
+                    <div class="post-card-image">
+                        🍽️
+                    </div>
+                    <div class="post-card-content">
+                        <div class="post-card-date">Feb 5, 2026</div>
+                        <h2 class="post-card-title">Weekly Meal Plan & Grocery Guide</h2>
+                        <p class="post-card-excerpt">
+                            Complete meal templates with raw weights, weekly grocery lists, and tracking guidance. 
+                            Flexible 1800-2000 kcal plans that adapt to your goals and preferences.
+                        </p>
+                        <a href="posts/meal-plan-groceries.html" class="post-card-link">
+                            Read More
+                        </a>
+                    </div>
+                </article>
+                
+                <article class="post-card">
+                    <div class="post-card-image">
+                        🏋️‍♂️
+                    </div>
+                    <div class="post-card-content">
+                        <div class="post-card-date">Jan 15, 2026</div>
+                        <h2 class="post-card-title">Complete Home Workout Guide: 10-30 Min Programs</h2>
+                        <p class="post-card-excerpt">
+                            Flexible programs for every schedule: 10-min daily circuits, 15-20 min bodyweight HIIT, 
+                            and 25-30 min dumbbell hypercircuits. Start anywhere, progress at your pace.
+                        </p>
+                        <a href="posts/home-workouts.html" class="post-card-link">
+                            Read More
+                        </a>
+                    </div>
+                </article>
+            </div>
+            
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-icon">📝</div>
+                <h2>Posts Coming Soon</h2>
+                <p>
+                    We're working on creating valuable content for your fitness journey. 
+                    Check back soon for insights, tips, and stories from the DadFit community.
+                </p>
+                <a href="resources.html" class="btn btn-primary" style="padding: 12px 32px;">
+                    Explore Resources
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS for Posts Page -->
+    <script>
+        // Navbar scroll behavior
+        const navbar = document.querySelector('.navbar');
+        const navbarToggler = document.querySelector('.navbar-toggler');
+        const navbarCollapse = document.querySelector('.navbar-collapse');
+        
+        let lastScroll = 0;
+        let ticking = false;
+        
+        function updateNavbar() {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 50 || navbarCollapse.classList.contains('show')) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+            
+            lastScroll = currentScroll;
+            ticking = false;
+        }
+        
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(updateNavbar);
+                ticking = true;
+            }
+        });
+        
+        // Mobile menu toggle
+        navbarToggler.addEventListener('click', () => {
+            setTimeout(() => {
+                if (navbarCollapse.classList.contains('show')) {
+                    navbar.classList.add('scrolled');
+                } else if (window.pageYOffset <= 50) {
+                    navbar.classList.remove('scrolled');
+                }
+            }, 350);
+        });
+        
+        // Check if there are posts to display
+        document.addEventListener('DOMContentLoaded', () => {
+            const postsGrid = document.getElementById('postsGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            // Check if postsGrid has any article children
+            if (postsGrid.querySelectorAll('article').length === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Support DadFit - Buy me a coffee for free fitness content">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Favicon (1).png">
+    
+    <title>Support DadFit | Buy Me a Coffee</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/coffee.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.html">
+                <img src="images/logo.svg" alt="DAD FIT" height="16" class="me-2">
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#about">My Story</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#package">Package</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#faq">FAQ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="resources.html">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="posts.html">Posts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="coffee.html">Coffee</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Coffee Support Section -->
+    <section class="coffee-section">
+        <div class="coffee-background"></div>
+        <div class="coffee-overlay"></div>
+        <div class="container">
+            <div class="coffee-container">
+                <div class="coffee-card">
+                    <div class="coffee-icon">🚧</div>
+                    <h1 class="coffee-title">Payment Integration</h1>
+                    <p class="coffee-description">
+                        We're currently setting up the payment integration to make it easy for you to support DadFit. 
+                        This page is under construction and will be ready soon!
+                    </p>
+                    
+                    <div class="qr-container">
+                        <div class="qr-placeholder">
+                            <strong class="qr-status-title">WORK IN PROGRESS</strong>
+                            <div>Payment integration is being configured.</div>
+                            <div>Check back soon for UPI and other payment options.</div>
+                        </div>
+                    </div>
+                    
+                    <p class="coming-soon-note">
+                        🔨 Coming Soon: UPI QR Code & Payment Links
+                    </p>
+                    
+                    <p class="gratitude-text">
+                        Thank you for your interest in supporting DadFit! 💪
+                    </p>
+                    
+                    <a href="index.html" class="back-link">
+                        ← Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS for Navbar -->
+    <script>
+        // Navbar scroll behavior
+        const navbar = document.querySelector('.navbar');
+        const navbarToggler = document.querySelector('.navbar-toggler');
+        const navbarCollapse = document.querySelector('.navbar-collapse');
+        
+        // Set navbar to scrolled state by default for coffee page
+        navbar.classList.add('scrolled');
+        
+        let lastScroll = 0;
+        let ticking = false;
+        
+        function updateNavbar() {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 50 || navbarCollapse.classList.contains('show')) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+            
+            lastScroll = currentScroll;
+            ticking = false;
+        }
+        
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(updateNavbar);
+                ticking = true;
+            }
+        });
+        
+        // Mobile menu toggle
+        navbarToggler.addEventListener('click', () => {
+            setTimeout(() => {
+                if (navbarCollapse.classList.contains('show')) {
+                    navbar.classList.add('scrolled');
+                } else if (window.pageYOffset <= 50) {
+                    navbar.classList.remove('scrolled');
+                }
+            }, 350);
+        });
+    </script>
+</body>
+</html>

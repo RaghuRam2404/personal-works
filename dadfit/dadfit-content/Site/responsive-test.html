@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="images/logo.png">
+    
+    <title>Responsive Test - DAD FIT</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f4f4f4;
+        }
+        .test-container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 20px;
+        }
+        .device-info {
+            background: #34C363;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .back-link {
+            display: inline-block;
+            background: #34C363;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 25px;
+            margin-top: 20px;
+        }
+        .back-link:hover {
+            background: #2ba854;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>DAD FIT - Responsive Test Page</h1>
+        <div class="device-info" id="device-info">
+            Loading device information...
+        </div>
+        
+        <h3>Testing Guidelines:</h3>
+        <ul>
+            <li><strong>Mobile (320px - 767px):</strong> Single column layout, stacked buttons, centered content</li>
+            <li><strong>Tablet (768px - 1024px):</strong> Optimized for both portrait and landscape</li>
+            <li><strong>Desktop (1025px+):</strong> Two-column layout with hero image visible</li>
+        </ul>
+        
+        <h3>Current Viewport:</h3>
+        <div id="viewport-info">
+            Width: <span id="width"></span>px<br>
+            Height: <span id="height"></span>px<br>
+            Device Type: <span id="device-type"></span>
+        </div>
+        
+        <a href="index.html" class="back-link">← Back to Main Site</a>
+    </div>
+
+    <script>
+        function updateViewportInfo() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            let deviceType = '';
+            
+            if (width <= 767) {
+                deviceType = 'Mobile';
+            } else if (width <= 1024) {
+                deviceType = 'Tablet';
+            } else {
+                deviceType = 'Desktop';
+            }
+            
+            document.getElementById('width').textContent = width;
+            document.getElementById('height').textContent = height;
+            document.getElementById('device-type').textContent = deviceType;
+            
+            const deviceInfo = document.getElementById('device-info');
+            deviceInfo.innerHTML = `
+                Viewport: ${width}x${height} | 
+                Device: ${deviceType} | 
+                Orientation: ${width > height ? 'Landscape' : 'Portrait'}
+            `;
+        }
+        
+        updateViewportInfo();
+        window.addEventListener('resize', updateViewportInfo);
+        
+        // Test touch capability
+        const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        if (hasTouch) {
+            document.getElementById('device-info').innerHTML += ' | Touch: Yes';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="Take the free DadFit Assessment - discover exactly what is blocking your fitness progress and get a personalized plan built for your life as a dad.">
+    <meta name="keywords" content="dad fitness, indian dad fitness, fitness assessment, dad workout plan, sustainable fitness">
+    <meta name="author" content="DAD FIT">
+    <meta property="og:title" content="Still Out of Shape Even Though You Keep Trying? - DadFit">
+    <meta property="og:description" content="Take the free 3-minute DadFit Assessment and get a personalized fitness roadmap built for your life as a dad.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://dadfit.in">
+    <meta property="og:image" content="images/Transformation.png">
+    <meta name="theme-color" content="#34C363">
+    <meta name="msapplication-navbutton-color" content="#34C363">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" type="image/png" href="Favicon (1).png">
+    <title>DadFit - Free Fitness Assessment for Indian Dads</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn-in.pagesense.io/js/dadfitin/c77d1e3929134d1faab48d5f738e4489.js"></script>
+    <link rel="stylesheet" href="css/assessment-based-landing.css">
+</head>
+<body>
+
+    <nav class="lp-nav" id="lp-nav" aria-label="Main navigation">
+        <!-- Desktop + Tablet bar -->
+        <div class="lp-nav-inner">
+            <a href="index.html" class="lp-nav-brand" aria-label="DadFit Home">
+                <img src="images/logo.svg" alt="DAD FIT" height="16">
+            </a>
+            <!-- Desktop nav links -->
+            <ul class="lp-nav-links" role="list">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#value">Assessment</a></li>
+                <li><a href="#about">My Story</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="resources.html">Resources</a></li>
+                <li><a href="posts.html">Posts</a></li>
+                <li><a href="coffee.html">Coffee</a></li>
+            </ul>
+            <!-- Desktop CTA (hidden on tablet/mobile) -->
+            <a href="assessment.html" class="lp-nav-cta lp-nav-desktop-cta">Start Assessment &#8594;</a>
+            <!-- Hamburger toggler (shown on tablet/mobile) -->
+            <button class="lp-nav-toggler" id="lp-toggler" aria-label="Toggle navigation" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        <!-- Mobile drawer -->
+        <div class="lp-nav-drawer" id="lp-drawer">
+            <a href="#home">Home</a>
+            <a href="#value">Assessment</a>
+            <a href="#about">My Story</a>
+            <a href="#faq">FAQ</a>
+            <a href="resources.html">Resources</a>
+            <a href="posts.html">Posts</a>
+            <a href="coffee.html">Coffee</a>
+            <a href="assessment.html" class="lp-nav-cta">Start My Free Assessment &#8594;</a>
+        </div>
+    </nav>
+
+    <!-- SECTION 1 + 2: HERO (Hook + Subheading) -->
+    <section class="lp-hero" id="home" aria-labelledby="hero-heading">
+        <div class="lp-hero-row">
+
+            <!-- PHOTOS WRAPPER: display:contents on desktop (children join flex), flex-row on mobile -->
+            <div class="lp-hero-persons">
+
+            <!-- LEFT: Before photo — Thailand, 2019 (relatable, heavier) -->
+            <div class="lp-hero-person lp-hero-person--left">
+                <img src="images/raghu-before.jpg"
+                     alt="Raghu at Erawan waterfalls, Thailand 2019 — before his fitness transformation"
+                     loading="eager">
+                <div class="lp-hero-person-cap">2019 &middot; Before</div>
+            </div>
+
+            <!-- RIGHT: After photo — gym flex, 2025 (aspirational, fit) -->
+            <div class="lp-hero-person lp-hero-person--right">
+                <img src="images/raghu-after.jpg"
+                     alt="Raghu at the gym, 2025 — fit and strong after his transformation"
+                     loading="eager">
+                <div class="lp-hero-person-cap">2025 &middot; After</div>
+            </div>
+
+            </div><!-- /.lp-hero-persons -->
+
+            <!-- CENTER: Hook text + CTA -->
+            <div class="lp-hero-inner">
+                <h1 class="lp-hook" id="hero-heading">
+                    Still Out of Shape<br>
+                    <em>Even Though You Keep Trying?</em>
+                </h1>
+                <p class="lp-subheading">
+                    A dad who went from 96kg to 62kg will show you exactly what&#39;s blocking your progress.
+                </p>
+                <div class="lp-cta-group">
+                    <a href="assessment.html" class="lp-cta-btn">FIND OUT WHY</a>
+                    <div class="lp-microcopy">
+                        <span>3 minutes</span>
+                        <span>100% free</span>
+                        <span>Your specific blockers</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- PROOF STRIP -->
+    <div class="lp-proof" aria-label="Key results">
+        <div class="container">
+            <div class="lp-proof-grid">
+                <div class="lp-proof-item">
+                    <div class="lp-proof-num">96&#8594;62</div>
+                    <div class="lp-proof-lbl">kg transformation</div>
+                </div>
+                <div class="lp-proof-item">
+                    <div class="lp-proof-num">6 yrs</div>
+                    <div class="lp-proof-lbl">results sustained</div>
+                </div>
+                <div class="lp-proof-item">
+                    <div class="lp-proof-num">3&#8211;4x</div>
+                    <div class="lp-proof-lbl">workouts/week as a dad</div>
+                </div>
+                <div class="lp-proof-item">
+                    <div class="lp-proof-num">NASM</div>
+                    <div class="lp-proof-lbl">certified personal trainer</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 3: VALUE PROPOSITION (3 Pillars) -->
+    <section class="lp-value" id="value" aria-labelledby="value-heading">
+        <div class="container">
+            <div class="lp-section-tag">Why most dads stay stuck</div>
+            <h2 class="lp-section-heading" id="value-heading">Three things that decide if you get fit &#8212;<br>or keep trying.</h2>
+            <p class="lp-section-desc">
+                Fix all three and results become almost inevitable. Ignore even one and you&#39;ll keep starting over.
+            </p>
+            <div class="lp-pillars">
+                <div class="lp-pillar">
+                    <img src="images/pillar1.png" class="lp-pillar-icon" alt="Nutrition habits" loading="lazy">
+                    <div class="lp-pillar-title">You don&#39;t need a diet.<br>You need habits that survive Friday night.</div>
+                    <p class="lp-pillar-body">
+                        Most dad diets fail at the first family dinner or office lunch.
+                        We find the two or three changes that actually stick &#8212; without cooking separate meals or going hungry.
+                    </p>
+                </div>
+                <div class="lp-pillar">
+                    <img src="images/pillar2.png" class="lp-pillar-icon" alt="Training consistency" loading="lazy">
+                    <div class="lp-pillar-title">Workouts that survive school runs, deadlines, and 9pm exhaustion.</div>
+                    <p class="lp-pillar-body">
+                        Generic fitness plans are built for people with no schedule.
+                        We build around your actual week &#8212; so missing one session doesn&#39;t unravel everything.
+                    </p>
+                </div>
+                <div class="lp-pillar">
+                    <img src="images/pillar3.png" class="lp-pillar-icon" alt="Sleep and recovery" loading="lazy">
+                    <div class="lp-pillar-title">The real reason most dads quit isn&#39;t motivation. It&#39;s running on empty.</div>
+                    <p class="lp-pillar-body">
+                        Poor sleep and unmanaged stress kill progress before the workout even starts.
+                        Fix recovery first and everything &#8212; energy, fat loss, consistency &#8212; gets dramatically easier.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: CREDIBILITY -->
+    <section class="lp-cred" id="about" aria-labelledby="cred-heading">
+        <div class="container">
+            <div class="lp-cred-grid">
+                <!-- Name block: shown above image on mobile/iPad, hidden on desktop -->
+                <div class="lp-cred-img-header">
+                    <div class="lp-cred-badge">&#10003; NASM Certified Personal Trainer</div>
+                    <div class="lp-cred-name" id="cred-heading">Raghu Ram</div>
+                    <div class="lp-cred-role">Creator of DadFit &#183; Software Engineer &#183; Dad</div>
+                </div>
+                <div class="lp-cred-img">
+                    <img src="images/Transformation.png"
+                         alt="Raghu Ram before (96 kg, 2019) and after (62 kg, 2025)"
+                         loading="lazy">
+                    <div class="lp-cred-img-cap">2019 &#8594; 2025 &#183; From 96 kg to 62&#8211;65 kg &#8212; maintained as a working dad</div>
+                </div>
+                <div class="lp-cred-content">
+                    <div class="lp-cred-badge lp-cred-desktop-only">&#10003; NASM Certified Personal Trainer</div>
+                    <div class="lp-cred-name lp-cred-desktop-only" id="cred-heading-desktop">Raghu Ram</div>
+                    <div class="lp-cred-role lp-cred-desktop-only">Creator of DadFit &#183; Software Engineer &#183; Dad</div>
+                    <p class="lp-cred-bio">
+                        I was a <strong>software engineer at 96 kg</strong> who got winded on a hiking trail
+                        while older tourists breezed past me. No personal trainer. No shortcuts.
+                        Just figuring out what actually works when you have a full-time job, a family,
+                        and eventually a toddler at home.<br><br>
+                        I went from <strong>96 kg to 62 kg</strong>, earned my
+                        <strong><a href="https://credentials.nasm.org/profile/raghuram26717/wallet" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline;text-underline-offset:3px">NASM Personal Training &amp; Nutrition certifications</a></strong>,
+                        and now work out 3&#8211;4 days a week &#8212; fitting fitness around dad life, not the other way around.
+                    </p>
+                    <div class="lp-cred-numbers">
+                        <div class="lp-cred-num">
+                            <div class="lp-cred-num-val">&#8722;34 kg</div>
+                            <div class="lp-cred-num-lbl">weight lost</div>
+                        </div>
+                        <div class="lp-cred-num">
+                            <div class="lp-cred-num-val">12&#8211;15%</div>
+                            <div class="lp-cred-num-lbl">body fat</div>
+                        </div>
+                        <div class="lp-cred-num">
+                            <div class="lp-cred-num-val">6 yrs</div>
+                            <div class="lp-cred-num-lbl">maintained</div>
+                        </div>
+                    </div>
+                    <div class="lp-insight-box">
+                        <p>
+                            <strong>78% of working dads</strong> say &#8220;no time&#8221; is their #1 reason for skipping fitness &#8212;
+                            yet the real barrier is having no system that fits their actual life.
+                            This assessment finds <em>your</em> specific blockers.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIDEO -->
+    <section class="lp-video" aria-labelledby="video-heading">
+        <div class="container">
+            <div class="lp-section-tag">See what DadFit is about</div>
+            <h2 class="lp-section-heading" id="video-heading">
+                What it actually looks like<br>to get fit as a dad
+            </h2>
+            <div class="lp-video-wrap">
+                <iframe
+                    src="https://www.youtube.com/embed/eFEGr6Jsahs?modestbranding=1&rel=0&playsinline=1"
+                    title="DadFit — Brand Animation"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    loading="lazy">
+                </iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="lp-faq" id="faq" aria-labelledby="faq-heading">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="lp-section-tag">Common questions</div>
+                    <h2 class="lp-section-heading" id="faq-heading" style="margin-bottom:2rem">FAQs</h2>
+                    <div class="accordion" id="lpFaqAccordion">
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#lpFaq1"
+                                        aria-expanded="false" aria-controls="lpFaq1">
+                                    What exactly is this assessment?
+                                </button>
+                            </h3>
+                            <div id="lpFaq1" class="accordion-collapse collapse" data-bs-parent="#lpFaqAccordion">
+                                <div class="accordion-body">
+                                    It&#39;s 15 questions that map your actual life &#8212; your schedule, sleep,
+                                    stress, eating habits, and fitness history &#8212; to identify the specific
+                                    blockers keeping you stuck.<br><br>
+                                    You get a personalised breakdown at the end. Not generic advice.
+                                    Your specific blockers, with a roadmap to fix them.
+                                    Takes 3 minutes.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#lpFaq2"
+                                        aria-expanded="false" aria-controls="lpFaq2">
+                                    I&#39;ve tried getting fit before. Why would this be different?
+                                </button>
+                            </h3>
+                            <div id="lpFaq2" class="accordion-collapse collapse" data-bs-parent="#lpFaqAccordion">
+                                <div class="accordion-body">
+                                    It probably won&#39;t be &#8212; if you do the same thing.<br><br>
+                                    The assessment is designed to find why your past attempts didn&#39;t stick.
+                                    Not your motivation. The actual structural blockers: wrong timing,
+                                    wrong program type, missing recovery, meal misalignment.
+                                    Fix those, and the effort you&#39;ve already put in starts working.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#lpFaq3"
+                                        aria-expanded="false" aria-controls="lpFaq3">
+                                    How much time do I actually need each week?
+                                </button>
+                            </h3>
+                            <div id="lpFaq3" class="accordion-collapse collapse" data-bs-parent="#lpFaqAccordion">
+                                <div class="accordion-body">
+                                    3&#8211;4 sessions, 45&#8211;60 minutes each. If that&#39;s too much right now,
+                                    2 sessions still works. The goal is to find what fits your actual week &#8212;
+                                    not what a fitness magazine says you should do.<br><br>
+                                    5:30 AM before the family wakes up. Lunch break. Post-bedtime.
+                                    Whatever window exists, we use it.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#lpFaq4"
+                                        aria-expanded="false" aria-controls="lpFaq4">
+                                    Do I have to follow a strict diet?
+                                </button>
+                            </h3>
+                            <div id="lpFaq4" class="accordion-collapse collapse" data-bs-parent="#lpFaqAccordion">
+                                <div class="accordion-body">
+                                    No strict meal plan. No cutting out food your family eats.<br><br>
+                                    You&#39;ll make small, specific changes that actually compound &#8212;
+                                    without becoming the guy who can&#39;t eat at a restaurant or has to cook
+                                    a separate meal at home.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#lpFaq5"
+                                        aria-expanded="false" aria-controls="lpFaq5">
+                                    Is this actually free? What&#39;s the catch?
+                                </button>
+                            </h3>
+                            <div id="lpFaq5" class="accordion-collapse collapse" data-bs-parent="#lpFaqAccordion">
+                                <div class="accordion-body">
+                                    The assessment is free. No credit card. No automatic upsell at the end.<br><br>
+                                    If you want personalised coaching after seeing your results, that option exists.
+                                    But you can take the assessment, get your roadmap, and never hear from me again.
+                                    I built it because most dad fitness advice is generic.
+                                    This gives you something specific to act on &#8212; right now.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: FINAL CTA -->
+    <section class="lp-final" aria-labelledby="final-cta-heading">
+        <div class="lp-final-inner">
+            <div class="lp-eyebrow" style="margin-bottom:1.25rem">Free &#183; 3 minutes &#183; No obligation</div>
+            <h2 class="lp-section-heading" id="final-cta-heading" style="margin-bottom:1rem">
+                Find Out What&#39;s<br>Holding You Back
+            </h2>
+            <p class="lp-section-desc" style="margin-bottom:2.75rem">
+                Take the free assessment and discover your specific blockers.
+            </p>
+            <div class="lp-cta-group">
+                <a href="assessment.html" class="lp-cta-btn">FIND OUT WHY</a>
+                <div class="lp-microcopy">
+                    <span>3 minutes</span>
+                    <span>100% free</span>
+                    <span>Your specific blockers</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="lp-footer">
+        <div class="container">
+            <div class="lp-footer-row">
+                <a href="#" aria-label="DadFit Home">
+                    <img src="images/logo.svg" alt="DAD FIT" height="14">
+                </a>
+                <nav class="lp-footer-links" aria-label="Footer navigation">
+                    <a href="posts.html">Posts</a>
+                    <a href="resources.html">Resources</a>
+                    <a href="coffee.html">Buy Me a Coffee</a>
+                    <a href="https://www.youtube.com/playlist?list=PLPp5lrulpyPcG5hE_8WXX1irRDNqNLF-U"
+                       target="_blank" rel="noopener noreferrer">YouTube</a>
+                    <a href="contact.html">Contact</a>
+                </nav>
+            </div>
+            <p class="lp-footer-legal">
+                &#169; 2026 DadFit &#183; NASM Certified Personal Trainer &#183;
+                Results are individual and may vary. This is not medical advice.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    (function(){
+        var nav=document.getElementById('lp-nav');
+        var toggler=document.getElementById('lp-toggler');
+        var drawer=document.getElementById('lp-drawer');
+
+        window.addEventListener('resize',function(){
+            if(window.innerWidth>=992){
+                toggler.classList.remove('open');
+                drawer.classList.remove('open');
+                toggler.setAttribute('aria-expanded','false');
+            }
+        },{passive:true});
+
+        // Hamburger open/close
+        toggler.addEventListener('click',function(){
+            var open=drawer.classList.toggle('open');
+            toggler.classList.toggle('open',open);
+            toggler.setAttribute('aria-expanded',open?'true':'false');
+        });
+
+        // Close drawer on any drawer link click
+        drawer.querySelectorAll('a').forEach(function(a){
+            a.addEventListener('click',function(){
+                drawer.classList.remove('open');
+                toggler.classList.remove('open');
+                toggler.setAttribute('aria-expanded','false');
+            });
+        });
+
+        // Active nav link based on scroll position
+        var sections=document.querySelectorAll('section[id]');
+        var navLinks=document.querySelectorAll('.lp-nav-links a[href^="#"]');
+        window.addEventListener('scroll',function(){
+            var scrollY=window.scrollY+100;
+            var current='';
+            sections.forEach(function(sec){
+                if(scrollY>=sec.offsetTop) current=sec.id;
+            });
+            navLinks.forEach(function(l){
+                l.classList.toggle('active', l.getAttribute('href')==='#'+current);
+            });
+        },{passive:true});
+    })();
+    </script>
+</body>
+</html>

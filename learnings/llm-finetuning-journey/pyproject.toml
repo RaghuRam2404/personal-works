@@ -8,6 +8,7 @@ dependencies = [
     "accelerate>=1.13.0",
     "bitsandbytes>=0.49.2",
     "datasets>=4.8.5",
+    "matplotlib>=3.10.9",
     "peft>=0.19.1",
     "torch>=2.11.0",
     "torchaudio>=2.11.0",

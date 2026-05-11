@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="Take the free DadFit Assessment — 15 questions to find exactly what's blocking your fitness and get a personalized roadmap built for your life as a dad.">
+    <meta name="theme-color" content="#34C363">
+    <link rel="icon" type="image/png" href="Favicon (1).png">
+    <title>DadFit Assessment – Free 3-Minute Fitness Check for Indian Dads</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn-in.pagesense.io/js/dadfitin/c77d1e3929134d1faab48d5f738e4489.js"></script>
+    <link rel="stylesheet" href="css/assessment-based-landing.css">
+    <style>
+        :root {
+            --green: #34C363;
+            --green-dark: #2ba854;
+            --dark: #1E1E1E;
+            --darker: #141414;
+            --darkest: #111111;
+            --white: #FFFFFF;
+            --muted: #9A9A9A;
+            --card-bg: #242424;
+        }
+
+        body {
+            background: var(--darkest);
+            color: var(--white);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* ── MODAL OVERLAY ── */
+        #lead-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.93);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            max-width: 440px;
+            width: 100%;
+            border: 1px solid rgba(52, 195, 99, 0.25);
+        }
+
+        .modal-card h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 0.4rem;
+        }
+
+        .modal-card .modal-sub {
+            color: var(--muted);
+            font-size: 0.88rem;
+            margin-bottom: 1.75rem;
+            line-height: 1.5;
+        }
+
+        .modal-card .field-label {
+            display: block;
+            color: var(--white);
+            font-size: 0.83rem;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+
+        .modal-card .field-input {
+            width: 100%;
+            background: var(--darker);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            color: var(--white);
+            border-radius: 8px;
+            padding: 0.7rem 1rem;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s;
+            margin-bottom: 1rem;
+        }
+
+        .modal-card .field-input:focus {
+            outline: none;
+            border-color: var(--green);
+            background: var(--darker);
+            box-shadow: 0 0 0 3px rgba(52, 195, 99, 0.15);
+        }
+
+        .modal-card .field-input::placeholder {
+            color: var(--muted);
+        }
+
+        .modal-error {
+            color: #f87171;
+            font-size: 0.8rem;
+            margin-top: -0.7rem;
+            margin-bottom: 0.75rem;
+            display: none;
+        }
+
+        .btn-start {
+            width: 100%;
+            background: var(--green);
+            color: var(--darkest);
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0.9rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 0.25rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-start:hover { background: var(--green-dark); }
+        .btn-start:active { transform: scale(0.98); }
+
+        .modal-microcopy {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.78rem;
+            margin-top: 0.75rem;
+        }
+
+        /* ── ASSESSMENT PAGE ── */
+        #assessment-page {
+            padding-top: 80px;
+            padding-bottom: 4rem;
+            min-height: 100vh;
+        }
+
+        .ass-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 2rem 1.25rem;
+        }
+
+        .ass-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .ass-header h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 0.5rem;
+        }
+
+        .ass-header p {
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        /* Progress */
+        .ass-progress-wrap { margin-bottom: 2.25rem; }
+
+        .ass-progress-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .ass-progress-track {
+            height: 5px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .ass-progress-fill {
+            height: 100%;
+            background: var(--green);
+            border-radius: 99px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* Section heading */
+        .ass-section-title {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--green);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(52, 195, 99, 0.2);
+        }
+
+        /* Question card */
+        .ass-q {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .ass-q-num {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--green);
+            letter-spacing: 0.06em;
+            margin-bottom: 0.3rem;
+        }
+
+        .ass-q-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--white);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        /* Yes / No toggle */
+        .ass-yn-group { display: flex; gap: 0.75rem; }
+
+        .ass-yn-group input[type="radio"] { display: none; }
+
+        .ass-yn-group label {
+            flex: 1;
+            text-align: center;
+            padding: 0.6rem 0;
+            border-radius: 8px;
+            border: 1.5px solid rgba(255, 255, 255, 0.14);
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .ass-yn-group input[type="radio"]:checked + label {
+            border-color: var(--green);
+            background: rgba(52, 195, 99, 0.12);
+            color: var(--green);
+        }
+
+        .ass-yn-group label:hover {
+            border-color: rgba(52, 195, 99, 0.45);
+            color: var(--white);
+        }
+
+        /* Multi-choice options */
+        .ass-opts { display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .ass-opts input[type="radio"] { display: none; }
+
+        .ass-opts label {
+            padding: 0.65rem 1rem;
+            border-radius: 8px;
+            border: 1.5px solid rgba(255, 255, 255, 0.11);
+            color: var(--muted);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+            line-height: 1.45;
+        }
+
+        .ass-opts input[type="radio"]:checked + label {
+            border-color: var(--green);
+            background: rgba(52, 195, 99, 0.1);
+            color: var(--white);
+        }
+
+        .ass-opts label:hover {
+            border-color: rgba(52, 195, 99, 0.4);
+            color: var(--white);
+        }
+
+        /* Open text */
+        .ass-textarea {
+            width: 100%;
+            background: var(--darker);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            color: var(--white);
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            padding: 0.75rem 1rem;
+            resize: vertical;
+            min-height: 80px;
+            transition: border-color 0.2s;
+        }
+
+        .ass-textarea:focus {
+            outline: none;
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(52, 195, 99, 0.12);
+        }
+
+        .ass-textarea::placeholder { color: var(--muted); }
+
+        /* Submit */
+        .ass-submit-wrap { margin-top: 2rem; text-align: center; }
+
+        .ass-submit-btn {
+            background: var(--green);
+            color: var(--darkest);
+            font-weight: 700;
+            font-size: 1.05rem;
+            padding: 0.9rem 2.5rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .ass-submit-btn:hover { background: var(--green-dark); }
+        .ass-submit-btn:active { transform: scale(0.98); }
+
+        .ass-submit-note {
+            color: var(--muted);
+            font-size: 0.78rem;
+            margin-top: 0.75rem;
+        }
+
+        /* ── RESULTS PAGE ── */
+        #results-page {
+            display: none;
+            padding-top: 80px;
+            min-height: 100vh;
+            padding-bottom: 4rem;
+        }
+
+        .res-container {
+            max-width: 660px;
+            margin: 0 auto;
+            padding: 2.5rem 1.25rem;
+            text-align: center;
+        }
+
+        .res-score-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            border: 3px solid;
+        }
+
+        .res-score-badge.red    { border-color: #f87171; background: rgba(248,113,113,0.1); color: #f87171; }
+        .res-score-badge.yellow { border-color: #fbbf24; background: rgba(251,191,36,0.1);  color: #fbbf24; }
+        .res-score-badge.green  { border-color: var(--green); background: rgba(52,195,99,0.1); color: var(--green); }
+
+        .res-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 0.75rem;
+        }
+
+        .res-subtitle {
+            color: var(--muted);
+            font-size: 0.97rem;
+            line-height: 1.65;
+            margin-bottom: 2rem;
+        }
+
+        .res-cta-btn {
+            display: inline-block;
+            background: var(--green);
+            color: var(--darkest);
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0.9rem 2rem;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.1s;
+            margin-bottom: 0.5rem;
+        }
+
+        .res-cta-btn:hover { background: var(--green-dark); color: var(--darkest); }
+
+        .res-summary-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: left;
+            margin-top: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .res-summary-card h4 {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--green);
+            margin-bottom: 1rem;
+        }
+
+        .res-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 0.45rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.83rem;
+        }
+
+        .res-summary-row:last-child { border-bottom: none; }
+
+        .res-summary-row .res-label { color: var(--muted); white-space: nowrap; }
+        .res-summary-row .res-val   { font-weight: 600; color: var(--white); text-align: right; }
+
+        .res-footnote {
+            color: var(--muted);
+            font-size: 0.78rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 576px) {
+            .ass-header h1  { font-size: 1.35rem; }
+            .res-title      { font-size: 1.35rem; }
+            .modal-card     { padding: 2rem 1.25rem; }
+            .ass-q          { padding: 1rem 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE-BLOCKING LEAD CAPTURE MODAL
+════════════════════════════════════════════════════════════ -->
+<div id="lead-modal" role="dialog" aria-modal="true" aria-labelledby="modal-heading">
+    <div class="modal-card">
+        <h2 id="modal-heading">Get Your Free DadFit Assessment</h2>
+        <p class="modal-sub">
+            Answer 15 quick questions. Get a personalized fitness roadmap built around your real life as a dad — free, takes 3 minutes.
+        </p>
+
+        <label class="field-label" for="lead-name">Your Name <span style="color:#f87171">*</span></label>
+        <input type="text" id="lead-name" class="field-input" placeholder="e.g. Rahul" autocomplete="given-name">
+        <div class="modal-error" id="err-name">Please enter your name.</div>
+
+        <label class="field-label" for="lead-email">Email Address <span style="color:#f87171">*</span></label>
+        <input type="email" id="lead-email" class="field-input" placeholder="you@example.com" autocomplete="email">
+        <div class="modal-error" id="err-email">Please enter a valid email address.</div>
+
+        <label class="field-label" for="lead-phone">Mobile Number</label>
+        <input type="tel" id="lead-phone" class="field-input" placeholder="+91 98765 43210" autocomplete="tel">
+
+        <button class="btn-start" id="modal-start-btn" onclick="startAssessment()">
+            Start My Free Assessment &#8594;
+        </button>
+        <p class="modal-microcopy">Takes 3 minutes &nbsp;&#183;&nbsp; 100% free &nbsp;&#183;&nbsp; Instant results</p>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     NAV
+════════════════════════════════════════════════════════════ -->
+<nav class="lp-nav" id="lp-nav" aria-label="Main navigation">
+    <div class="lp-nav-inner">
+        <a href="index.html" class="lp-nav-brand" aria-label="DadFit Home">
+            <img src="images/logo.svg" alt="DAD FIT" height="16">
+        </a>
+        <ul class="lp-nav-links" role="list">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#value">Assessment</a></li>
+            <li><a href="index.html#about">My Story</a></li>
+            <li><a href="index.html#faq">FAQ</a></li>
+            <li><a href="resources.html">Resources</a></li>
+            <li><a href="posts.html">Posts</a></li>
+            <li><a href="coffee.html">Coffee</a></li>
+        </ul>
+        <a href="assessment.html" class="lp-nav-cta lp-nav-desktop-cta">Take Assessment &#8594;</a>
+        <button class="lp-nav-toggler" id="lp-toggler" aria-label="Toggle navigation" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+    <div class="lp-nav-drawer" id="lp-drawer">
+        <a href="index.html">Home</a>
+        <a href="index.html#value">Assessment</a>
+        <a href="index.html#about">My Story</a>
+        <a href="index.html#faq">FAQ</a>
+        <a href="resources.html">Resources</a>
+        <a href="posts.html">Posts</a>
+        <a href="coffee.html">Coffee</a>
+        <a href="assessment.html" class="lp-nav-cta">Take Assessment &#8594;</a>
+    </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ASSESSMENT PAGE
+════════════════════════════════════════════════════════════ -->
+<div id="assessment-page">
+    <div class="ass-container">
+
+        <div class="ass-header">
+            <h1>Your Free DadFit Assessment</h1>
+            <p>Answer honestly — the more accurate you are, the better your roadmap.</p>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="ass-progress-wrap">
+            <div class="ass-progress-meta">
+                <span id="ass-progress-label">0 of 15 answered</span>
+                <span id="ass-progress-pct">0%</span>
+            </div>
+            <div class="ass-progress-track">
+                <div class="ass-progress-fill" id="ass-progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- ─── PART 1: LIFESTYLE HABITS (scored) ─── -->
+        <div class="ass-section-title">Part 1 of 2 &nbsp;·&nbsp; Lifestyle Habits &nbsp;·&nbsp; Scored</div>
+
+        <div class="ass-q" id="qcard-1">
+            <div class="ass-q-num">Q1</div>
+            <div class="ass-q-text">Do you exercise at least 2–3 times per week right now?</div>
+            <div class="ass-yn-group">
+                <input type="radio" name="q1" id="q1y" value="Yes" onchange="updateProgress()">
+                <label for="q1y">&#10003; Yes</label>
+                <input type="radio" name="q1" id="q1n" value="No" onchange="updateProgress()">
+                <label for="q1n">&#10007; No</label>
+            </div>
+        </div>
+
+        <div class="ass-q" id="qcard-2">
+            <div class="ass-q-num">Q2</div>
+            <div class="ass-q-text">Do you get 7 or more hours of sleep most nights?</div>
+            <div class="ass-yn-group">
+                <input type="radio" name="q2" id="q2y" value="Yes" onchange="updateProgress()">
+                <label for="q2y">&#10003; Yes</label>
+                <input type="radio" name="q2" id="q2n" value="No" onchange="updateProgress()">
+                <label for="q2n">&#10007; No</label>
+            </div>
+        </div>
+
+        <div class="ass-q" id="qcard-3">
+            <div class="ass-q-num">Q3</div>
+            <div class="ass-q-text">Do you wake up at a consistent time — including weekends?</div>
+            <div class="ass-yn-group">
+                <input type="radio" name="q3" id="q3y" value="Yes" onchange="updateProgress()">
+                <label for="q3y">&#10003; Yes</label>
+                <input type="radio" name="q3" id="q3n" value="No" onchange="updateProgress()">
+                <label for="q3n">&#10007; No</label>
+            </div>
+        </div>
+
+        <div class="ass-q" id="qcard-4">
+            <div class="ass-q-num">Q4</div>
+            <div class="ass-q-text">Do you eat at least 2 balanced meals per day (protein + vegetables)?</div>
+            <div class="ass-yn-group">
+                <input type="radio" name="q4" id="q4y" value="Yes" onchange="updateProgress()">
+                <label for="q4y">&#10003; Yes</label>
+                <input type="radio" name="q4" id="q4n" value="No" onchange="updateProgress()">
+                <label for="q4n">&#10007; No</label>
+            </div>
+        </div>
+
+        <div class="ass-q" id="qcard-5">
+            <div class="ass-q-num">Q5</div>
+            <div class="ass-q-text">Do you drink 2 or more litres of water daily?</div>
+            <div class="ass-yn-group">
+                <input type="radio" name="q5" id="q5y" value="Yes" onchange="updateProgress()">
+                <label for="q5y">&#10003; Yes</label>
+                <input type="radio" name="q5" id="q5n" value="No" onchange="updateProgress()">
+                <label for="q5n">&#10007; No</label>
+            </div>
+        </div>
+
+        <div class="ass-q" id="qcard-6">
+            <div class="ass-q-num">Q6</div>
+            <div class="ass-q-text">Do you carve out dedicated time each week for yourself — not work, not kids?</div>
+            <div class="ass-yn-group">
+                <input type="radio" name="q6" id="q6y" value="Yes" onchange="updateProgress()">
+                <label for="q6y">&#10003; Yes</label>
+                <input type="radio" name="q6" id="q6n" value="No" onchange="updateProgress()">
+                <label for="q6n">&#10007; No</label>
+            </div>
+        </div>
+
+        <div class="ass-q" id="qcard-7">
+            <div class="ass-q-num">Q7</div>
+            <div class="ass-q-text">Do you avoid heavily processed or fast food at least 3 times per week?</div>
+            <div class="ass-yn-group">
+                <input type="radio" name="q7" id="q7y" value="Yes" onchange="updateProgress()">
+                <label for="q7y">&#10003; Yes</label>
+                <input type="radio" name="q7" id="q7n" value="No" onchange="updateProgress()">
+                <label for="q7n">&#10007; No</label>
+            </div>
+        </div>
+
+        <div class="ass-q" id="qcard-8">
+            <div class="ass-q-num">Q8</div>
+            <div class="ass-q-text">Do you have a deliberate practice to manage daily stress?</div>
+            <div class="ass-yn-group">
+                <input type="radio" name="q8" id="q8y" value="Yes" onchange="updateProgress()">
+                <label for="q8y">&#10003; Yes</label>
+                <input type="radio" name="q8" id="q8n" value="No" onchange="updateProgress()">
+                <label for="q8n">&#10007; No</label>
+            </div>
+        </div>
+
+        <div class="ass-q" id="qcard-9">
+            <div class="ass-q-num">Q9</div>
+            <div class="ass-q-text">Were you consistent with a fitness routine for 4+ consecutive weeks at any point in the last year?</div>
+            <div class="ass-yn-group">
+                <input type="radio" name="q9" id="q9y" value="Yes" onchange="updateProgress()">
+                <label for="q9y">&#10003; Yes</label>
+                <input type="radio" name="q9" id="q9n" value="No" onchange="updateProgress()">
+                <label for="q9n">&#10007; No</label>
+            </div>
+        </div>
+
+        <div class="ass-q" id="qcard-10">
+            <div class="ass-q-num">Q10</div>
+            <div class="ass-q-text">Do you actively track or pay attention to what you eat?</div>
+            <div class="ass-yn-group">
+                <input type="radio" name="q10" id="q10y" value="Yes" onchange="updateProgress()">
+                <label for="q10y">&#10003; Yes</label>
+                <input type="radio" name="q10" id="q10n" value="No" onchange="updateProgress()">
+                <label for="q10n">&#10007; No</label>
+            </div>
+        </div>
+
+        <!-- ─── PART 2: QUALIFICATION (not scored) ─── -->
+        <div class="ass-section-title">Part 2 of 2 &nbsp;·&nbsp; Your Situation</div>
+
+        <div class="ass-q" id="qcard-11">
+            <div class="ass-q-num">Q11</div>
+            <div class="ass-q-text">What stage of dadhood are you in right now?</div>
+            <div class="ass-opts">
+                <input type="radio" name="q11" id="q11a" value="Newborn / Infant (0–12 months)" onchange="updateProgress()">
+                <label for="q11a">Newborn / Infant (0–12 months)</label>
+                <input type="radio" name="q11" id="q11b" value="Young kids (1–7 years)" onchange="updateProgress()">
+                <label for="q11b">Young kids (1–7 years)</label>
+                <input type="radio" name="q11" id="q11c" value="School-age kids (8–14 years)" onchange="updateProgress()">
+                <label for="q11c">School-age kids (8–14 years)</label>
+                <input type="radio" name="q11" id="q11d" value="Teenagers (15–18 years)" onchange="updateProgress()">
+                <label for="q11d">Teenagers (15–18 years)</label>
+                <input type="radio" name="q11" id="q11e" value="Kids grown up / Independent" onchange="updateProgress()">
+                <label for="q11e">Kids grown up / Independent</label>
+            </div>
+        </div>
+
+        <div class="ass-q" id="qcard-12">
+            <div class="ass-q-num">Q12</div>
+            <div class="ass-q-text">If you hit one big win in the next 90 days, what would it be?</div>
+            <div class="ass-opts">
+                <input type="radio" name="q12" id="q12a" value="Lose belly fat and look better" onchange="updateProgress()">
+                <label for="q12a">Lose belly fat and look better</label>
+                <input type="radio" name="q12" id="q12b" value="Build consistent energy throughout the day" onchange="updateProgress()">
+                <label for="q12b">Build consistent energy throughout the day</label>
+                <input type="radio" name="q12" id="q12c" value="Get stronger and feel more capable" onchange="updateProgress()">
+                <label for="q12c">Get stronger and feel more capable</label>
+                <input type="radio" name="q12" id="q12d" value="Fix my sleep and recovery" onchange="updateProgress()">
+                <label for="q12d">Fix my sleep and recovery</label>
+                <input type="radio" name="q12" id="q12e" value="Build a lasting fitness habit" onchange="updateProgress()">
+                <label for="q12e">Build a lasting fitness habit</label>
+            </div>
+        </div>
+
+        <div class="ass-q" id="qcard-13">
+            <div class="ass-q-num">Q13</div>
+            <div class="ass-q-text">What has stopped you from staying consistent in the past?</div>
+            <div class="ass-opts">
+                <input type="radio" name="q13" id="q13a" value="No time — life gets in the way" onchange="updateProgress()">
+                <label for="q13a">No time — life gets in the way</label>
+                <input type="radio" name="q13" id="q13b" value="I start strong but fall off after 2–3 weeks" onchange="updateProgress()">
+                <label for="q13b">I start strong but fall off after 2–3 weeks</label>
+                <input type="radio" name="q13" id="q13c" value="I don't have a clear plan that fits my life" onchange="updateProgress()">
+                <label for="q13c">I don't have a clear plan that fits my life</label>
+                <input type="radio" name="q13" id="q13d" value="My diet is all over the place" onchange="updateProgress()">
+                <label for="q13d">My diet is all over the place</label>
+                <input type="radio" name="q13" id="q13e" value="Injury, pain, or physical limitations" onchange="updateProgress()">
+                <label for="q13e">Injury, pain, or physical limitations</label>
+            </div>
+        </div>
+
+        <div class="ass-q" id="qcard-14">
+            <div class="ass-q-num">Q14</div>
+            <div class="ass-q-text">What kind of support would help you most right now?</div>
+            <div class="ass-opts">
+                <input type="radio" name="q14" id="q14a" value="Free content — I'll follow tutorials on my own" onchange="updateProgress()">
+                <label for="q14a">Free content — I'll follow tutorials on my own</label>
+                <input type="radio" name="q14" id="q14b" value="One-time expert session — get a clear plan fast" onchange="updateProgress()">
+                <label for="q14b">One-time expert session — get a clear plan fast</label>
+                <input type="radio" name="q14" id="q14c" value="Structured 1:1 coaching with ongoing accountability" onchange="updateProgress()">
+                <label for="q14c">Structured 1:1 coaching with ongoing accountability</label>
+            </div>
+        </div>
+
+        <div class="ass-q" id="qcard-15">
+            <div class="ass-q-num">Q15</div>
+            <div class="ass-q-text">
+                Anything else you want me to know?
+                <span style="color:var(--muted);font-weight:400;font-size:0.85rem"> (optional)</span>
+            </div>
+            <textarea id="q15" class="ass-textarea"
+                      placeholder="Share anything — your biggest challenge, a past attempt, what's really going on..."
+                      oninput="updateProgress()"></textarea>
+        </div>
+
+        <div class="ass-submit-wrap">
+            <button class="ass-submit-btn" onclick="submitAssessment()">
+                See My Results &#8594;
+            </button>
+            <p class="ass-submit-note">Your answers are private and only used to build your roadmap.</p>
+        </div>
+
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     RESULTS PAGE (hidden until submission)
+════════════════════════════════════════════════════════════ -->
+<div id="results-page">
+    <div class="res-container">
+
+        <div id="res-badge" class="res-score-badge"></div>
+        <h2 id="res-title" class="res-title"></h2>
+        <p id="res-subtitle" class="res-subtitle"></p>
+        <a id="res-cta" href="#" class="res-cta-btn"></a>
+
+        <div class="res-summary-card">
+            <h4>Your Summary</h4>
+            <div class="res-summary-row">
+                <span class="res-label">Score</span>
+                <span class="res-val" id="res-score-text"></span>
+            </div>
+            <div class="res-summary-row">
+                <span class="res-label">Dad Stage</span>
+                <span class="res-val" id="res-q11"></span>
+            </div>
+            <div class="res-summary-row">
+                <span class="res-label">90-Day Goal</span>
+                <span class="res-val" id="res-q12"></span>
+            </div>
+            <div class="res-summary-row">
+                <span class="res-label">Biggest Obstacle</span>
+                <span class="res-val" id="res-q13"></span>
+            </div>
+            <div class="res-summary-row">
+                <span class="res-label">Support Preferred</span>
+                <span class="res-val" id="res-q14"></span>
+            </div>
+        </div>
+
+        <p class="res-footnote">Your results have been noted. Raghu will review your responses personally.</p>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HIDDEN ZOHO CRM FORM — submits in background via hidden iframe
+     Fields: Last Name, Email, Mobile, LEADCF5 (Assessment)
+     Source: crm_assessment_webform.html
+════════════════════════════════════════════════════════════ -->
+<iframe name="zoho-hidden-frame" id="zoho-hidden-frame" style="display:none" aria-hidden="true" title=""></iframe>
+<form id="zoho-form"
+      action="https://crm.zoho.in/crm/WebToLeadForm"
+      name="WebToLeads1166383000001228034"
+      method="POST"
+      target="zoho-hidden-frame"
+      accept-charset="UTF-8"
+      style="display:none">
+    <!-- Required hidden tokens — do not modify -->
+    <input type="hidden" name="xnQsjsdp" value="63ead44e04505992658e340ba8933d5ed6551fcb152972a33e3f823876a720c0">
+    <input type="hidden" name="zc_gad" id="zc_gad" value="">
+    <input type="hidden" name="xmIwtLD" value="86122864b37784974aef628c0de3b9261c869610dfee1d3028fb7cab2a66263e3078fabf1ed08e4dc72c64178feada50">
+    <input type="hidden" name="actionType" value="TGVhZHM=">
+    <input type="hidden" name="returnURL" value="https://dadfit.in/assessment.html#">
+    <input type="hidden" name="aG9uZXlwb3Q" value="">
+    <!-- Lead data fields -->
+    <input type="hidden" name="Last Name" id="crm-name">
+    <input type="hidden" name="Email" id="crm-email">
+    <input type="hidden" name="Mobile" id="crm-mobile">
+    <input type="hidden" name="LEADCF5" id="crm-assessment">
+</form>
+
+<!-- Zoho Analytics — do not remove -->
+<script id="wf_anal" src="https://crm.zohopublic.in/crm/WebFormAnalyticsServeServlet?rid=2b310b7b6eb9c24cdd4a050ba5e7ff21b5bc554c351bd59a8676203fa9b30fc564dc2ab3717b260dcf887e742d21d608gid3a2da84c69312913c943d9de4bf14f82719ca1bc8b9d14c151242237f157becdgid91a8a43fd449f62a566c44d888563142139c7bb89f5af6f3c72b51e64cba0dd7gid681f841bebfbc3207dd7995c9a5bf3de5918fdb2899a0833e8170029e8f8b88d&tw=08a8fa849cbc88712855e42bbc62523418d4ffc416025229af533ff0b700c9c4"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    // ── NAV HAMBURGER ──────────────────────────────────────────
+    document.getElementById('lp-toggler').addEventListener('click', function () {
+        var drawer = document.getElementById('lp-drawer');
+        var expanded = this.getAttribute('aria-expanded') === 'true';
+        this.setAttribute('aria-expanded', String(!expanded));
+        drawer.classList.toggle('open');
+    });
+
+    // ── LEAD DATA (captured from modal) ───────────────────────
+    var leadName = '', leadEmail = '', leadPhone = '';
+
+    // ── MODAL: validate & dismiss ─────────────────────────────
+    window.startAssessment = function () {
+        var nameVal  = document.getElementById('lead-name').value.trim();
+        var emailVal = document.getElementById('lead-email').value.trim();
+        var valid    = true;
+
+        document.getElementById('err-name').style.display  = 'none';
+        document.getElementById('err-email').style.display = 'none';
+
+        if (!nameVal) {
+            document.getElementById('err-name').style.display = 'block';
+            valid = false;
+        }
+        if (!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+            document.getElementById('err-email').style.display = 'block';
+            valid = false;
+        }
+        if (!valid) return;
+
+        leadName  = nameVal;
+        leadEmail = emailVal;
+        leadPhone = document.getElementById('lead-phone').value.trim();
+
+        document.getElementById('lead-modal').style.display = 'none';
+    };
+
+    // Also allow Enter key on modal inputs
+    ['lead-name', 'lead-email', 'lead-phone'].forEach(function (id) {
+        document.getElementById(id).addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') window.startAssessment();
+        });
+    });
+
+    // ── PROGRESS BAR ──────────────────────────────────────────
+    window.updateProgress = function () {
+        var answered = 0;
+        for (var i = 1; i <= 14; i++) {
+            if (document.querySelector('input[name="q' + i + '"]:checked')) answered++;
+        }
+        if (document.getElementById('q15').value.trim()) answered++;
+        var pct = Math.round((answered / 15) * 100);
+        document.getElementById('ass-progress-fill').style.width = pct + '%';
+        document.getElementById('ass-progress-label').textContent = answered + ' of 15 answered';
+        document.getElementById('ass-progress-pct').textContent   = pct + '%';
+    };
+
+    // ── SUBMIT ASSESSMENT ─────────────────────────────────────
+    window.submitAssessment = function () {
+        function getRadio(name) {
+            var el = document.querySelector('input[name="' + name + '"]:checked');
+            return el ? el.value : null;
+        }
+
+        var a = {
+            q1:  getRadio('q1'),  q2:  getRadio('q2'),  q3:  getRadio('q3'),
+            q4:  getRadio('q4'),  q5:  getRadio('q5'),  q6:  getRadio('q6'),
+            q7:  getRadio('q7'),  q8:  getRadio('q8'),  q9:  getRadio('q9'),
+            q10: getRadio('q10'), q11: getRadio('q11'), q12: getRadio('q12'),
+            q13: getRadio('q13'), q14: getRadio('q14'),
+            q15: document.getElementById('q15').value.trim()
+        };
+
+        // Validate Q1–Q10
+        for (var i = 1; i <= 10; i++) {
+            if (!a['q' + i]) {
+                alert('Please answer Question ' + i + ' before submitting.');
+                document.getElementById('qcard-' + i).scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+        }
+        // Validate Q11–Q14
+        for (var j = 11; j <= 14; j++) {
+            if (!a['q' + j]) {
+                alert('Please answer Question ' + j + ' before submitting.');
+                document.getElementById('qcard-' + j).scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+        }
+
+        // Score: Q1–Q10, Yes = 1 point
+        var score = 0;
+        for (var k = 1; k <= 10; k++) {
+            if (a['q' + k] === 'Yes') score++;
+        }
+
+        // Build Markdown → LEADCF5
+        var md = buildMarkdown(a, score);
+
+        // Populate & submit hidden CRM form (fires in background iframe)
+        document.getElementById('crm-name').value       = leadName;
+        document.getElementById('crm-email').value      = leadEmail;
+        document.getElementById('crm-mobile').value     = leadPhone;
+        document.getElementById('crm-assessment').value = md;
+        document.getElementById('zoho-form').submit();
+
+        // Show results immediately
+        showResults(a, score);
+    };
+
+    // ── BUILD MARKDOWN ────────────────────────────────────────
+    function buildMarkdown(a, score) {
+        var band = score >= 8 ? 'Strong Foundation (8–10)'
+                 : score >= 5 ? 'Building Blocks (5–7)'
+                 :              'Starting Point (0–4)';
+
+        var lines = [
+            '# DadFit Assessment Results',
+            '',
+            '**Name:** '  + leadName,
+            '**Email:** ' + leadEmail,
+            '**Phone:** ' + (leadPhone || '—'),
+            '**Score:** ' + score + '/10 — ' + band,
+            '',
+            '## Part 1 – Lifestyle Habits (Scored)',
+            '',
+            '| # | Question | Answer |',
+            '|---|----------|--------|',
+            '| Q1  | Exercise 2–3x/week?                             | **' + a.q1  + '** |',
+            '| Q2  | 7+ hours sleep most nights?                     | **' + a.q2  + '** |',
+            '| Q3  | Consistent wake-up time incl. weekends?         | **' + a.q3  + '** |',
+            '| Q4  | 2+ balanced meals/day (protein + veg)?          | **' + a.q4  + '** |',
+            '| Q5  | 2+ litres water daily?                          | **' + a.q5  + '** |',
+            '| Q6  | Dedicated weekly time block for yourself?       | **' + a.q6  + '** |',
+            '| Q7  | Avoid heavy processed/fast food 3x+/week?       | **' + a.q7  + '** |',
+            '| Q8  | Deliberate stress management practice?          | **' + a.q8  + '** |',
+            '| Q9  | Consistent 4+ consecutive weeks in last year?   | **' + a.q9  + '** |',
+            '| Q10 | Track or pay attention to what you eat?         | **' + a.q10 + '** |',
+            '',
+            '## Part 2 – Qualification',
+            '',
+            '**Q11 – Dad Stage:** '        + a.q11,
+            '**Q12 – 90-Day Goal:** '       + a.q12,
+            '**Q13 – What Stopped You:** '  + a.q13,
+            '**Q14 – Support Preferred:** ' + a.q14,
+            '**Q15 – Additional Notes:** '  + (a.q15 || '—'),
+            '',
+            '---',
+            '**Result Band:** ' + band
+        ];
+
+        return lines.join('\n');
+    }
+
+    // ── SHOW RESULTS ──────────────────────────────────────────
+    function contactUrl(intent, a, score) {
+        var p = new URLSearchParams();
+        if (leadName)  p.set('name',  leadName);
+        if (leadEmail) p.set('email', leadEmail);
+        if (leadPhone) p.set('phone', leadPhone);
+        if (intent)    p.set('intent', intent);
+        if (a) {
+            if (a.q12) p.set('goal',     a.q12);
+            if (a.q13) p.set('obstacle', a.q13);
+            if (a.q1)  p.set('q1',       a.q1);
+        }
+        if (typeof score === 'number') p.set('score', score);
+        return 'contact.html?' + p.toString();
+    }
+
+    function showResults(a, score) {
+        var support   = a.q14 || '';
+        var isFree    = support.indexOf('Free content')  !== -1;
+        var isOneTime = support.indexOf('One-time')      !== -1;
+        var is1on1    = support.indexOf('1:1')           !== -1;
+
+        var ctaUrl = contactUrl('1on1', a, score), ctaLabel = 'Apply for 1:1 Coaching →';
+
+        if (score <= 4) {
+            if (is1on1) {
+                ctaUrl = contactUrl('1on1', a, score); ctaLabel = 'Apply for 1:1 Coaching →';
+            } else {
+                ctaUrl = 'https://www.youtube.com/playlist?list=PLPp5lrulpyPcG5hE_8WXX1irRDNqNLF-U'; ctaLabel = 'Watch Free Tutorials →';
+            }
+        } else if (score <= 7) {
+            if (is1on1) {
+                ctaUrl = contactUrl('1on1', a, score); ctaLabel = 'Apply for 1:1 Coaching →';
+            } else if (isOneTime) {
+                ctaUrl = contactUrl('consultation', a, score); ctaLabel = 'Book a One-Time Consultation →';
+            } else {
+                ctaUrl = 'https://www.youtube.com/playlist?list=PLPp5lrulpyPcG5hE_8WXX1irRDNqNLF-U'; ctaLabel = 'Watch Free Tutorials →';
+            }
+        } else {
+            if (isFree) {
+                ctaUrl = contactUrl('consultation', a, score); ctaLabel = 'Book a One-Time Consultation →';
+            } else {
+                ctaUrl = contactUrl('1on1', a, score); ctaLabel = 'Apply for 1:1 Coaching →';
+            }
+        }
+
+        var badge    = document.getElementById('res-badge');
+        var title    = document.getElementById('res-title');
+        var subtitle = document.getElementById('res-subtitle');
+
+        if (score <= 4) {
+            badge.className   = 'res-score-badge red';
+            badge.textContent = score + '/10';
+            title.textContent = 'Time to Lay the Foundation';
+            subtitle.textContent = "You're at the start of the journey — and that's exactly the right place to begin. Small, consistent changes will create visible results fast. Here's where to start.";
+        } else if (score <= 7) {
+            badge.className   = 'res-score-badge yellow';
+            badge.textContent = score + '/10';
+            title.textContent = "You're Closer Than You Think";
+            subtitle.textContent = "You have some solid habits in place — but there are clear gaps holding you back. With the right structure, you could be a different version of yourself in 90 days.";
+        } else {
+            badge.className   = 'res-score-badge green';
+            badge.textContent = score + '/10';
+            title.textContent = 'Strong Foundations, Missing the System';
+            subtitle.textContent = "You're already doing more right than most dads. What's missing is a structured system to take you from 'pretty good' to genuinely great. Let's build that.";
+        }
+
+        document.getElementById('res-cta').href        = ctaUrl;
+        document.getElementById('res-cta').textContent = ctaLabel;
+        document.getElementById('res-score-text').textContent = score + '/10 — ' +
+            (score >= 8 ? 'Strong Foundation' : score >= 5 ? 'Building Blocks' : 'Starting Point');
+        document.getElementById('res-q11').textContent = a.q11 || '—';
+        document.getElementById('res-q12').textContent = a.q12 || '—';
+        document.getElementById('res-q13').textContent = a.q13 || '—';
+        document.getElementById('res-q14').textContent = a.q14 || '—';
+
+        document.getElementById('assessment-page').style.display = 'none';
+        document.getElementById('results-page').style.display    = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+}());
+</script>
+
+</body>
+</html>

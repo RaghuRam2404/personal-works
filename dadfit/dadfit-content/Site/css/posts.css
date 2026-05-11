@@ -1,0 +1,682 @@
+/* Post Page Specific Styles */
+body {
+    overflow-x: hidden;
+}
+
+.post-hero {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, #2a2a2a 100%);
+    padding: 160px 0 80px;
+    position: relative;
+    overflow: hidden;
+}
+
+.post-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at top right, rgba(52, 195, 99, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.post-hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.post-category {
+    display: inline-block;
+    background: rgba(52, 195, 99, 0.2);
+    color: var(--primary-green);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1.5rem;
+}
+
+.post-hero h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--primary-white);
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.post-meta {
+    display: flex;
+    gap: 2rem;
+    color: var(--primary-gray);
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.post-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.post-excerpt {
+    font-size: 1.25rem;
+    color: var(--primary-gray);
+    line-height: 1.6;
+}
+
+.post-content-section {
+    background-color: var(--primary-dark);
+    padding: 80px 0;
+}
+
+.post-content {
+    max-width: 800px;
+    margin: 0 auto;
+    color: var(--primary-white);
+}
+
+.post-content h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-white);
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--primary-green);
+}
+
+.post-content h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-green);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.post-content p {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--primary-gray);
+    margin-bottom: 1.5rem;
+}
+
+.post-content strong {
+    color: var(--primary-white);
+    font-weight: 600;
+}
+
+.post-content ul,
+.post-content ol {
+    margin-bottom: 2rem;
+    padding-left: 2rem;
+}
+
+.post-content li {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--primary-gray);
+    margin-bottom: 0.75rem;
+}
+
+.workout-card {
+    background: linear-gradient(145deg, #252525 0%, #1a1a1a 100%);
+    border: 1px solid rgba(52, 195, 99, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 2rem 0;
+}
+
+.workout-card h3 {
+    margin-top: 0;
+}
+
+.workout-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(52, 195, 99, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(52, 195, 99, 0.15);
+}
+
+.workout-meta-item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.workout-meta-label {
+    font-size: 0.875rem;
+    color: var(--primary-gray);
+    font-weight: 400;
+}
+
+.workout-meta-value {
+    font-size: 1.125rem;
+    color: var(--primary-green);
+    font-weight: 700;
+}
+
+.exercise-list {
+    list-style: none;
+    padding: 0;
+}
+
+.exercise-list li {
+    background: rgba(52, 195, 99, 0.05);
+    border-left: 3px solid var(--primary-green);
+    padding: 1rem 1.5rem;
+    margin-bottom: 0.75rem;
+    border-radius: 4px;
+}
+
+.exercise-list li strong {
+    color: var(--primary-green);
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    margin: 2rem 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+.comparison-table {
+    width: 100%;
+    min-width: 600px;
+    margin: 0;
+    border-collapse: collapse;
+    background: linear-gradient(145deg, #252525 0%, #1a1a1a 100%);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: 1.25rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comparison-table th {
+    background: rgba(52, 195, 99, 0.2);
+    color: var(--primary-white);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.875rem;
+}
+
+.comparison-table td {
+    color: var(--primary-gray);
+}
+
+.comparison-table tr:last-child td {
+    border-bottom: none;
+}
+
+.highlight-box {
+    background: rgba(52, 195, 99, 0.1);
+    border: 1px solid rgba(52, 195, 99, 0.3);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+}
+
+.highlight-box.warning {
+    background: rgba(255, 171, 0, 0.1);
+    border: 1px solid rgba(255, 171, 0, 0.4);
+}
+
+.highlight-box.warning strong {
+    color: #ffab00;
+}
+
+.highlight-box p:last-child {
+    margin-bottom: 0;
+}
+
+.cta-section {
+    background: linear-gradient(135deg, rgba(52, 195, 99, 0.1) 0%, rgba(52, 195, 99, 0.05) 100%);
+    border: 2px solid rgba(52, 195, 99, 0.3);
+    border-radius: 16px;
+    padding: 3rem;
+    margin: 4rem 0;
+    text-align: center;
+}
+
+.cta-section h3 {
+    color: var(--primary-white);
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.cta-section p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.back-to-posts {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary-green);
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    transition: all 0.2s ease;
+}
+
+.back-to-posts:hover {
+    color: var(--primary-white);
+    transform: translateX(-4px);
+}
+
+.back-to-posts::before {
+    content: '←';
+    font-size: 1.25rem;
+}
+
+/* Protocol Card Styles */
+.protocol-card {
+    background: linear-gradient(145deg, #252525 0%, #1a1a1a 100%);
+    border: 1px solid rgba(52, 195, 99, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 2rem 0;
+}
+
+.protocol-card h3 {
+    margin-top: 0;
+    color: var(--primary-white);
+    border-bottom: 2px solid var(--primary-green);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.protocol-step {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(52, 195, 99, 0.05);
+    border-radius: 12px;
+    border-left: 3px solid var(--primary-green);
+}
+
+.protocol-step:last-child {
+    margin-bottom: 0;
+}
+
+.step-number {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-green);
+    color: var(--primary-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-content h4 {
+    color: var(--primary-white);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.step-content p {
+    color: var(--primary-gray);
+    margin-bottom: 0.75rem;
+}
+
+.step-content p:last-child {
+    margin-bottom: 0;
+}
+
+.step-content ul {
+    margin-top: 0.75rem;
+    padding-left: 1.5rem;
+}
+
+.step-content li {
+    color: var(--primary-gray);
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.protocol-card.summary {
+    background: linear-gradient(135deg, rgba(52, 195, 99, 0.15) 0%, rgba(52, 195, 99, 0.05) 100%);
+    border: 2px solid rgba(52, 195, 99, 0.4);
+}
+
+.summary-item {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.summary-item:last-child {
+    margin-bottom: 0;
+}
+
+.summary-item h4 {
+    color: var(--primary-green);
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.summary-item p {
+    margin-bottom: 0;
+}
+
+/* Checklist Styles */
+.checklist {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+}
+
+.checklist li {
+    background: rgba(52, 195, 99, 0.05);
+    border-left: 3px solid var(--primary-green);
+    padding: 1rem 1.5rem;
+    margin-bottom: 0.75rem;
+    border-radius: 4px;
+    position: relative;
+    padding-left: 3rem;
+}
+
+.checklist li::before {
+    content: '✓';
+    color: var(--primary-green);
+    font-size: 1.25rem;
+    font-weight: 700;
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* CTA Box Styles */
+.cta-box {
+    background: linear-gradient(135deg, rgba(52, 195, 99, 0.1) 0%, rgba(52, 195, 99, 0.05) 100%);
+    border: 2px solid rgba(52, 195, 99, 0.3);
+    border-radius: 16px;
+    padding: 3rem;
+    margin: 4rem 0;
+    text-align: center;
+}
+
+.cta-box h3 {
+    color: var(--primary-white);
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    border: none;
+    padding: 0;
+}
+
+.cta-box p {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+}
+
+.cta-box p:last-of-type {
+    margin-bottom: 0;
+}
+
+.inline-link {
+    color: var(--primary-green);
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.inline-link:hover {
+    color: var(--primary-white);
+}
+
+/* Post Footer Styles */
+.post-footer {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.post-footer p {
+    font-size: 1.125rem;
+    line-height: 1.8;
+}
+
+.post-footer strong {
+    color: var(--primary-green);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .post-hero {
+        padding: 140px 0 60px;
+    }
+    
+    .post-hero h1 {
+        font-size: 2rem;
+    }
+    
+    .post-excerpt {
+        font-size: 1.125rem;
+    }
+    
+    .post-content-section {
+        padding: 60px 0;
+    }
+    
+    .post-content h2 {
+        font-size: 1.5rem;
+    }
+    
+    .post-content h3 {
+        font-size: 1.25rem;
+    }
+    
+    .post-content p,
+    .post-content li {
+        font-size: 1rem;
+    }
+    
+    .workout-card,
+    .highlight-box,
+    .protocol-card {
+        padding: 1.5rem;
+    }
+    
+    .cta-section,
+    .cta-box {
+        padding: 2rem 1.5rem;
+    }
+    
+    .protocol-step {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .step-number {
+        width: 36px;
+        height: 36px;
+        font-size: 1.125rem;
+    }
+    
+    .step-content h4 {
+        font-size: 1.125rem;
+    }
+    
+    .checklist li {
+        padding: 0.875rem 1.25rem;
+        padding-left: 2.75rem;
+    }
+    
+    .checklist li::before {
+        left: 0.875rem;
+        font-size: 1.125rem;
+    }
+    
+    .summary-item {
+        padding: 1.25rem;
+    }
+    
+    .post-footer {
+        margin-top: 3rem;
+        padding-top: 2rem;
+    }
+    
+    .comparison-table {
+        min-width: 100%;
+        font-size: 0.8125rem;
+    }
+    
+    .comparison-table th,
+    .comparison-table td {
+        padding: 0.875rem 0.75rem;
+        font-size: 0.8125rem;
+    }
+    
+    .workout-meta {
+        gap: 1rem;
+    }
+}
+
+/* Food Tables */
+.food-table {
+    width: 100%;
+    margin: 2rem 0;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.food-table thead {
+    background: rgba(52, 195, 99, 0.1);
+}
+
+.food-table thead.red-header {
+    background: rgba(195, 52, 52, 0.1);
+}
+
+.food-table thead.orange-header {
+    background: rgba(255, 165, 52, 0.1);
+}
+
+.food-table thead.blue-header {
+    background: rgba(52, 152, 219, 0.1);
+}
+
+.food-table th {
+    color: #FFFFFF;
+    padding: 1rem;
+    border: none;
+    font-weight: 600;
+    text-align: left;
+}
+
+.food-table td {
+    padding: 1rem;
+    border: none;
+    line-height: 1.6;
+}
+
+.food-table tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.food-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.food-table .cell-number {
+    color: var(--primary-gray);
+}
+
+.food-table .cell-food-name {
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+.food-table .cell-calories {
+    color: var(--primary-green);
+    font-weight: 600;
+}
+
+.food-table .cell-calories.red {
+    color: #ff6b6b;
+}
+
+.food-table .cell-calories.orange {
+    color: #ffa94d;
+}
+
+.food-table .cell-calories.blue {
+    color: #3498db;
+}
+
+.food-table .cell-description {
+    color: var(--primary-gray);
+}
+
+@media (max-width: 480px) {
+    .post-hero h1 {
+        font-size: 1.75rem;
+    }
+    
+    .comparison-table {
+        font-size: 0.75rem;
+    }
+    
+    .comparison-table th,
+    .comparison-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .food-table th,
+    .food-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .protocol-card,
+    .cta-box,
+    .highlight-box {
+        padding: 1.25rem;
+    }
+    
+    .cta-box h3 {
+        font-size: 1.5rem;
+    }
+    
+    .protocol-step {
+        padding: 0.875rem;
+    }
+    
+    .step-number {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+}
