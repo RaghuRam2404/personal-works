@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DadFit Carousel Viewer</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- ── Left panel: carousel list ── -->
+  <aside id="sidebar">
+    <div id="sidebar-header">
+      <div id="brand">🎠 DadFit</div>
+      <div id="progress-chips">
+        <span class="chip chip-created"  id="count-HTML_CREATED">—</span>
+        <span class="chip chip-doodles"  id="count-DOODLES_DONE">—</span>
+        <span class="chip chip-approved" id="count-HTML_APPROVED">—</span>
+      </div>
+      <input id="search" type="text" placeholder="Search…" autocomplete="off">
+    </div>
+
+    <ul id="carousel-list"></ul>
+  </aside>
+
+  <!-- ── Right panel: preview + action ── -->
+  <main id="preview-panel">
+    <div id="preview-toolbar">
+      <div id="preview-meta">
+        <span id="preview-title">Select a carousel</span>
+        <span id="preview-badges"></span>
+      </div>
+      <button id="action-btn" class="action-btn" disabled>—</button>
+    </div>
+    <iframe id="preview-frame" src="about:blank" title="Carousel Preview"></iframe>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

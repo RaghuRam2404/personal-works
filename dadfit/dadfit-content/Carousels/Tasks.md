@@ -105,13 +105,25 @@ Track every task top to bottom. Do not move to the next phase until all tasks in
   - Creates folder: `Carousels/data/batch_{batch_no}/{running_no}_{uuid}/`
   - Saves `carousel.html` and `Prompts.md` per carousel
   - Updates DB: sets `folder_name = {running_no}_{uuid}`, `current_stage = HTML_CREATED`
-- [ ] **8.3** Test: Verify 100 HTML files exist, open 3–5 manually to check output
+- [x] **8.3** Test: Verify 100 HTML files exist, open 3–5 manually to check output
 
-### Step 9: Create Doodles (Manual)
-- [ ] **9.1** For each carousel, hand-draw or source doodle images
-- [ ] **9.2** Place doodle images into `Carousels/data/batch_{batch_no}/{folder_name}/doodles/`
-- [ ] **9.3** After placing doodles for a carousel, manually set `current_stage = DOODLES_DONE` in DB
-- [ ] **9.4** Repeat 9.1–9.3 for all 100 carousels
+### Step 8b: Web Carousel Viewer & Approver
+- [ ] **8b.1** Build a local web server (`Carousels/scripts/carousel_viewer.py`) that:
+  - Lists all carousels for a batch with running_no, title, category, current_stage
+  - Renders each carousel's `carousel.html` in an iframe / embedded preview
+  - Shows doodle images from `doodles/` alongside the carousel if they exist
+  - Has a **Mark Doodles Done** button (enabled when stage = `HTML_CREATED`) → sets `current_stage = DOODLES_DONE` in DB
+  - Has an **Approve** button (enabled only when stage = `DOODLES_DONE`) → sets `current_stage = HTML_APPROVED` in DB
+  - Shows a progress bar: `HTML_CREATED | DOODLES_DONE | HTML_APPROVED` counts at a glance
+  - Runs entirely locally — no external dependencies beyond Python stdlib + SQLite
+- [ ] **8b.2** Test: Start server, place doodles for 1 carousel, click Mark Doodles Done → verify `DOODLES_DONE`; then click Approve → verify `HTML_APPROVED`
+
+### Step 9: Create Doodles (Manual) + Approve via Web Viewer
+- [ ] **9.1** For each `HTML_CREATED` carousel, generate doodle images using prompts from `doodle_prompts.json`
+- [ ] **9.2** Place doodle images into `Carousels/data/batch_{batch_no}/doodles/` (shared batch doodles folder)
+- [ ] **9.3** Open the Step 8b web viewer, review the carousel with doodles, click **Mark Doodles Done** → `DOODLES_DONE`
+- [ ] **9.4** Review the full carousel visually in the viewer, click **Approve** → `HTML_APPROVED`
+- [ ] **9.5** Repeat 9.1–9.4 for all 100 carousels
 
 ### Step 10: Convert HTML to Slide Images
 - [ ] **10.1** Create `Carousels/skills/step10-html-to-images/SKILL.md`
@@ -193,7 +205,7 @@ Once the pipeline is built, use this for every new batch:
 - [ ] Run Step 6 (CTA writer)
 - [ ] Run Step 7 (caption writer)
 - [ ] Run Step 8 (HTML builder)
-- [ ] Complete Step 9 manually (doodles) — set `DOODLES_DONE` in DB
+- [ ] Step 9 (manual, via web viewer): place doodles → Mark Doodles Done → `DOODLES_DONE`, then Approve → `HTML_APPROVED`
 - [ ] Run Step 10 (HTML → images)
 - [ ] Run Step 11 (music chooser)
 - [ ] Each day: Run Step 12 (publish queue) → upload manually → update DB

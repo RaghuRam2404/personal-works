@@ -30,6 +30,7 @@ STAGE_ORDER = [
     "CAPTION_WRITTEN",
     "HTML_CREATED",
     "DOODLES_DONE",
+    "HTML_APPROVED",
     "IMAGES_CREATED",
     "MUSIC_CHOSEN",
     "READY_TO_PUBLISH",
@@ -45,8 +46,9 @@ STAGE_TO_STEP = {
     "SCRIPT_WRITTEN":   "Step 6  — Run CTA writer skill",
     "CTA_WRITTEN":      "Step 7  — Run caption writer skill",
     "CAPTION_WRITTEN":  "Step 8  — Run HTML builder skill",
-    "HTML_CREATED":     "Step 9  — MANUAL: Place doodles, then set current_stage = DOODLES_DONE",
-    "DOODLES_DONE":     "Step 10 — Run HTML-to-images skill (Puppeteer)",
+    "HTML_CREATED":     "Step 9  — MANUAL: Place doodles in doodles/ folder, then mark DOODLES_DONE via web viewer",
+    "DOODLES_DONE":     "Step 8b — Open web viewer (carousel_viewer.py), review carousel + doodles, click Approve → HTML_APPROVED",
+    "HTML_APPROVED":    "Step 10 — Run HTML-to-images skill (Puppeteer)",
     "IMAGES_CREATED":   "Step 11 — Run music chooser skill (10 agents)",
     "MUSIC_CHOSEN":     "→ All production done. Set current_stage = READY_TO_PUBLISH",
     "READY_TO_PUBLISH": "Step 12 — Run publish queue skill, upload manually",
@@ -119,25 +121,30 @@ def cmd_next(batch_no):
 def cmd_stuck(batch_no):
     conn = get_conn()
     c = conn.cursor()
-    # Show carousels sitting at HTML_CREATED (waiting for manual doodles)
-    query = "SELECT uuid, title, batch_no, folder_name FROM Carousel WHERE current_stage = 'HTML_CREATED'"
-    params = []
-    if batch_no:
-        query += " AND batch_no = ?"
-        params.append(batch_no)
-    c.execute(query, params)
-    rows = c.fetchall()
-    conn.close()
-
-    if not rows:
-        print("\n  ✓ No carousels stuck waiting for doodles.\n")
-        return
-
-    print(f"\n  ⚠ {len(rows)} carousel(s) waiting for manual doodles (HTML_CREATED):\n")
-    for uuid, title, batch, folder in rows:
-        print(f"    [{batch}] {title}")
-        print(f"           folder → data/batch_{batch}/{folder}/doodles/")
-        print(f"           uuid   → {uuid}\n")
+    # Show carousels stuck at HTML_CREATED (need approval via web viewer)
+    # or HTML_APPROVED (need doodles placed)
+    for stuck_stage, hint in [
+        ("HTML_CREATED",  "needs doodles placed in doodles/ folder, then marked DOODLES_DONE via web viewer"),
+        ("DOODLES_DONE",  "needs review + approval in web viewer (Step 8b) → HTML_APPROVED"),
+    ]:
+        query = (
+            "SELECT uuid, title, batch_no, folder_name FROM Carousel "
+            f"WHERE current_stage = '{stuck_stage}'"
+        )
+        params = []
+        if batch_no:
+            query += " AND batch_no = ?"
+            params.append(batch_no)
+        c.execute(query, params)
+        rows = c.fetchall()
+        if rows:
+            print(f"\n  \u26a0 {len(rows)} carousel(s) at {stuck_stage} — {hint}:\n")
+            for uuid, title, batch, folder in rows[:10]:
+                print(f"    [{batch}] {title}")
+                print(f"           folder → data/batch_{batch}/{folder}/")
+                print(f"           uuid   → {uuid}\n")
+            if len(rows) > 10:
+                print(f"    ... and {len(rows) - 10} more.\n")
 
 
 def main():

@@ -1,0 +1,14 @@
+{
+  "name": "dadfit-carousel-server",
+  "version": "1.0.0",
+  "description": "DadFit Carousel review, approval, and analytics server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "sql.js": "^1.12.0"
+  }
+}
