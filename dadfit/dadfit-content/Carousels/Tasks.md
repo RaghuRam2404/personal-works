@@ -108,15 +108,15 @@ Track every task top to bottom. Do not move to the next phase until all tasks in
 - [x] **8.3** Test: Verify 100 HTML files exist, open 3–5 manually to check output
 
 ### Step 8b: Web Carousel Viewer & Approver
-- [ ] **8b.1** Build a local web server (`Carousels/scripts/carousel_viewer.py`) that:
+- [x] **8b.1** Build a local web server (`Carousels/server/`) that:
   - Lists all carousels for a batch with running_no, title, category, current_stage
-  - Renders each carousel's `carousel.html` in an iframe / embedded preview
-  - Shows doodle images from `doodles/` alongside the carousel if they exist
-  - Has a **Mark Doodles Done** button (enabled when stage = `HTML_CREATED`) → sets `current_stage = DOODLES_DONE` in DB
-  - Has an **Approve** button (enabled only when stage = `DOODLES_DONE`) → sets `current_stage = HTML_APPROVED` in DB
-  - Shows a progress bar: `HTML_CREATED | DOODLES_DONE | HTML_APPROVED` counts at a glance
-  - Runs entirely locally — no external dependencies beyond Python stdlib + SQLite
-- [ ] **8b.2** Test: Start server, place doodles for 1 carousel, click Mark Doodles Done → verify `DOODLES_DONE`; then click Approve → verify `HTML_APPROVED`
+  - Renders each carousel's `carousel.html` in the right-side iframe on click
+  - Shows **Mark Doodles Done** button (enabled when stage = `HTML_CREATED`) → sets `current_stage = DOODLES_DONE`
+  - Shows **Approve** button (enabled only when stage = `DOODLES_DONE`) → sets `current_stage = HTML_APPROVED`
+  - Shows live progress chips: `HTML Created | Doodles Done | Approved` counts at top
+  - Built with Express + sql.js (no native build required)
+  - Start: `cd Carousels/server && npm start` — opens at http://localhost:3333
+- [x] **8b.2** Test: Verified `DOODLES_DONE` → `HTML_APPROVED` transitions work, duplicate/wrong-stage calls correctly rejected
 
 ### Step 9: Create Doodles (Manual) + Approve via Web Viewer
 - [ ] **9.1** For each `HTML_CREATED` carousel, generate doodle images using prompts from `doodle_prompts.json`

@@ -2,6 +2,9 @@
 
 const BATCH = new URLSearchParams(location.search).get('batch') || '1';
 
+const ICON_COPY  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+const ICON_CHECK = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
 const STAGE_LABEL = {
   HTML_CREATED:  'HTML Created',
   DOODLES_DONE:  'Doodles Done',
@@ -90,6 +93,9 @@ function selectCarousel(c) {
 
   // load iframe
   document.getElementById('preview-frame').src = `/carousel/${BATCH}/${c.running_no}`;
+
+  // load doodle prompts
+  loadDoodles(c.running_no);
 }
 
 // ── Action button ─────────────────────────────────────────────────────────────
@@ -149,6 +155,88 @@ async function doAction(action) {
     alert('Action failed: ' + (data.error || 'unknown error'));
     updateActionBtn(selected.current_stage);
   }
+}
+
+// ── Doodle prompts panel ─────────────────────────────────────────────────────
+
+async function loadDoodles(runningNo) {
+  const list  = document.getElementById('doodle-list');
+  const count = document.getElementById('doodle-count');
+  list.innerHTML = '<p class="doodle-empty">Loading…</p>';
+  count.textContent = '';
+
+  try {
+    const res     = await fetch(`/api/doodles/${BATCH}/${runningNo}`);
+    const entries = await res.json();
+
+    if (!entries.length) {
+      list.innerHTML = '<p class="doodle-empty">No prompts found for this carousel.</p>';
+      return;
+    }
+
+    count.textContent = `${entries.length} slides`;
+    list.innerHTML = '';
+    entries.forEach(e => {
+      const div = document.createElement('div');
+      div.className = 'doodle-entry';
+      div.innerHTML = `
+        <div class="doodle-filename-row">
+          <span class="doodle-filename">${e.image_name}</span>
+          <span class="copy-status"></span>
+          <button class="copy-btn" title="Copy filename">${ICON_COPY}</button>
+        </div>
+        <div class="doodle-prompt-row">
+          <p class="doodle-prompt">${e.prompt}</p>
+          <span class="copy-status"></span>
+          <button class="copy-btn copy-btn-prompt" title="Copy prompt">${ICON_COPY}</button>
+        </div>
+      `;
+
+      div.querySelector('.doodle-filename-row').addEventListener('click', () =>
+        copyText(e.image_name, div.querySelector('.doodle-filename-row'))
+      );
+      div.querySelector('.doodle-prompt-row').addEventListener('click', () =>
+        copyText(e.prompt, div.querySelector('.doodle-prompt-row'))
+      );
+
+      list.appendChild(div);
+    });
+  } catch (err) {
+    list.innerHTML = `<p class="doodle-empty" style="color:#e55">Error: ${err.message}</p>`;
+  }
+}
+
+// ── Copy helper ───────────────────────────────────────────────────────────────
+
+function copyText(text, rowEl) {
+  if (rowEl.dataset.copied) return; // debounce
+
+  const btn    = rowEl.querySelector('.copy-btn');
+  const status = rowEl.querySelector('.copy-status');
+
+  function restore() {
+    delete rowEl.dataset.copied;
+    btn.innerHTML = ICON_COPY;
+    status.textContent = '';
+  }
+
+  function showCopied() {
+    rowEl.dataset.copied = '1';
+    btn.innerHTML = ICON_CHECK;
+    status.textContent = 'Copied!';
+    setTimeout(restore, 1500);
+  }
+
+  navigator.clipboard.writeText(text).then(showCopied).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showCopied();
+  });
 }
 
 // ── Search filter ─────────────────────────────────────────────────────────────
