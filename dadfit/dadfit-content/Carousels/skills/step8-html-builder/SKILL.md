@@ -236,7 +236,7 @@ Use this prompt per subagent (fill in all placeholders from the carousel data):
 >
 > **Do NOT write a full HTML page.** Do NOT include `<!DOCTYPE>`, `<html>`, `<head>`, `<style>`, `<body>`, or `<script>` tags. The assembler script adds all of that automatically from the master template file.
 >
-> Your output is a concatenated string of `<div class="section">` blocks — one per slide. Structure:
+> Your output is a concatenated string of `<div class="section">` blocks — one per slide. **Both `section-header` and `slide-label` are mandatory on every single slide — the assembler script validates this and will reject your output with `VALIDATION_FAILED` if they are missing.** Structure:
 >
 > ```html
 > <!-- One block per slide — copy structure verbatim from template -->
@@ -255,6 +255,8 @@ Use this prompt per subagent (fill in all placeholders from the carousel data):
 > </div>
 > <!-- repeat for every slide -->
 > ```
+>
+> ⚠️ **VALIDATION RULE (enforced by assembler):** For each `<div class="section">` the file must contain exactly one `class="section-header">` and one `class="slide-label"`. Missing either causes a `VALIDATION_FAILED` exit code 2 — your carousel will not be written and the main agent will flag you for retry.
 >
 > **Critical rules:**
 >

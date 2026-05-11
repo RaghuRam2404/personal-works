@@ -72,6 +72,53 @@ script_start = template.rindex('<script>')
 script_end   = template.rindex('</script>') + len('</script>')
 script_block = template[script_start:script_end]
 
+# ── Validate slides_html structure ─────────────────────────────────────────
+# Every <div class="section"> must contain both a section-header and a slide-label.
+# If any are missing the assembler rejects the file so the subagent must retry.
+
+import re as _re
+
+def _validate_slides(html: str) -> list[str]:
+    """Return a list of error strings. Empty list = valid."""
+    errors = []
+    sections = _re.findall(r'<div class="section">(.*?)</div>\s*</div>\s*</div>\s*(?=<div class="section">|$)', html, _re.DOTALL)
+    # Simpler: count occurrences
+    n_sections     = html.count('<div class="section">')
+    n_headers      = html.count('class="section-header">')
+    n_labels       = html.count('class="slide-label"')
+    if n_sections == 0:
+        errors.append('No <div class="section"> blocks found in slides_html')
+        return errors
+    if n_headers < n_sections:
+        errors.append(
+            f'Missing section-header: found {n_headers} but expected {n_sections} '
+            f'(one per slide). Every <div class="section"> must start with '
+            f'<div class="section-header"><h2>Slide N — TYPE — Label</h2></div>.'
+        )
+    if n_labels < n_sections:
+        errors.append(
+            f'Missing slide-label: found {n_labels} but expected {n_sections} '
+            f'(one per slide). Every slide-item must have '
+            f'<div class="slide-label"><strong>TYPE</strong> — Label</div>.'
+        )
+    return errors
+
+validation_errors = _validate_slides(slides_html)
+if validation_errors:
+    print('VALIDATION FAILED — slides_html rejected:', file=sys.stderr)
+    for e in validation_errors:
+        print(f'  ✗ {e}', file=sys.stderr)
+    print('\nThe subagent must re-generate this carousel with the correct structure.', file=sys.stderr)
+    print('See SKILL.md Step 2 — the section-header and slide-label divs are mandatory.', file=sys.stderr)
+    result_err = {
+        'uuid': data.get('uuid', '?'),
+        'running_no': data.get('running_no', '?'),
+        'status': 'VALIDATION_FAILED',
+        'errors': validation_errors
+    }
+    print(json.dumps(result_err))
+    sys.exit(2)
+
 # ── Fix logo paths in slides_html ───────────────────────────────────────────
 # Template uses ../../Brand assets/logo.png; output is 4 levels deep
 slides_html = slides_html.replace(
