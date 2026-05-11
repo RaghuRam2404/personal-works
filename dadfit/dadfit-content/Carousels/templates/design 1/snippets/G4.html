@@ -1,0 +1,36 @@
+<div class="s-bg slide-type-G4"></div>
+<div class="doodle-ph">
+  <img src="{{DOODLE_SRC}}" alt="{{DOODLE_ALT}}" />
+  <div class="doodle-ph-icon">
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M32 4L40 12L14 38H6V30L32 4Z" stroke="#34C363" stroke-width="2" stroke-linejoin="round"/><path d="M26 10L34 18" stroke="#34C363" stroke-width="2"/><path d="M6 30L14 38" stroke="#34C363" stroke-width="2"/></svg>
+    <span>Doodle<br>placeholder</span>
+  </div>
+</div>
+<div style="position:absolute;top:55px;left:60px;right:60px;display:flex;justify-content:space-between;align-items:center;">
+  <span class="s-counter">{{COUNTER}}</span>
+</div>
+<div class="s-zone">
+  <div style="font-family:'Permanent Marker',cursive;font-size:52px;color:#34C363;">YOUR SCORECARD</div>
+  <div style="display:flex;flex-direction:column;gap:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;background:#292929;border-radius:12px;padding:24px 28px;">
+      <span style="font-family:'Inter',sans-serif;font-weight:600;font-size:30px;color:#fff;">{{HABIT1}}</span>
+      <div style="display:flex;gap:10px;" data-filled="{{HABIT1_FILLED}}">
+        <!-- renderer fills these 7 dots based on HABIT1_FILLED -->
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;background:#292929;border-radius:12px;padding:24px 28px;">
+      <span style="font-family:'Inter',sans-serif;font-weight:600;font-size:30px;color:#fff;">{{HABIT2}}</span>
+      <div style="display:flex;gap:10px;" data-filled="{{HABIT2_FILLED}}">
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;background:#292929;border-radius:12px;padding:24px 28px;">
+      <span style="font-family:'Inter',sans-serif;font-weight:600;font-size:30px;color:#fff;">{{HABIT3}}</span>
+      <div style="display:flex;gap:10px;" data-filled="{{HABIT3_FILLED}}">
+      </div>
+    </div>
+  </div>
+  <div style="font-family:'Caveat',cursive;font-weight:400;font-size:40px;color:#ADADAD;">{{G4_CAVEAT}}</div>
+</div>
+<div style="position:absolute;bottom:52px;left:60px;right:60px;display:flex;justify-content:space-between;align-items:center;">
+  <span class="s-arrow">&larr;</span>
+</div>

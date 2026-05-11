@@ -1,0 +1,28 @@
+<div class="s-bg slide-type-G1"></div>
+<div class="doodle-ph">
+  <img src="{{DOODLE_SRC}}" alt="{{DOODLE_ALT}}" />
+  <div class="doodle-ph-icon">
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M32 4L40 12L14 38H6V30L32 4Z" stroke="#34C363" stroke-width="2" stroke-linejoin="round"/><path d="M26 10L34 18" stroke="#34C363" stroke-width="2"/><path d="M6 30L14 38" stroke="#34C363" stroke-width="2"/></svg>
+    <span>Doodle<br>placeholder</span>
+  </div>
+</div>
+<div style="position:absolute;top:55px;left:60px;right:60px;display:flex;justify-content:space-between;align-items:center;">
+  <span class="s-counter">{{COUNTER}}</span>
+</div>
+<div class="s-zone">
+  <div style="font-family:'Permanent Marker',cursive;font-size:60px;color:#34C363;">QUICK RECAP</div>
+  <div style="display:grid;gap:30px;">
+    <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:36px;color:#fff;line-height:1.1;"><span style="color:#34C363;margin-right:20px;">1</span>{{BULLET1}}</div>
+    <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:36px;color:#fff;line-height:1.1;"><span style="color:#34C363;margin-right:20px;">2</span>{{BULLET2}}</div>
+    <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:36px;color:#fff;line-height:1.1;"><span style="color:#34C363;margin-right:20px;">3</span>{{BULLET3}}</div>
+    {{#if BULLET4}}<div style="font-family:'Inter',sans-serif;font-weight:700;font-size:36px;color:#fff;line-height:1.1;"><span style="color:#34C363;margin-right:20px;">4</span>{{BULLET4}}</div>{{/if}}
+    {{#if BULLET5}}<div style="font-family:'Inter',sans-serif;font-weight:700;font-size:36px;color:#fff;line-height:1.1;"><span style="color:#34C363;margin-right:20px;">5</span>{{BULLET5}}</div>{{/if}}
+  </div>
+  <div>
+    <div style="height:3px;width:80px;background:#ADADAD;border-radius:2px;opacity:0.25;margin-bottom:26px;"></div>
+    <div style="font-family:'Caveat',cursive;font-weight:400;font-size:42px;color:#ADADAD;">{{G1_CAVEAT}}</div>
+  </div>
+</div>
+<div style="position:absolute;bottom:52px;left:60px;right:60px;display:flex;justify-content:space-between;align-items:center;">
+  <span class="s-arrow">&larr;</span>
+</div>
