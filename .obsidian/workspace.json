@@ -197,7 +197,11 @@
   },
   "active": "0356ccf574624382",
   "lastOpenFiles": [
+    "dadfit/dadfit-content/Carousels/data/batch_1/999_test-smoke/carousel.html",
+    "dadfit/dadfit-content/Carousels/data/batch_1/999_test-smoke",
+    "dadfit/dadfit-content/Carousels/data/batch_1/_test_input.json",
     "dadfit/dadfit-content/Carousels/scripts/step8_renderer.py",
+    "dadfit/dadfit-content/Carousels/skills/step8-html-builder/SKILL.md",
     "dadfit/dadfit-content/Carousels/templates/design 1/snippets/H4.html",
     "dadfit/dadfit-content/Carousels/templates/design 1/snippets/H3.html",
     "dadfit/dadfit-content/Carousels/templates/design 1/snippets/H2.html",
@@ -205,9 +209,6 @@
     "dadfit/dadfit-content/Carousels/templates/design 1/snippets/G4.html",
     "dadfit/dadfit-content/Carousels/templates/design 1/snippets/G3.html",
     "dadfit/dadfit-content/Carousels/templates/design 1/snippets/G2.html",
-    "dadfit/dadfit-content/Carousels/templates/design 1/snippets/G1.html",
-    "dadfit/dadfit-content/Carousels/templates/design 1/snippets/F4.html",
-    "dadfit/dadfit-content/Carousels/templates/design 1/snippets/F3.html",
     "dadfit/dadfit-content/Carousels/templates/design 1/snippets/_VARIABLES.md",
     "dadfit/dadfit-content/Carousels/data/batch_1/doodles/2-d-09.png",
     "dadfit/dadfit-content/Carousels/data/batch_1/doodles/2-d-08.png",
@@ -241,7 +242,6 @@
     "dadfit/dadfit-content/Carousels/server/node_modules/es-object-atoms/README.md",
     "dadfit/dadfit-content/Carousels/server/node_modules/es-define-property/README.md",
     "dadfit/dadfit-content/Carousels/server/node_modules/es-object-atoms/CHANGELOG.md",
-    "dadfit/dadfit-content/Carousels/server/node_modules/gopd/README.md",
-    "dadfit/dadfit-content/Carousels/server/node_modules/call-bound/README.md"
+    "dadfit/dadfit-content/Carousels/server/node_modules/gopd/README.md"
   ]
 }
