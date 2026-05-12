@@ -4,7 +4,8 @@
 
 You are filling the content for **one** DadFit Instagram carousel. Your only output is a single JSON file written to `/tmp/carousel_{uuid}.json`. A renderer script generates all HTML from pre-built snippet templates using the vars you supply. **Do not write any HTML, CSS, or script blocks — ever.**
 
-> **TASK RULE:** This skill requires no pipeline commands. Do not use `run_in_terminal` or `run_task`. Your only output is a JSON file written with `create_file`.
+> ⛔ **OUTPUT RULE — READ BEFORE ANYTHING ELSE:**
+> Your **only** output mechanism is a single `create_file` call. **DO NOT use `run_in_terminal` to write the JSON.** No `python3 -c "..."`, no heredoc, no multiline shell command. Any command with a newline (`\n`) inside it is forbidden. If you catch yourself typing `python3 -c`, stop and use `create_file` instead.
 
 ---
 
@@ -400,6 +401,8 @@ For every slide **except H1** write one doodle prompt entry. These go in the `do
 ---
 
 ## STEP 4 — Write the JSON file and respond DONE
+
+> ⛔ **HARD STOP:** Use **only** `create_file`. Never `run_in_terminal` with `python3 -c` or any multiline command to produce this file. Doing so violates the skill contract.
 
 Use `create_file` to write exactly ONE file: `/tmp/carousel_{uuid}.json`
 

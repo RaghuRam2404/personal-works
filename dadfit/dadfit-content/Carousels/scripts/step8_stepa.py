@@ -1,17 +1,19 @@
 """
 Step 8 — State Checker
 Queries CAPTION_WRITTEN rows, diffs against html_checkpoint.json,
-and outputs the next 1 carousel to /tmp/batch_{N}_html_round.json.
+and outputs the next N carousels to /tmp/batch_{N}_html_round.json.
 
 Usage (run from project root):
-    python3 Carousels/scripts/step8_stepa.py [--batch 1]
+    python3 Carousels/scripts/step8_stepa.py [--batch 1] [--count 5]
 """
 import sqlite3, json, os, argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--batch', type=int, default=1)
+parser.add_argument('--count', type=int, default=1)
 args = parser.parse_args()
 BATCH_NO = args.batch
+COUNT = args.count
 
 checkpoint_path = f'Carousels/data/batch_{BATCH_NO}/html_checkpoint.json'
 
@@ -36,7 +38,7 @@ if os.path.exists(checkpoint_path):
         done_uuids = {e['uuid'] for e in json.load(f)}
 
 remaining = [c for c in all_carousels if c['uuid'] not in done_uuids]
-this_round = remaining[:1]
+this_round = remaining[:COUNT]
 
 total = len(all_carousels)
 print(f'Done: {len(done_uuids)}/{total}  |  Remaining: {len(remaining)}  |  This round: {len(this_round)}')
@@ -44,7 +46,8 @@ print(f'Done: {len(done_uuids)}/{total}  |  Remaining: {len(remaining)}  |  This
 if not this_round:
     print('STATUS: ALL DONE — proceed to step8_insert.py')
 else:
-    print(f'STATUS: PROCESS running_no {this_round[0]["running_no"]}')
+    running_nos = ', '.join(str(c['running_no']) for c in this_round)
+    print(f'STATUS: PROCESS running_no {running_nos}')
     for c in this_round:
         print(f'  # {c["running_no"]} [{c["category"]}] {c["title"]}')
     out_path = f'/tmp/batch_{BATCH_NO}_html_round.json'
