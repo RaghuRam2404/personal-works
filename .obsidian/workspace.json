@@ -197,18 +197,19 @@
   },
   "active": "0356ccf574624382",
   "lastOpenFiles": [
+    "dadfit/dadfit-content/Carousels/data/batch_1/3_39dfb3bf-1cc5-4866-83ed-f3b1a8dc9b2e/carousel.html",
+    "dadfit/dadfit-content/Carousels/data/batch_1/3_39dfb3bf-1cc5-4866-83ed-f3b1a8dc9b2e",
+    "dadfit/dadfit-content/Carousels/data/batch_1/10_f47fe899-5665-430f-b501-5800760e117a/carousel.html",
+    "dadfit/dadfit-content/Carousels/data/batch_1/10_f47fe899-5665-430f-b501-5800760e117a",
+    "dadfit/dadfit-content/Carousels/data/batch_1/9_befb945d-1a93-4fff-91d0-7c7e1e572bcf/carousel.html",
+    "dadfit/dadfit-content/Carousels/data/batch_1/9_befb945d-1a93-4fff-91d0-7c7e1e572bcf",
+    "dadfit/dadfit-content/Carousels/data/batch_1/8_4abd15ef-6dd1-4380-a311-2ab33b600111/carousel.html",
+    "dadfit/dadfit-content/Carousels/data/batch_1/8_4abd15ef-6dd1-4380-a311-2ab33b600111",
+    "dadfit/dadfit-content/Carousels/data/batch_1/7_95a443f9-896c-450d-bfc3-c5fbf455730a/carousel.html",
+    "dadfit/dadfit-content/Carousels/data/batch_1/7_95a443f9-896c-450d-bfc3-c5fbf455730a",
+    "dadfit/dadfit-content/Carousels/data/batch_1/6_4959a78e-9b7b-4085-8753-716a74721a02/carousel.html",
     "dadfit/dadfit-content/Carousels/skills/step8-slide-writer/SKILL.md",
-    "dadfit/dadfit-content/Carousels/skills/step8-slide-writer",
-    "dadfit/dadfit-content/Carousels/data/batch_1/999_test-smoke/carousel.html",
-    "dadfit/dadfit-content/Carousels/data/batch_1/999_test-smoke",
-    "dadfit/dadfit-content/Carousels/data/batch_1/_test_input.json",
-    "dadfit/dadfit-content/Carousels/scripts/step8_renderer.py",
     "dadfit/dadfit-content/Carousels/skills/step8-html-builder/SKILL.md",
-    "dadfit/dadfit-content/Carousels/templates/design 1/snippets/H4.html",
-    "dadfit/dadfit-content/Carousels/templates/design 1/snippets/H3.html",
-    "dadfit/dadfit-content/Carousels/templates/design 1/snippets/H2.html",
-    "dadfit/dadfit-content/Carousels/templates/design 1/snippets/H1.html",
-    "dadfit/dadfit-content/Carousels/templates/design 1/snippets/G4.html",
     "dadfit/dadfit-content/Carousels/templates/design 1/snippets/_VARIABLES.md",
     "dadfit/dadfit-content/Carousels/data/batch_1/doodles/2-d-09.png",
     "dadfit/dadfit-content/Carousels/data/batch_1/doodles/2-d-08.png",
@@ -241,7 +242,6 @@
     "dadfit/dadfit-content/Carousels/server/node_modules/get-proto/CHANGELOG.md",
     "dadfit/dadfit-content/Carousels/server/node_modules/es-object-atoms/README.md",
     "dadfit/dadfit-content/Carousels/server/node_modules/es-define-property/README.md",
-    "dadfit/dadfit-content/Carousels/server/node_modules/es-object-atoms/CHANGELOG.md",
-    "dadfit/dadfit-content/Carousels/server/node_modules/gopd/README.md"
+    "dadfit/dadfit-content/Carousels/server/node_modules/es-object-atoms/CHANGELOG.md"
   ]
 }

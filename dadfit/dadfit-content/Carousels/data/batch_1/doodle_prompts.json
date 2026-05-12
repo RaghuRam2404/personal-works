@@ -1,1 +1,462 @@
-[]
+[
+  {
+    "running_no": 1,
+    "image_name": "1-d-01.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a bathroom scale with a plump belly silhouette in dotted outline floating just above the scale display, suggesting invisible fat accumulation despite a normal weight reading. The scale is a simple oval-base shape with a round dial face; the belly outline is a soft rounded curve hovering above it with a small gap. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70–80% of canvas height, centered, generous empty space. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 1,
+    "image_name": "1-d-02.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a bathroom scale with a simple frown drawn on its dial face and two short drooping lines on either side suggesting it has been stuck at the same number for years. The scale is oval-shaped with a round display face showing a sad expression. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 1,
+    "image_name": "1-d-03.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple torso silhouette split vertically down the center — the left half showing a lean angular muscular outline and the right half showing a soft rounded belly shape — representing body composition versus body weight. Two contrasting halves of one body, minimal stick-figure style torso only, no limbs. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 1,
+    "image_name": "1-d-04.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a round thali plate divided into two very unequal sections by a single straight line — a large dominant section overflowing with stacked rotis and a rice mound, and a tiny section containing just one small egg or fish piece — showing the severe carb-to-protein imbalance on a typical Indian plate. Simple circular plate outline. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 1,
+    "image_name": "1-d-05.png",
+    "prompt": "A flat hand-drawn ink-line doodle showing two adjacent shapes side by side: on the left a deflating flexed bicep arm silhouette gradually shrinking with a small downward arrow, and on the right an inflating rounded belly blob growing larger with a small upward arrow — illustrating how fat fills the space left by lost muscle. Simple silhouettes with minimal arrow indicators. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 1,
+    "image_name": "1-d-06.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a person sitting hunched at a simple rectangular desk with a rounded belly visible. On the desk sits a plate with a rice mound. Two curved arrows arc from the plate toward the person's belly area, indicating excess carbs travelling directly to belly fat storage. Simple stick-figure seated posture at a clean desk. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 1,
+    "image_name": "1-d-07.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a tall protein shaker bottle with measurement markings drawn as horizontal tick marks along its side. A target ring or circle with a small arrow points to a marking partway up the bottle indicating the daily protein goal. Simple cylindrical bottle shape with a screw cap on top and a few horizontal measurement tick marks on the side. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 1,
+    "image_name": "1-d-08.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple three-step ascending staircase rising from left to right, with a small stick-figure person standing at the top step with arms slightly raised in achievement. Each step face has a small filled circle representing a completed protocol step. Three clearly distinct steps and a tiny celebrating figure at the summit. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 1,
+    "image_name": "1-d-09.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple notepad or clipboard with five horizontal lines drawn on it, each preceded by a checkbox square with a checkmark inside. The notepad has a clean rectangular outline, a small binding clip at the top center, and the five checkbox + line elements stacked evenly down the page. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 2,
+    "image_name": "2-d-01.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a shield with a flexed bicep arm icon centered inside it. The shield has a simple pointed-bottom outline and the arm is a clean bicep-flex silhouette. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Single object fills 70-80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 2,
+    "image_name": "2-d-02.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a man standing in front of a rectangular mirror. The reflection shows the same figure but with a noticeably thinner arm and slumped posture. Simple stick-figure style, clean rectangular mirror frame with a small stand at the base. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Figure and mirror fill 70-80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 2,
+    "image_name": "2-d-03.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a classic balance scale. Left pan holds a water-drop fat shape, right pan holds a flexed bicep arm icon, both pans level. Central upright post, horizontal beam, two hanging pans. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Single object fills 70-80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 2,
+    "image_name": "2-d-04.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a circular speedometer gauge. Evenly spaced tick marks around the dial, needle pointing hard right into a danger zone marked by three bold radiating lines at the far-right edge. No labels. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Single object fills 70-80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 2,
+    "image_name": "2-d-05.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple handheld calculator. Rectangular body with a small display screen at the top and a 3x4 grid of rounded button outlines below. A small floating equals sign and result line sketched above it suggesting a formula. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Single object fills 70-80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 2,
+    "image_name": "2-d-06.png",
+    "prompt": "A flat hand-drawn ink-line doodle of two cracked eggs with circular yolk outlines placed beside a compact dumbbell, arranged side by side. Oval egg shapes with a crack line and a yolk circle; dumbbell has two circular end weights and a short bar. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Objects centered, fills 70-80% of canvas. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 2,
+    "image_name": "2-d-07.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a round dinner plate divided by a vertical center line. Left half shows a packet of chips with a bold X drawn over it. Right half shows a small dal bowl with two eggs beside it. Clean plate circle, simple dividing line, minimal detail. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Single object fills 70-80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 2,
+    "image_name": "2-d-08.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a stick figure performing a dumbbell bicep curl. One arm raised with elbow bent at 90 degrees holding a small dumbbell with two round ends, the other arm hanging straight. Simple joint marks and limb lines, dumbbell clearly visible. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Figure fills 70-80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 2,
+    "image_name": "2-d-09.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple notepad with five horizontal lines, each preceded by a small checkbox square with a checkmark inside. Clean rectangular outline with a small binding clip at the top center, five checkbox-and-line elements stacked evenly down the page. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Fills 70-80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 3,
+    "image_name": "3-d-01.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a large round wall clock with a bold jagged crack running diagonally across its face. The clock hands point to roughly 7 o'clock. The crack is sharp and dramatic, splitting the clock face in two. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Single object centered, fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 3,
+    "image_name": "3-d-02.png",
+    "prompt": "A flat hand-drawn ink-line doodle of two hourglasses side by side — the left one cracked with sand spilling out messily beyond its broken outline, the right one intact and upright with sand flowing cleanly through its narrow waist. Both are simple in shape with a clean rectangular frame and curved neck. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Two objects side by side centered, fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 3,
+    "image_name": "3-d-03.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple line graph — a flat baseline along the bottom then a sharply jagged spiking line shooting dramatically upward to the right like a stress spike. Short x and y axis lines form a basic chart frame. The spike line is bold and erratic with sharp peaks. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Single graph centered, fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 3,
+    "image_name": "3-d-04.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a flexed muscular arm in a side-view bicep curl pose, with a bold jagged crack or fracture line cutting across the upper arm bicep area, suggesting muscle breakdown. The arm silhouette is simple and clear with a defined bicep curve. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Single figure centered, fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 3,
+    "image_name": "3-d-05.png",
+    "prompt": "A flat hand-drawn ink-line doodle of three objects arranged in a loose triangular cluster — a smartphone with radiating screen-glow lines, a small teacup with two curved steam wisps rising from it, and a thought bubble containing a lightning bolt. Each object is simple and iconic. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Three objects centered, fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 3,
+    "image_name": "3-d-06.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a circle divided into a pie chart — a dominant large wedge taking up roughly 80% of the circle separated from a small 20% slice by two clean radial lines. A small upward arrow rises from the large wedge suggesting release or production. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Single chart centered, fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 3,
+    "image_name": "3-d-07.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a round dinner plate with a fork on the left and knife on the right, placed beside a round clock with hands pointing to roughly 8 o'clock and a small X mark drawn above the plate suggesting a cutoff time. Both objects are simple clean outlines. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Two objects side by side centered, fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 3,
+    "image_name": "3-d-08.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a smartphone lying face-down on a flat surface, with a crescent moon and three small five-pointed stars floating in the space above it, suggesting nighttime and undisturbed sleep. The phone is a simple rectangle with rounded corners, power button visible on the side. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Single scene centered, fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 3,
+    "image_name": "3-d-09.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a clipboard with a clean rectangular outline and a small binding clip at the top center, showing five horizontal lines each preceded by a small checkbox square with a bold checkmark inside. All five boxes are checked and evenly stacked down the page. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Single object centered, fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 4,
+    "image_name": "4-d-01.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a crescent moon above a simple bed outline with a person lying in it, eyes closed, with a smooth rhythmic wave representing breath cycles flowing beside the figure. The bed has a simple headboard, straight legs, and a blanket shown as a curved line. The breathing wave beside the bed has three smooth equal peaks. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 4,
+    "image_name": "4-d-02.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a person lying flat in bed with eyes wide open, staring upward. A simple analog clock sits on a bedside table beside the bed. The figure lies under a minimal blanket outline, head on a pillow, eyes depicted as two wide open circles with small dot pupils. The bedside clock is a simple circle with two hands and four tick marks. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 4,
+    "image_name": "4-d-03.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a line graph showing an upward trend that suddenly cracks — the line rises on the left, then breaks at the peak with a visible jagged gap, then drops sharply downward on the right. The graph has two clean axis lines forming an L-shape. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 4,
+    "image_name": "4-d-04.png",
+    "prompt": "A flat hand-drawn ink-line doodle of three minimal elements arranged left to right: a simple side-profile nose with a curved inward arrow (inhale), a pair of simple lung outlines with a horizontal double-headed pause arrow above them (hold), and a side-profile mouth outline with a curved outward arrow (exhale). Each element is small and clean with generous space between them. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70–80% of canvas width, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 4,
+    "image_name": "4-d-05.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple circular stopwatch with three concentric arcs radiating outward beyond the circular face, each arc slightly larger than the last, with a small tick mark at the end of each arc — representing three distinct timed intervals. The stopwatch has a clean circular face, a short winding crown button at the top, and a single hand inside. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 4,
+    "image_name": "4-d-06.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a bold circular repeat arrow — two curved arrows forming a complete loop with arrowheads at each end pointing in the same direction, representing a recurring daily habit. A simple crescent moon shape floats in the upper-right area near the loop, implying a nighttime routine. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 4,
+    "image_name": "4-d-07.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple round dinner plate with a fork on its left side and a knife on its right side, both crossed over the plate in an X pattern, with a small crescent moon shape beside the plate. The plate is a clean circle outline, the fork and knife are simple minimal utensils with handles, and the moon is a thin crescent. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 4,
+    "image_name": "4-d-08.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple teacup with three short curved steam lines rising from the open top, with a bold diagonal line crossing through the entire image from upper-left to lower-right. The cup is a simple curved trapezoid shape with a small loop handle on the right side and a flat saucer line at the base. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 4,
+    "image_name": "4-d-09.png",
+    "prompt": "A flat hand-drawn ink-line doodle of two simple circular stopwatches side by side — the left one is noticeably smaller with its hand pointing to a very short interval near the top, and the right one is noticeably larger with its hand pointing to a long interval near the three-quarter mark — representing fast vs slow sleep onset. Both watches have clean circular faces and a small winding crown button at the top. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70–80% of canvas width, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 5,
+    "image_name": "5-d-01.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a piggy bank with a visible crack along its body, with two or three small coin shapes falling out through the crack downward. The piggy bank is a simple rounded silhouette with four short leg lines, a small snout circle, and a coin slot on top. The coins are small flat circles. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Single object fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 5,
+    "image_name": "5-d-02.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple wall calendar with a recurring circled date and a downward-pointing drip arrow extending from the bottom of the calendar. The calendar shows a clean grid of date squares, a circled date near the top, and three small drop shapes at the tip of the arrow below. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Single object fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 5,
+    "image_name": "5-d-03.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a trophy cup with a large bold X drawn over it on the left, placed beside a simple two-line graph on the right — one line rising steeply and a second line drooping below it. The trophy is a classic cup silhouette with two handles and a base. The graph has a minimal L-shaped axis. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Two objects side by side fill 70–80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 5,
+    "image_name": "5-d-04.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a circular pie chart with one large wedge slice being pulled away from the rest of the circle, leaving a visible gap. The extracted slice has a small flag or label tab attached to its tip. The remaining pie body is intact with a clean circular outline. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Single graphic fills 70–80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 5,
+    "image_name": "5-d-05.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a large stacked pile of rupee coins on the left side of the frame, with a broom sweeping them off the right edge. The coins are simple overlapping circles with a small rupee stroke on each. The broom has a long diagonal handle and a wide fan bristle base at the sweeping end. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70–80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 5,
+    "image_name": "5-d-06.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple line chart with a single clean upward-sloping trend line rising from bottom-left to top-right, with a small upward arrowhead at its tip. The chart has a minimal L-shaped axis with three evenly spaced tick marks on each side. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Single graphic fills 70–80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 5,
+    "image_name": "5-d-07.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple rectangular price tag with a small circle hole at the top-left corner and a short looped string. The tag face has a single thin horizontal line across its center representing a minimal cost value. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Single object fills 70–80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 5,
+    "image_name": "5-d-08.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a human hand with the index finger extended pointing right toward a simple circular pie chart divided exactly in half by a single vertical line through the center. The hand is a simple outline showing four fingers and a thumb in a clear pointing gesture. The pie circle sits to the right of the pointing finger. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Two elements fill 70–80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 5,
+    "image_name": "5-d-09.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple rectangular clipboard with a metal spring clip at the top center. On the clipboard face, four horizontal lines are stacked evenly down the page, each preceded by a small square checkbox with a checkmark inside. The clipboard has a clean rectangular outline with slightly rounded bottom corners. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill on the clipboard body. Single object fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 6,
+    "image_name": "6-d-01.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple handheld calculator with a large rupee symbol (₹) displayed prominently on the rectangular screen area. The calculator has a compact rectangular body with rows of small square buttons below the screen, clean outlines, no labels on buttons. Single central object. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 6,
+    "image_name": "6-d-02.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple wall calendar page with a large bold circle drawn around a central date block and a bold question mark drawn over it. The calendar has a clean rectangular outline, a hanging tab at the top, and a simple grid of date rows visible below. Single object. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 6,
+    "image_name": "6-d-03.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple bar chart with two vertical bars side by side on a baseline. The left bar is tall and full-height; the right bar is noticeably shorter — roughly 60% the height of the left bar — with a jagged horizontal cut line across its top suggesting loss or reduction. No axis labels. Clean minimal design. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 6,
+    "image_name": "6-d-04.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a smartphone held vertically with a simple form interface visible on the screen — three stacked horizontal input rows inside the screen area, each row showing a short dash and an underline for user input. The phone has rounded corners, a small camera dot at the top, and a home bar at the bottom. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 6,
+    "image_name": "6-d-05.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple house — triangular roof, square body, small centered door — resting on top of a thick solid horizontal foundation platform. The platform has horizontal hatch lines across it suggesting dense concrete or solid ground. Clean minimal architecture. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 6,
+    "image_name": "6-d-06.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple calculator face with one large rectangular input display field at the top and a small circular refresh arrow icon beside it, indicating the value is being changed. The calculator body has a basic grid of small square buttons below the display area. Single object. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 6,
+    "image_name": "6-d-07.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a graduation mortarboard cap with a tassel hanging to one side, positioned above a small stack of three flat coins stacked on top of each other. The cap has a flat square top with a circular base and the tassel hangs with a small decorative end. Clean minimal design. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 6,
+    "image_name": "6-d-08.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a large circle representing a coin, with a small seedling growing upward from the top of the coin — two or three small leaves branching outward from a thin central stem. The coin has a simple circular outline. The seedling suggests growth and compounding over time. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 6,
+    "image_name": "6-d-09.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple notepad or clipboard with five horizontal lines drawn on it, each preceded by a small checkbox square with a checkmark inside. The notepad has a clean rectangular outline and a small binding clip or ring at the top center, with the five checkbox-plus-line elements stacked evenly down the page. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 7,
+    "image_name": "7-d-01.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a slim male figure standing upright in a collared shirt, arms slightly limp at the sides, posture slumped — conveying looking thin but feeling drained. Simple stick figure with a shirt outline, rounded shoulders, and a slightly downcast face. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Figure fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 7,
+    "image_name": "7-d-02.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a stick figure adult carrying a small child figure on their back while climbing a staircase of three steps. The adult figure leans forward with an exaggerated slouch and small sweat drops drawn near their head to show exhaustion. The child rides on back with arms out to the sides. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Scene fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 7,
+    "image_name": "7-d-03.png",
+    "prompt": "A flat hand-drawn ink-line doodle of two bold arrows originating from a shared center point: one arrow points sharply downward on the left side and one points sharply upward on the right side, forming a forked split shape — like a Y rotated 90 degrees. The arrows are thick with clean arrowheads. Rendered in #34C363 green ink lines, stroke weight ~5px, no fill. Centered on canvas, fills 70–80% of height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 7,
+    "image_name": "7-d-04.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a protein shake blender bottle with a rounded bottom, screw-top lid with a small loop handle, and five horizontal measurement lines at regular intervals along the side. A small barbell icon with circular weight plates sits to the right of the bottle. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Objects fill 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 7,
+    "image_name": "7-d-05.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a barbell with large circular weight plates on each end, shown horizontally resting on two vertical squat rack uprights. Three short curved motion lines radiate from the center of the bar suggesting it is being lifted. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside weight discs. Object fills 70–80% of canvas width, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 7,
+    "image_name": "7-d-06.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a two-pan balance scale. The left pan hangs visibly lower than the right, indicating a mild imbalance. The scale has a vertical center post with a pointed fulcrum, a horizontal crossbeam, and two round shallow pans connected by thin chains. Three short horizontal lines sit in the left pan representing a small food portion. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Centered on canvas, fills 70–80% of height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 7,
+    "image_name": "7-d-07.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a trail of five human footprints arranged in a natural walking pattern, alternating left and right, progressing from bottom-left to upper-right of the frame. Each footprint is a simple outlined sole shape with five toe bumps. A small circular step-counter dial sits in the upper right corner. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Footprints fill 70–80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 7,
+    "image_name": "7-d-08.png",
+    "prompt": "A flat hand-drawn ink-line doodle of two food items placed side by side separated by a thin vertical dividing line: on the left a simple round bowl with small oval rice grain shapes inside it, on the right a round flatbread with two concentric circular lines suggesting layered dough. Both items are roughly equal in size. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Items fill 70–80% of canvas width, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 7,
+    "image_name": "7-d-09.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple clipboard with a rectangular notepad face showing five evenly-spaced horizontal lines, each preceded by a small square checkbox with a checkmark inside. A small binding clip sits at the top center of the clipboard outline. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 8,
+    "image_name": "8-d-01.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a traditional katori bowl filled with dal, with two or three short curved steam lines rising from the top, and a bold checkmark drawn to its right. The bowl has a simple rounded silhouette with a wide rim. The checkmark is roughly the same height as the bowl for visual balance. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Both elements together fill 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 8,
+    "image_name": "8-d-02.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a compact rectangular glucometer device with a small screen on its face showing a simple upward-pointing arrow or three rising bar segments indicating a high reading. The device has a clean rectangular body, a small round button on one side, and a narrow test strip slot at one end. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Single object centered on canvas, fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 8,
+    "image_name": "8-d-03.png",
+    "prompt": "A flat hand-drawn ink-line doodle of two objects placed side by side with clear space between them. On the left: a cylindrical pill bottle with a cap, and a bold X drawn above it. On the right: a round flat plate with simple food outlines (a circle for roti, a small mound for dal), and a bold checkmark drawn above it. Both objects are roughly the same size. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Both objects together fill 70–80% of canvas width, centered vertically. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 8,
+    "image_name": "8-d-04.png",
+    "prompt": "A flat hand-drawn ink-line doodle of two round bowls placed side by side. The left bowl is filled with small round dot clusters (representing white rice) and has a large bold X drawn above it. The right bowl is filled with slightly irregular oval grain shapes (representing millets) and has a bold checkmark drawn above it. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Both bowls together fill 70–80% of canvas width, centered vertically. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 8,
+    "image_name": "8-d-05.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a small katori bowl on the left, filled with simple liquid (dal, suggested by a slightly wavy top line), and a bold curved arrow pointing to the right toward a larger round flat plate with a simple food arrangement (a small roti circle, a small mound shape for sabzi). The arrow flows clearly left to right indicating the eating sequence. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Full composition fills 70–80% of canvas width, centered vertically. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 8,
+    "image_name": "8-d-06.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a wide shallow bowl representing curd, with a simple hand (outline only, showing thumb and fingers) positioned above it tilting a small pouch or jar at an angle. Below the pouch, a trail of small oval and dot seed shapes falls downward into the bowl. The falling seeds are scattered naturally between the pouch and the bowl surface. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Scene fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 8,
+    "image_name": "8-d-07.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a large Indian Rupee symbol (₹) occupying the upper portion of the canvas, with a fork and spoon crossed in an X-pattern drawn cleanly below it — like cutlery forming a 'no payment required' visual. The rupee symbol is bold and prominent. The fork and spoon cross at their handles and fan out at top and bottom. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Single composition fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 8,
+    "image_name": "8-d-08.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple stick figure in a clear mid-stride walking pose: one leg forward, one back, one arm swinging forward, torso upright. A curved arrow wraps from behind the figure in a large arc, suggesting a short looping walk route. A tiny simple plate icon is drawn near the figure's starting point to suggest post-meal context. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Single figure with arrow fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 8,
+    "image_name": "8-d-09.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple rectangular calendar page with a top border for the header and a grid of small squares below it in 4 columns and 3 rows (suggesting 12 weeks). A bold downward-slanting arrow overlays the right side of the calendar, pointing from upper-right toward lower-left, indicating a declining trend over time. The arrow is thick and clear, cutting across the grid diagonally. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Composition fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 8,
+    "image_name": "8-d-10.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple stick figure adult standing with both arms raised and extended upward, lifting a smaller stick figure child above their head. The child's arms are spread wide in a joyful pose. The adult's legs are planted firmly, and the two figures form a clear vertical tower of celebration. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Two-figure scene fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 9,
+    "image_name": "9-d-01.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a half-empty hourglass with three stylised zzz sleep symbols curving upward from the top half. The hourglass has a classic pinched waist shape with sand sitting at the halfway mark, a simple rectangular frame with knobs on top and bottom. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Single centered object fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 9,
+    "image_name": "9-d-02.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple stick-figure dad standing beside a baby crib, arms hanging down in exhaustion, with a crescent moon and three small stars in the upper corner indicating nighttime. The crib is a simple rectangular outline with evenly spaced vertical bars and short legs. The dad figure has a slightly bowed head suggesting fatigue. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Scene fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 9,
+    "image_name": "9-d-03.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a gym duffel bag with two large bold X strokes crossed over it, and a bold curved arrow looping around the bag and pointing forward to the right, indicating a redirect away from skipping. The bag is a simple rounded rectangular duffel shape with a short carry handle and a zipper line along the top. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Single centered object fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 9,
+    "image_name": "9-d-04.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a bold flexed arm with a clear bicep peak, and a crescent moon with two small stars positioned above the clenched fist, suggesting training under low-sleep conditions. The arm shows a strong outline from forearm to upper arm with a visible bicep curve. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Single centered composition fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 9,
+    "image_name": "9-d-05.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a barbell with circular plates on each end and a straight horizontal bar, with a bold downward-pointing arrow positioned to the right side of the barbell indicating a reduction in volume. The arrow is thick with a clean arrowhead pointing down. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Single centered composition fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 9,
+    "image_name": "9-d-06.png",
+    "prompt": "A flat hand-drawn ink-line doodle of three minimal stick-figure exercise poses stacked vertically: at the top a squat position with a barbell across the back and knees bent, in the middle a bench press position with a figure lying flat pressing a barbell upward, and at the bottom a bent-over row with a figure leaning forward pulling a barbell. Each figure is a simple clean line drawing showing only the key movement shape. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Three evenly spaced icons fill 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 9,
+    "image_name": "9-d-07.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple brain outline with a clean lobed silhouette, with two or three jagged lightning bolt shapes striking down into it from above, representing CNS fatigue or nervous system stress. The lightning bolts are angular and sharp, clearly aimed at the brain. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Single centered object fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 9,
+    "image_name": "9-d-08.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a small measuring scoop with a rounded bowl and a short straight handle, filled with a mound of fine powder sitting above the rim of the scoop. The scoop sits centered with the powder mound clearly visible above it. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Single centered object fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 9,
+    "image_name": "9-d-09.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a tall water bottle with a simple cylindrical body and a cap on top, positioned beside a wilting plant with a drooping curved stem and two small limp leaves hanging downward, showing the link between dehydration and fatigue. The bottle and plant are side by side at similar heights, centered together. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Centered composition fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 9,
+    "image_name": "9-d-10.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple clipboard with a rounded top binding clip and five horizontal lines evenly spaced down the page, each preceded by a small square checkbox — the top three checkboxes have checkmarks drawn inside them and the bottom two are empty squares, representing a partial checklist. The clipboard has a clean rectangular outline with slight corner rounding. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Single centered object fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 10,
+    "image_name": "10-d-01.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a crescent moon on the left beside a simple rectangular calendar grid showing 30 small boxes arranged in rows, with the last several boxes marked with checkmarks indicating days completed. Clean crescent moon outline, simple grid lines dividing the calendar, bold checkmarks in the completed boxes. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Both elements together fill 70-80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 10,
+    "image_name": "10-d-02.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a seated human figure with head drooped heavily forward, elbows resting on a flat surface, both hands wrapped around a wide mug with steam lines rising from it. The figure posture clearly communicates exhaustion — rounded shoulders, heavy hanging head. Simple stick-figure proportions with emphasis on the slumped posture. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Single figure fills 70-80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 10,
+    "image_name": "10-d-03.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple rectangular calendar with a visible 5x6 box grid, and a bold upward-pointing arrow rising diagonally from the bottom-left corner of the calendar toward the upper-right, suggesting progress and positive change over 30 days. Clean calendar rectangle outline, thin grid lines inside, strong solid arrow with a pointed tip. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Calendar and arrow together fill 70-80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 10,
+    "image_name": "10-d-04.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a circular dinner plate with a fork to the left and a knife to the right, and a simple round clock face overlaid at the center of the plate, with clock hands pointing to approximately 8 o'clock, indicating a mealtime cutoff. Clean plate circle outline, minimal fork and knife silhouettes, simple clock face with two hands and small tick marks at 12 and 6. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70-80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 10,
+    "image_name": "10-d-05.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a smartphone with rounded corners and a simple screen rectangle, with two bold diagonal lines forming a large X crossing the entire screen, and a crescent moon floating above the top-right corner of the phone. Clean phone outline, bold X strokes on screen, small clean crescent moon. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Fills 70-80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 10,
+    "image_name": "10-d-06.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a classic round alarm clock with a circular face, two bell domes on top with a small handle between them, and short legs at the bottom. Behind the clock, a slightly larger shield shape is drawn with its pointed bottom visible below the clock, suggesting the wake time is protected. Clean clock outline, simple bell and leg details, clean shield outline peeking from behind. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Single object fills 70-80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 10,
+    "image_name": "10-d-07.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple cylindrical supplement pill bottle with a flat cap on top, and three oval capsule shapes each divided in half lengthwise by a single line floating to the upper right of the bottle as if spilling out. Clean bottle silhouette with a simple rectangular label outline on the body, three clean oval capsule shapes with center dividing lines. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Fills 70-80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 10,
+    "image_name": "10-d-08.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a rectangular window frame with two curtain panels drawn closed on each side, a small crescent moon visible through a narrow gap at the top center where the curtains meet, and a simple thermometer with a low liquid line (bulb at the bottom, fill line reaching only about one-third up the tube) positioned to the right of the window. Clean window rectangle, simple curtain drape curves on each side, small crescent moon at top gap, simple thermometer outline with a low fill line. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Fills 70-80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  },
+  {
+    "running_no": 10,
+    "image_name": "10-d-09.png",
+    "prompt": "A flat hand-drawn ink-line doodle of a simple notepad or clipboard with a rectangular body, a small binding clip at the top center, and five evenly spaced rows each consisting of a small square checkbox on the left followed by a short horizontal line representing text. Four of the five checkboxes contain a bold checkmark inside them; the fifth checkbox is empty. Clean rectangular clipboard outline, binding clip detail at top, five checkbox-line rows stacked evenly. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70-80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+  }
+]
