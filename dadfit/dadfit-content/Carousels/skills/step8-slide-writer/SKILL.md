@@ -4,8 +4,15 @@
 
 You are filling the content for **one** DadFit Instagram carousel. Your only output is a single JSON file written to `/tmp/carousel_{uuid}.json`. A renderer script generates all HTML from pre-built snippet templates using the vars you supply. **Do not write any HTML, CSS, or script blocks — ever.**
 
-> ⛔ **OUTPUT RULE — READ BEFORE ANYTHING ELSE:**
-> Your **only** output mechanism is a single `create_file` call. **DO NOT use `run_in_terminal` to write the JSON.** No `python3 -c "..."`, no heredoc, no multiline shell command. Any command with a newline (`\n`) inside it is forbidden. If you catch yourself typing `python3 -c`, stop and use `create_file` instead.
+> ⛔ **TERMINAL RULE — READ BEFORE ANYTHING ELSE:**
+> Multi-line patterns are **forbidden in any `run_in_terminal` call** — not just for writing the output file. This applies to every action throughout the skill. The following patterns are illegal everywhere — zero exceptions:
+> - `python3 -c "..."`
+> - `python3 - <<'PYEOF' ... PYEOF`
+> - Any heredoc (`<<`, `<<'EOF'`, `<<-EOF`, etc.)
+> - Any shell command containing a newline or line continuation
+> - Any attempt to write JSON or multi-line content via the terminal in any form
+>
+> Your **only** output mechanism is a single `create_file` tool call. If you catch yourself opening a terminal to write the file, **stop immediately** and use `create_file` instead. There is no circumstance where `run_in_terminal` is acceptable for this output or for any multi-line operation.
 
 ---
 
@@ -402,7 +409,17 @@ For every slide **except H1** write one doodle prompt entry. These go in the `do
 
 ## STEP 4 — Write the JSON file and respond DONE
 
-> ⛔ **HARD STOP:** Use **only** `create_file`. Never `run_in_terminal` with `python3 -c` or any multiline command to produce this file. Doing so violates the skill contract.
+> ⛔ **HARD STOP — ZERO EXCEPTIONS:**
+> The **only** permitted action to write `/tmp/carousel_{uuid}.json` is the `create_file` tool.
+> Multi-line patterns are forbidden in **any** `run_in_terminal` call throughout this skill — not just here.
+> **All of the following are forbidden everywhere:**
+> - `run_in_terminal` with `python3 -c "..."`
+> - `run_in_terminal` with `python3 - <<'PYEOF'`
+> - Any heredoc (`<<EOF`, `<<'PYEOF'`, `<<-EOF`, etc.)
+> - Any shell command that spans multiple lines or contains a line continuation
+> - Writing the file by any terminal mechanism whatsoever
+>
+> Violating this rule means the skill has failed. Use `create_file`. Full stop.
 
 Use `create_file` to write exactly ONE file: `/tmp/carousel_{uuid}.json`
 

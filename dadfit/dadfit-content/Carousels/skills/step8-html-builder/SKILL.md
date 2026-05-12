@@ -4,8 +4,15 @@
 
 Orchestrate HTML generation for all 100 `CAPTION_WRITTEN` carousels. Each round spawns **5 subagents in parallel** (one per carousel) that use `step8-slide-writer/SKILL.md` to produce content JSON; a renderer script converts that JSON to HTML using snippet templates.
 
-> **CLI RULE:** All pipeline commands must be run using `run_in_terminal` with `mode=sync` (foreground). Never use VS Code tasks or background execution. Always set `cwd` to `/Users/raghu-2264/Raghu/Personal Works/dadfit/dadfit-content` and wait for the command to complete before reading its output.
-> **STRICTLY NO MULTILINE COMMANDS.** Every command sent to the terminal must be a single line. No `\n` inside strings, no here-docs, no multiline `python3 -c`. If a Python snippet is needed, write it to a `.py` file using `create_file`, then run `python3 /path/to/file.py`.
+> ⛔ **TERMINAL RULE — READ BEFORE ANYTHING ELSE:**
+> Multi-line patterns are **forbidden in any `run_in_terminal` call** — not just for writing the output file. This applies to every action throughout the skill. The following patterns are illegal everywhere — zero exceptions:
+> - `python3 -c "..."`
+> - `python3 - <<'PYEOF' ... PYEOF`
+> - Any heredoc (`<<`, `<<'EOF'`, `<<-EOF`, etc.)
+> - Any shell command containing a newline or line continuation
+> - Any attempt to write JSON or multi-line content via the terminal in any form
+>
+> All `run_in_terminal` calls must use `mode=sync` (foreground). Never use VS Code tasks or background execution. Always set `cwd` to `/Users/raghu-2264/Raghu/Personal Works/dadfit/dadfit-content` and wait for the command to complete before reading its output. If a Python snippet is needed for any purpose, write it to a `.py` file using `create_file`, then run `python3 /path/to/file.py`. Violating this rule means the step has failed.
 
 ---
 
@@ -204,8 +211,15 @@ To reach `doodles/`: go up one level to `batch_1/`, then into `doodles/` → `..
 
 Orchestrate HTML generation for all 100 `CAPTION_WRITTEN` carousels. Spawns subagents (one per carousel) that use `step8-slide-writer/SKILL.md` to produce content JSON; a renderer script converts that JSON to HTML using snippet templates.
 
-> **CLI RULE:** All pipeline commands must be run using `run_in_terminal` with `mode=sync` (foreground). Never use VS Code tasks or background execution. Always set `cwd` to `/Users/raghu-2264/Raghu/Personal Works/dadfit/dadfit-content` and wait for the command to complete before reading its output.
-> **STRICTLY NO MULTILINE COMMANDS.** Every command sent to the terminal must be a single line. No `\n` inside strings, no here-docs, no multiline `python3 -c`. If a Python snippet is needed, write it to a `.py` file using `create_file`, then run `python3 /path/to/file.py`.
+> ⛔ **TERMINAL RULE — READ BEFORE ANYTHING ELSE:**
+> Multi-line patterns are **forbidden in any `run_in_terminal` call** — not just for writing the output file. This applies to every action throughout the skill. The following patterns are illegal everywhere — zero exceptions:
+> - `python3 -c "..."`
+> - `python3 - <<'PYEOF' ... PYEOF`
+> - Any heredoc (`<<`, `<<'EOF'`, `<<-EOF`, etc.)
+> - Any shell command containing a newline or line continuation
+> - Any attempt to write JSON or multi-line content via the terminal in any form
+>
+> All `run_in_terminal` calls must use `mode=sync` (foreground). Never use VS Code tasks or background execution. Always set `cwd` to `/Users/raghu-2264/Raghu/Personal Works/dadfit/dadfit-content` and wait for the command to complete before reading its output. If a Python snippet is needed for any purpose, write it to a `.py` file using `create_file`, then run `python3 /path/to/file.py`. Violating this rule means the step has failed.
 
 ---
 
