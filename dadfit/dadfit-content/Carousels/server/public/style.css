@@ -47,12 +47,50 @@ body {
   flex-shrink: 0;
 }
 
+#brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
 #brand {
   font-size: 16px;
   font-weight: 700;
   color: var(--green);
   letter-spacing: 0.02em;
+  flex-shrink: 0;
 }
+
+#batch-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.batch-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.batch-select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.batch-select:focus,
+.batch-select:hover { border-color: var(--green); }
 
 #progress-chips {
   display: flex;
@@ -195,6 +233,27 @@ body {
   display: flex;
   gap: 6px;
   flex-shrink: 0;
+}
+
+#uuid-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  padding: 2px 4px;
+  cursor: default;
+  transition: background 0.12s;
+}
+#uuid-row:hover { background: rgba(255,255,255,0.04); }
+#uuid-row[data-copied] { background: rgba(52,195,99,0.1); }
+
+.uuid-text {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Menlo', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
 }
 
 .badge {

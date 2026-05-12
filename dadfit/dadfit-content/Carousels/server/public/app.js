@@ -1,6 +1,6 @@
 /* app.js — DadFit Carousel Viewer frontend */
 
-const BATCH = new URLSearchParams(location.search).get('batch') || '1';
+let currentBatch = new URLSearchParams(location.search).get('batch') || '1';
 
 const ICON_COPY  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
 const ICON_CHECK = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
@@ -23,19 +23,85 @@ let selected     = null;   // { uuid, running_no, current_stage, … }
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 
 async function init() {
+  await initBatches();
   await Promise.all([loadCarousels(), loadCounts()]);
+  navigateToHash();
 }
+
+// ── Batch selector ────────────────────────────────────────────────────────────
+
+async function initBatches() {
+  const res     = await fetch('/api/batches');
+  const batches = await res.json();
+  const sel     = document.getElementById('batch-select');
+
+  batches.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b;
+    opt.textContent = `Batch ${b}`;
+    if (String(b) === String(currentBatch)) opt.selected = true;
+    sel.appendChild(opt);
+  });
+
+  sel.addEventListener('change', async () => {
+    currentBatch = sel.value;
+    selected = null;
+    history.replaceState(null, '', location.pathname);
+    document.getElementById('preview-title').textContent = 'Select a carousel';
+    document.getElementById('preview-badges').innerHTML = '';
+    document.getElementById('preview-frame').src = 'about:blank';
+    document.getElementById('doodle-list').innerHTML =
+      '<p class="doodle-empty">Select a carousel to view its doodle prompts.</p>';
+    document.getElementById('doodle-count').textContent = '';
+    const uuidRow = document.getElementById('uuid-row');
+    uuidRow.hidden = true;
+    delete uuidRow.dataset.copied;
+    const btn = document.getElementById('action-btn');
+    btn.disabled = true; btn.textContent = '\u2014'; btn.className = 'action-btn';
+    await Promise.all([loadCarousels(), loadCounts()]);
+  });
+}
+
+// ── Hash navigation ───────────────────────────────────────────────────────────
+
+function navigateToHash() {
+  const hash = location.hash.slice(1);
+  if (!hash) return;
+
+  const c = allCarousels.find(x => x.uuid === hash);
+  if (c) { selectCarousel(c); return; }
+
+  // UUID might belong to a different batch — resolve from server
+  fetch(`/api/carousel/${encodeURIComponent(hash)}`)
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (!data) return;
+      const batchStr = String(data.batch_no);
+      if (batchStr !== String(currentBatch)) {
+        currentBatch = batchStr;
+        const sel = document.getElementById('batch-select');
+        if (sel) sel.value = batchStr;
+        return Promise.all([loadCarousels(), loadCounts()]).then(() => {
+          const c2 = allCarousels.find(x => x.uuid === hash);
+          if (c2) selectCarousel(c2);
+        });
+      }
+    })
+    .catch(() => {});
+}
+
+window.addEventListener('hashchange', navigateToHash);
 
 // ── Data loading ──────────────────────────────────────────────────────────────
 
 async function loadCarousels() {
-  const res  = await fetch(`/api/carousels?batch=${BATCH}`);
+  const res  = await fetch(`/api/carousels?batch=${currentBatch}`);
   allCarousels = await res.json();
   renderList(allCarousels);
 }
 
 async function loadCounts() {
-  const res    = await fetch(`/api/stages?batch=${BATCH}`);
+  const res    = await fetch(`/api/stages?batch=${currentBatch}`);
   const counts = await res.json();
   ['HTML_CREATED', 'DOODLES_DONE', 'HTML_APPROVED'].forEach(s => {
     const el = document.getElementById(`count-${s}`);
@@ -73,6 +139,9 @@ function renderList(items) {
 function selectCarousel(c) {
   selected = c;
 
+  // update URL hash
+  history.replaceState(null, '', '#' + c.uuid);
+
   // highlight in list
   document.querySelectorAll('.carousel-item').forEach(el => {
     el.classList.toggle('active', el.dataset.uuid === c.uuid);
@@ -88,11 +157,23 @@ function selectCarousel(c) {
     <span class="badge" style="background:${stageColor}">${STAGE_LABEL[c.current_stage] || c.current_stage}</span>
   `;
 
+  // show UUID with copy button
+  const uuidRow    = document.getElementById('uuid-row');
+  const uuidCopyBtn    = document.getElementById('uuid-copy-btn');
+  const uuidCopyStatus = document.getElementById('uuid-copy-status');
+  uuidRow.hidden = false;
+  delete uuidRow.dataset.copied;
+  document.getElementById('uuid-text').textContent = c.uuid;
+  uuidCopyBtn.innerHTML   = ICON_COPY;
+  uuidCopyStatus.textContent = '';
+  uuidCopyBtn.title = `Copy UUID: ${c.uuid}`;
+  uuidRow.onclick   = () => copyText(c.uuid, uuidRow);
+
   // update action button
   updateActionBtn(c.current_stage);
 
   // load iframe
-  document.getElementById('preview-frame').src = `/carousel/${BATCH}/${c.running_no}`;
+  document.getElementById('preview-frame').src = `/carousel/${currentBatch}/${c.running_no}`;
 
   // load doodle prompts
   loadDoodles(c.running_no);
@@ -166,7 +247,7 @@ async function loadDoodles(runningNo) {
   count.textContent = '';
 
   try {
-    const res     = await fetch(`/api/doodles/${BATCH}/${runningNo}`);
+    const res     = await fetch(`/api/doodles/${currentBatch}/${runningNo}`);
     const entries = await res.json();
 
     if (!entries.length) {

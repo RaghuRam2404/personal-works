@@ -10,7 +10,13 @@
   <!-- ── Left panel: carousel list ── -->
   <aside id="sidebar">
     <div id="sidebar-header">
-      <div id="brand">🎠 DadFit</div>
+      <div id="brand-row">
+        <div id="brand">🎠 DadFit</div>
+        <div id="batch-row">
+          <label for="batch-select" class="batch-label">Batch</label>
+          <select id="batch-select" class="batch-select"></select>
+        </div>
+      </div>
       <div id="progress-chips">
         <span class="chip chip-created"  id="count-HTML_CREATED">—</span>
         <span class="chip chip-doodles"  id="count-DOODLES_DONE">—</span>
@@ -28,6 +34,11 @@
       <div id="preview-meta">
         <span id="preview-title">Select a carousel</span>
         <span id="preview-badges"></span>
+        <span id="uuid-row" hidden>
+          <span id="uuid-text" class="uuid-text"></span>
+          <button id="uuid-copy-btn" class="copy-btn" title="Copy UUID"></button>
+          <span id="uuid-copy-status" class="copy-status"></span>
+        </span>
       </div>
       <button id="action-btn" class="action-btn" disabled>—</button>
     </div>

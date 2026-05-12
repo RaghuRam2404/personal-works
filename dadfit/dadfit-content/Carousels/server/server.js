@@ -52,6 +52,23 @@ function run(sql, params = []) {
 
 // ── API routes ────────────────────────────────────────────────────────────────
 
+// GET /api/batches — distinct batch numbers that exist in the DB
+app.get('/api/batches', (req, res) => {
+  const rows = query('SELECT DISTINCT batch_no FROM Carousel ORDER BY batch_no');
+  res.json(rows.map(r => r.batch_no));
+});
+
+// GET /api/carousel/:uuid — single carousel row (used for hash-based navigation)
+app.get('/api/carousel/:uuid', (req, res) => {
+  const rows = query(
+    `SELECT running_no, uuid, folder_name, title, category, current_stage, batch_no
+     FROM Carousel WHERE uuid = ?`,
+    [req.params.uuid]
+  );
+  if (!rows.length) return res.status(404).json({ error: 'not found' });
+  res.json(rows[0]);
+});
+
 // GET /api/carousels?batch=1
 app.get('/api/carousels', (req, res) => {
   const batch = parseInt(req.query.batch || '1');
