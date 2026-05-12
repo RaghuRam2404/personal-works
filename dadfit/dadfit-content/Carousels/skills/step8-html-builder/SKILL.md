@@ -1,8 +1,8 @@
-# SKILL: Step 8 — HTML Builder
+# SKILL: Step 8 — HTML Builder (Orchestrator)
 
 ## Purpose
 
-Generate a fully-coded DadFit carousel HTML file for each of the 100 `CAPTION_WRITTEN` carousels. Doodle prompts are collected into a single batch-level JSON file; doodle images share one folder for the whole batch.
+Orchestrate HTML generation for all 100 `CAPTION_WRITTEN` carousels. Spawns subagents (one per carousel) that use `step8-slide-writer/SKILL.md` to produce content JSON; a renderer script converts that JSON to HTML using snippet templates.
 
 ---
 
@@ -15,23 +15,11 @@ For each carousel (identified by `uuid` and `running_no`):
 | Output folder | `Carousels/data/batch_{batch_no}/{running_no}_{uuid}/` |
 | Carousel HTML | `Carousels/data/batch_{batch_no}/{running_no}_{uuid}/carousel.html` |
 | Doodle prompts (batch-level) | `Carousels/data/batch_{batch_no}/doodle_prompts.json` |
-| Shared doodle images (future) | `Carousels/data/batch_{batch_no}/doodles/{running_no}-d-01.png` … |
+| Shared doodle images | `Carousels/data/batch_{batch_no}/doodles/{running_no}-d-01.png` … |
 
 DB columns set after all 100 are done:
 - `folder_name = '{running_no}_{uuid}'`
 - `current_stage = 'HTML_CREATED'`
-
----
-
-## Source Files (read before every round)
-
-| File | Purpose |
-|------|---------|
-| `Carousels/templates/DadFit Carousel design.MD` | Slide type library, color/type system, layout rules |
-| `Carousels/templates/design 1/DadFit Carousel Templates.html` | Complete HTML/CSS boilerplate and per-slide markup examples |
-| `Resources/Images/logo.png` | Brand logo — referenced in HTML as `../../../../Resources/Images/logo.png` |
-
-> **TEMPLATE VERSION RULE**: Always `list_dir Carousels/templates/` first and pick the **highest-numbered** `design N` folder. As of this writing the latest is `design 1`. If a `design 2` folder appears later, switch to it automatically.
 
 ---
 
@@ -43,383 +31,48 @@ DB columns set after all 100 are done:
 
 ---
 
-### Step A — Check state and decide what to do this invocation
+### Step A — Check state
 
-The state checker script is permanently stored at `Carousels/scripts/step8_stepa.py`. Do **not** re-create it — just run it.
+The state checker is at `Carousels/scripts/step8_stepa.py`. Do **not** re-create it.
 
-**Before round 1 only**: Create required files and folder if they don't exist:
+**Before round 1 only** — create files if missing:
 ```bash
 echo "[]" > Carousels/data/batch_1/html_checkpoint.json
 echo "[]" > Carousels/data/batch_1/doodle_prompts.json
 mkdir -p Carousels/data/batch_1/doodles
 ```
 
-Run from project root:
 ```bash
 cd "/Users/raghu-2264/Raghu/Personal Works/dadfit/dadfit-content" && python3 Carousels/scripts/step8_stepa.py --batch 1
 ```
 
-**Read the STATUS line:**
 - `ALL DONE` → skip to Step E
-- `PROCESS running_no X to Y` → this invocation handles only those carousels. Proceed to Step B.
+- `PROCESS running_no X to Y` → proceed to Step B with those carousels
 
 ---
 
-### Step B — Spawn 10 subagents for this round (one per carousel)
+### Step B — Spawn 10 subagents simultaneously
 
-Take the 10 carousels from `/tmp/batch_1_html_round.json`. Spawn all 10 subagents **simultaneously** — one per carousel, no exceptions.
+Read `/tmp/batch_1_html_round.json` to get the 10 carousels for this round. Spawn all 10 **simultaneously** — one per carousel, no exceptions.
 
-**STRICT RULE — ONE SUBAGENT, ONE CAROUSEL. SUBAGENTS OUTPUT CONTENT JSON VARS ONLY — NO HTML, NO CSS, NO SCRIPT.**
-A renderer script (`step8_renderer.py`) generates all HTML deterministically from pre-built snippet templates using the vars you supply. Never write HTML markup.
-
-Use this prompt per subagent (fill in all placeholders from the carousel data):
+Use this prompt for every subagent (fill in all `{placeholders}` from the carousel data):
 
 ---
 
-> You are filling the content for a single DadFit Instagram carousel. Your output is a **content JSON file** — not HTML. A renderer script generates all HTML from pre-built snippet templates using the vars you supply. Do not write any HTML, CSS, or script blocks.
+> **Read `Carousels/skills/step8-slide-writer/SKILL.md` in full as your FIRST action. Follow it exactly.**
 >
-> **Read these files FIRST before doing anything else (in this order):**
-> 1. `read_file` → `Carousels/templates/DadFit Carousel design.MD` — for slide type rules, category strategy, and copy guidelines
-> 2. `read_file` → `Carousels/skills/step8-html-builder/SKILL.md` — for the full vars reference per slide type (STEP 2 below)
->
-> Do not skip these reads.
->
-> ---
->
-> **Carousel data for this invocation:**
+> Carousel data:
 > - UUID: `{uuid}`
 > - Running No: `{running_no}`
 > - Batch: `1`
 > - Title: `{title}`
 > - Keyword: `{keyword}`
 > - Category: `{category}` (TOFU = educate cold audience | MOFU = deepen trust | BOFU = convert)
-> - Hook (first slide headline): `{hook}`
-> - CTA (last slide): `{cta}`
-> - Script content (one sentence per line — each line = one slide's core idea):
->
+> - Hook: `{hook}`
+> - CTA: `{cta}`
+> - Script:
 > ```
 > {script_content}
-> ```
->
-> ---
->
-> ## STEP 1 — Map script to slides
->
-> The `script_content` has one idea per line. Your job is to map these into a visual carousel story. **The goal is to tell the story well — not to pack everything onto as few slides as possible.**
->
-> ### The non-negotiable readability rule
->
-> **Every slide must be easy on the eyes and instantly readable at a glance.** Instagram carousels are swiped in under 2 seconds per slide. Cramming text is the #1 killer of engagement.
->
-> - **One idea per slide.** If a script line has two separable thoughts, give each its own slide.
-> - **Headline: 3–6 words max.** Strong, punchy, ALL CAPS.
-> - **Body copy: 2–3 lines max, never 4.** If a sentence is long, cut it to its essence.
-> - **Never stack more than 3 content blocks** (e.g. number + headline + body is the limit). Adding a callout box replaces body, not adds to it.
-> - **Breathing room is content.** Generous whitespace is intentional. Do not fill it.
-> - **If the slide feels crowded in your head, split it.** Use an additional B1 or E1 slide rather than cramming.
->
-> ### Slide type selection rules
->
-> The template has many slide types. Choose based on what the script sentence is **trying to do** — not just what's easiest to write. Every type is described below with the exact use case it was designed for.
->
-> ---
->
-> #### TYPE A — Cover / Hook (Slide 1 only)
->
-> | Type | Layout | Use when the hook is… |
-> |------|--------|----------------------|
-> | **A1** | Big headline + 1-line sub-text + "Swipe →" prompt + doodle | A bold declarative statement or urgent promise. Default cover type. Most carousels use this. |
-> | **A4** | Caveat opener line ("Be honest —") + big Inter headline + doodle | A personal, self-reflective hook that challenges the dad directly. Use when the hook sounds like a coach talking to you. |
-> | **A5** | Permanent Marker challenge word + big headline + doodle | A dare, challenge, or call to action as the hook. Use when the carousel is a 30-day challenge or protocol. |
->
-> > A2 and A3 require a real photo — skip them (no photos available yet).
->
-> ---
->
-> #### TYPE B — Content / Explainer (numbered content slides)
->
-> | Type | Layout | Use when the script sentence is… |
-> |------|--------|----------------------------------|
-> | **B1** | Section ① + headline + 2 lines body + optional Caveat footer + doodle | A single tip, principle, or insight that needs a brief explanation. The workhorse slide. Use for ~60% of content slides. |
-> | **B4** | Section ① + headline + callout box (one punchy sentence) + doodle | A tip where the key action is so concrete it deserves its own boxed highlight. The callout **replaces** body copy — do not use both. |
-> | **B5** | Section ① + headline + two-column WRONG vs RIGHT comparison grid + doodle | A contrast between the wrong approach and the right one. Use when the script explicitly compares two behaviours or methods. |
-> | **B6** | Section ① + headline + numbered step list (3 steps, one line each) + doodle | A sequence of 3 ordered steps. Use only when the script idea is a protocol or process with a clear 1→2→3 structure. |
->
-> > B2 requires a real photo. B3 is full-bleed image. Skip both.
->
-> ---
->
-> #### TYPE C — Problem / Pain
->
-> | Type | Layout | Use when the script sentence is… |
-> |------|--------|----------------------------------|
-> | **C1** | Permanent Marker pain label ("SOUND FAMILIAR?") + 2-line pain statement + 1-line reframe + doodle | Naming the dad's lived frustration, failure, or mistake. Emotionally confrontational. Use once near the start of the carousel to establish empathy before the solution. |
-> | **C3** | MYTH card (red border) + TRUTH card (green border) + doodle | Busting a specific named misconception. Use only when the script sentence explicitly contradicts a common belief. |
-> | **C4** | "BE REAL." header + 3-item excuse checklist + Caveat footer + doodle | Listing the specific excuses the dad makes. Use when the script calls out avoidance behaviours by name. |
->
-> > C2 requires a real photo — skip it.
->
-> ---
->
-> #### TYPE D — Proof / Stat
->
-> | Type | Layout | Use when the script sentence is… |
-> |------|--------|----------------------------------|
-> | **D1** | Permanent Marker label + giant number (200px+) + 1-line context + Caveat quote + doodle | A single real statistic or percentage from the script. The number must exist in the script — do not invent data. One sentence of context only. |
-> | **D3** | Two-column split: left stat (red) vs right stat (green) + 1-line footer + doodle | Comparing two contrasting numbers (e.g. "68% quit vs 94% with a system"). Use only when the script has two explicit opposing numbers. |
-> | **D4** | Headline + 3 progress bar rows (Week 1 / Week 4 / Week 12) + doodle | A real timeline with measurable milestones. Use only when the script describes a progression over time with specific checkpoints. |
->
-> > D2 requires a real photo — skip it.
->
-> ---
->
-> #### TYPE E — Transition / Bridge
->
-> | Type | Layout | Use when the script sentence is… |
-> |------|--------|----------------------------------|
-> | **E1** | Caveat opener ("But here's the thing —") + 1 bold Inter statement + doodle | A pivot between problem and solution. Use when the carousel shifts from "here's the pain" to "here's what to do". Minimal text — 2 elements only. |
-> | **E2** | Section label card ("PART 2 — The Nutrition Fix") + 1-line description | Dividing a long carousel into named parts. Use when the script clearly has two distinct sections (e.g. problem block + solution block). |
-> | **E3** | Caveat quote between two green bars + 1-line footer + doodle | A stand-alone insight or philosophy statement. Use when the script has a quotable one-liner that deserves its own moment. |
->
-> > E4 has pill navigation — use only for multi-part carousels with 3+ named sections.
->
-> ---
->
-> #### TYPE F — Pattern Interrupt / Breath (use sparingly — max 1 per carousel)
->
-> | Type | Layout | Use when… |
-> |------|--------|-----------|
-> | **F2** | Two massive ALL CAPS lines, no counter, no brand | The carousel is long (9+ slides) and needs a visual pause. The words must be a punchy truth ("SLOW IS / SUSTAINABLE."). |
-> | **F3** | One giant Caveat word pair ("just / start."), no counter, no brand | Same — a breather. Use when the carousel has a motivational tone and a natural midpoint rest. |
->
-> > F1 requires a real photo. F4 is decorative only. Avoid both. Use F slides only when the carousel would otherwise feel like a monotonous wall of B1 slides.
->
-> ---
->
-> #### TYPE G — Recap / Summary (second-to-last slide, before H1)
->
-> | Type | Layout | Use when… |
-> |------|--------|-----------|
-> | **G1** | "QUICK RECAP" + 3–5 numbered one-line bullets + Caveat footer "Save this." | The carousel has 3 or more distinct tips worth summarising. Most carousels end here before the CTA. Default recap type. |
-> | **G3** | "REMEMBER THIS —" + one giant statement + green bar + "Save it. Share it." | The carousel's entire lesson distills into one memorable line. Use instead of G1 when a list would feel weak. |
->
-> > G2 uses emoji icons — suitable only if the carousel has exactly 6 clean takeaways that map to icons. G4 is a habit tracker — use only for habit/routine carousels.
-> > **Skip G entirely** if the carousel is short (7 slides) or if all ideas were already distinct enough as individual slides.
->
-> ---
->
-> #### TYPE H — CTA (always last slide)
->
-> | Type | Layout | Use when… |
-> |------|--------|-----------|
-> | **H1** | Centered logo + URL + green divider + CTA text + `@dadfit.in` handle | Default CTA. Use for all carousels unless a specific variant fits better. |
-> | **H3** | Dark green glow + big "DM me START" + handle | Use only when the CTA explicitly asks users to DM a keyword. |
->
-> > H2 requires a founder photo. H4 uses a testimonial quote. Skip both unless you have real content.
->
-> ---
->
-> **Decision shortcut:** Read the script sentence. Ask: Is it a fact/tip → B1. A tip with one sharp action → B4. A pain/frustration → C1. A real number → D1. A contrast (wrong vs right) → B5 or C3. A pivot moment → E1. A sequence of steps → B6. A philosophical one-liner → E3 or G3.
->
-> ### Slide count rules
->
-> - **Fixed:** Slide 1 = A1 (Cover), Last slide = H1 (CTA)
-> - **Total:** 8–10 slides for a 10-line script. Never fewer than 7, never more than 11.
-> - If the script has 10 lines, expect roughly: 1 A1 + 1–2 C1/E1 + 5–6 B1/B4/D1 + 1 G1 (optional) + 1 H1
-> - **When in doubt, add a slide.** A shorter, cleaner slide is always better than an overloaded one.
->
-> **Write your slide map (type + one-line description per slide) before touching any HTML.**
->
-> ---
->
-> ## STEP 2 — Fill content vars for each slide
->
-> **Do NOT write HTML.** The renderer generates all HTML from snippet templates. Your job is to supply the content values (vars) for each slide you planned in Step 1.
->
-> For each slide, produce a slide object:
-> ```json
-> {
->   "type": "A1",
->   "slide_no": 1,
->   "label": "Cover",
->   "vars": {
->     "COUNTER": "01 / 10",
->     "HEADLINE": "YOU DON'T NEED <span style=\"color:#34C363;\">MORE TIME</span>",
->     "SUBTEXT": "You need a smarter 20-minute plan.",
->     "DOODLE_SRC": "../doodles/7-d-01.png",
->     "DOODLE_ALT": "A cracked hourglass"
->   }
-> }
-> ```
->
-> ### Global var rules
->
-> - **`DOODLE_SRC`**: always `"../doodles/{running_no}-d-{slide_no:02d}.png"` — e.g. slide 3 of carousel #7 → `"../doodles/7-d-03.png"`
-> - **`DOODLE_ALT`**: 1-line description of the doodle subject for that slide
-> - **`COUNTER`**: format `"0N / NN"` zero-padded — e.g. `"03 / 10"`. G-type recap slides show `←` arrow (handled by snippet automatically — still supply COUNTER as normal)
-> - **HTML in var values**: allowed — use `<span style="color:#34C363;">` for green words in HEADLINE; `<br>` for line breaks in BODY. Escape internal quotes with `\"`
-> - **`LOGO_SRC`**: injected automatically — never supply it
-> - **Optional vars** (e.g. `BULLET4`, `BULLET5`, `CAVEAT`): omit the key entirely if not needed — do not supply an empty string
->
-> ### Vars reference by type
->
-> **A1** — Cover: Text-Only
-> `COUNTER`, `HEADLINE` (4–7 words ALL CAPS, 1–2 words in green span), `SUBTEXT` (1 short sentence), `DOODLE_SRC`, `DOODLE_ALT`
->
-> **A4** — Cover: Caveat Hook
-> `COUNTER`, `CAVEAT_OPENER` ("Be honest —"), `HEADLINE`, `SUBTEXT`, `DOODLE_SRC`, `DOODLE_ALT`
->
-> **A5** — Cover: Challenge
-> `COUNTER`, `CHALLENGE_WORD` (1 word, Permanent Marker), `HEADLINE`, `SUBTEXT`, `DOODLE_SRC`, `DOODLE_ALT`
->
-> **B1** — Content: Body
-> `COUNTER`, `HEADLINE` (3–5 words), `BODY` (2–3 lines, `<br>` separators), `CAVEAT` *(optional)*, `DOODLE_SRC`, `DOODLE_ALT`
->
-> **B4** — Content: Callout Box
-> `COUNTER`, `HEADLINE`, `BODY` (1–2 lines context), `CALLOUT` (1 punchy action sentence), `DOODLE_SRC`, `DOODLE_ALT`
->
-> **B5** — Content: Wrong vs Right
-> `COUNTER`, `HEADLINE`, `WRONG_ITEMS` (`<li>` items, 2–3), `RIGHT_ITEMS` (`<li>` items, 2–3), `CAVEAT`, `DOODLE_SRC`, `DOODLE_ALT`
->
-> **B6** — Content: 3-Step Protocol
-> `COUNTER`, `HEADLINE`, `STEP1`, `STEP2`, `STEP3` (one line each), `CAVEAT`, `DOODLE_SRC`, `DOODLE_ALT`
->
-> **C1** — Pain: Empathy Frame
-> `COUNTER`, `PAIN_LABEL` (Permanent Marker, red — e.g. `"SOUND FAMILIAR?"`), `PAIN_LINE1`, `PAIN_LINE2`, `REFRAME` (1-line green pivot), `DOODLE_SRC`, `DOODLE_ALT`
->
-> **C3** — Myth vs Truth
-> `COUNTER`, `MYTH_TEXT`, `TRUTH_TEXT`, `DOODLE_SRC`, `DOODLE_ALT`
->
-> **C4** — Excuse Checklist
-> `COUNTER`, `EXCUSE1`, `EXCUSE2`, `EXCUSE3`, `C4_CAVEAT`, `DOODLE_SRC`, `DOODLE_ALT`
->
-> **D1** — Big Stat
-> `COUNTER`, `STAT_LABEL` (e.g. `"DID YOU KNOW?"`), `BIG_NUMBER`, `STAT_CONTEXT` (1 sentence), `STAT_CAVEAT`, `DOODLE_SRC`, `DOODLE_ALT`
->
-> **D3** — Split Stat
-> `COUNTER`, `LEFT_NUMBER`, `LEFT_LABEL`, `RIGHT_NUMBER`, `RIGHT_LABEL`, `D3_FOOTER`, `DOODLE_SRC`, `DOODLE_ALT`
->
-> **D4** — Progress Bar Timeline
-> `COUNTER`, `D4_LABEL`, `HEADLINE`, `ROW1_LABEL`, `ROW1_RESULT`, `ROW1_PCT` (e.g. `"25%"`), `ROW2_LABEL`, `ROW2_RESULT`, `ROW2_PCT`, `ROW3_LABEL`, `ROW3_RESULT`, `ROW3_PCT`, `DOODLE_SRC`, `DOODLE_ALT`
->
-> **E1** — Bridge: Pivot
-> `COUNTER`, `E1_OPENER` (Caveat opener), `E1_STATEMENT` (3–5 words, green), `E1_SUBTEXT` (1-line grey), `DOODLE_SRC`, `DOODLE_ALT`
->
-> **E2** — Section Label Card
-> `COUNTER`, `E2_PART_LABEL` (e.g. `"PART 2 — NUTRITION"`), `E2_SECTION_TITLE`, `E2_DESCRIPTION` (1 line), `DOODLE_SRC`, `DOODLE_ALT`
->
-> **E3** — Green Accent Quote
-> `COUNTER`, `E3_QUOTE` (quotable line, Caveat), `E3_FOOTER` (1-line attribution), `DOODLE_SRC`, `DOODLE_ALT`
->
-> **E4** — Part Intro with Pills
-> `COUNTER`, `E4_PILL1`, `E4_PILL2`, `E4_PILL3`, `E4_HEADLINE`, `E4_DESCRIPTION`, `DOODLE_SRC`, `DOODLE_ALT`
->
-> **F2** — Bold Statement (no counter/brand)
-> `F2_LINE1` (white, ALL CAPS, max 2 words), `F2_LINE2` (green, ALL CAPS, max 2 words), `DOODLE_SRC`, `DOODLE_ALT`
->
-> **F3** — Caveat Poster (no counter/brand)
-> `F3_LINE1` (white Caveat word), `F3_LINE2` (green Caveat word), `DOODLE_SRC`, `DOODLE_ALT`
->
-> **F4** — Rule Break / Tip Number
-> `F4_NUMBER` (decorative digit, e.g. `"2"`), `F4_TIP_LABEL` (e.g. `"TIP 2 OF 5"`), `DOODLE_SRC`, `DOODLE_ALT`
->
-> **G1** — Recap: Numbered List
-> `COUNTER`, `BULLET1`, `BULLET2`, `BULLET3`, `BULLET4` *(optional)*, `BULLET5` *(optional)*, `G1_CAVEAT` (e.g. `"Save this."`), `DOODLE_SRC`, `DOODLE_ALT`
->
-> **G2** — Recap: Icon Grid
-> `COUNTER`, `CARD1_EMOJI`–`CARD6_EMOJI`, `CARD1_LABEL`–`CARD6_LABEL` (2–4 words each), `DOODLE_SRC`, `DOODLE_ALT`
->
-> **G3** — One-Line Truth
-> `COUNTER`, `G3_STATEMENT` (ALL CAPS, max 6 words), `G3_CAVEAT`, `DOODLE_SRC`, `DOODLE_ALT`
->
-> **G4** — Habit Scoreboard
-> `COUNTER`, `HABIT1`, `HABIT2`, `HABIT3` (2–4 words each), `HABIT1_FILLED`, `HABIT2_FILLED`, `HABIT3_FILLED` (number 0–7 as string, e.g. `"5"`), `G4_CAVEAT`, `DOODLE_SRC`, `DOODLE_ALT`
->
-> **H1** — CTA: Text-Only
-> `CTA_TEXT` (1–2 sentences), `H1_FOLLOW` ("Join 5,000+ dads..."), `DOODLE_SRC`, `DOODLE_ALT`
->
-> **H3** — CTA: DM Action
-> `H3_HEADLINE` (ALL CAPS, 3–4 words), `H3_DM_WORD` ("START", "DAD", etc.), `DOODLE_SRC`, `DOODLE_ALT`
->
-> **H4** — CTA: Testimonial
-> `H4_TESTIMONIAL` (quote text), `H4_ATTRIBUTION` (name + handle), `H4_FOLLOW_TEXT`, `DOODLE_SRC`, `DOODLE_ALT`
->
-> ### Copy rules
->
-> - **Headline (A1/B1/B4/C1/D1)**: 3–7 words, ALL CAPS or Title Case. 1–2 words in `#34C363` span. Never 2 full lines of headline AND 3 lines of body.
-> - **Body (B1/B4)**: 2–3 lines max, never 4. Use `<br>` between lines.
-> - **Callout (B4)**: one punchy action sentence only — replaces body copy, never alongside it.
-> - **Photo slides (A2, A3, B2, B3, D2, F1)**: require real photos — **never use them**. Replace with A1, B1, B4, D1, D3.
-> - **No section numbers on content slides.** The counter shows position. Never add a large decorative number on B1/B4/B5/B6.
->
-> ---
->
-> ## STEP 3 — Prepare doodle prompts
->
-> For every slide that has a doodle (all slides except H1 CTA), write one doodle prompt entry. These are returned in your JSON response — **do not write a file**.
->
-> Each entry:
-> ```json
-> {"running_no": {running_no}, "image_name": "{running_no}-d-{slide_no:02d}.png", "prompt": "...full prompt text..."}
-> ```
->
-> **Prompt guidelines:**
-> - **Subject**: pick the single most concrete object or scene that visually represents this slide's idea — be specific (e.g. "a cracked hourglass", "a barbell with a tiny figure underneath", "a plate with a fried egg and dal bowl"). Avoid abstract nouns.
-> - **Style**: flat hand-drawn ink-line illustration, `#34C363` brand green ink only, ~3–5px stroke, no shading, no fill, no gradients
-> - **Framing**: subject fills ~70–80% of canvas, centered, generous empty space around it
-> - **Mandatory closing tag** — end every prompt with exactly: `Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style.`
-> - **`.doodle-full` slides only**: describe a wide atmospheric scene that works at 8% opacity behind full slide text — use loose, spacious line-work (e.g. "a sparse cityscape at dawn with a lone figure walking", not a tight icon)
->
-> **Example prompts (study the level of structural specificity required):**
->
-> > *Checklist / task slide:* "A flat hand-drawn ink-line doodle of a simple notepad or clipboard with three horizontal lines drawn on it, each preceded by a checkbox square with a checkmark inside. The notepad has a clean rectangular outline, a small binding clip at the top center (simple representation), and the three checkbox + line elements stacked evenly down the page. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
->
-> > *Process / cycle slide:* "A flat hand-drawn ink-line doodle showing a pair of lungs in simple outline form at the center, with four arrows forming a breathing cycle around them: (1) an inhale arrow pointing INTO the lungs from the left (labeled concept: 4 sec), (2) a short hold indicator at the top (pause), (3) an exhale arrow pointing OUT from the lungs to the right (labeled concept: 4 sec), (4) another hold at the bottom, forming a square breathing pattern visualization. The lungs are center, arrows curve around in a clockwise or box-shaped breathing cycle. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. The lungs and the four-directional arrow cycle together fill 70–80% of canvas, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
->
-> > *Movement / exercise slide:* "A flat hand-drawn ink-line doodle of a person performing the World's Greatest Stretch — a wide lunge position with one arm reaching up and torso rotating. Simple stick-figure style showing the key movement pattern: wide lunge stance (one leg forward, one back), upper body rotation visible, one arm extended upward toward the sky. The figure is shown in profile or three-quarter view to capture the rotation. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill. Icon-level simplicity — single pose, human figure fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
->
-> > *Single-object / stat slide:* "A flat hand-drawn ink-line doodle showing a simple timer/stopwatch displaying '20' with motion lines indicating speed and urgency. The stopwatch is circular with a button on top, clean circular face, simple button/crown at 12 o'clock position. Two or three short motion lines radiate from the sides suggesting rapid action. The entire illustration is rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Icon-level simplicity — single object centered on canvas, fills 70–80% of canvas height. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
->
-> Skip H1 (CTA) — no doodle.
->
-> ---
->
-> ## STEP 4 — Write the content JSON file and return confirmation
->
-> Use `create_file` to write ONE JSON file to `/tmp/carousel_{uuid}.json`. This contains your slide content vars — **not HTML**. The renderer reads this and generates all HTML from snippets.
->
-> ```json
-> {
->   "uuid": "{uuid}",
->   "running_no": {running_no},
->   "folder_name": "{running_no}_{uuid}",
->   "page_title": "HOOK HEADLINE — DadFit Carousel",
->   "slides": [
->     {
->       "type": "A1",
->       "slide_no": 1,
->       "label": "Cover",
->       "vars": {
->         "COUNTER": "01 / 10",
->         "HEADLINE": "YOU DON'T NEED <span style=\"color:#34C363;\">MORE TIME</span>",
->         "SUBTEXT": "You need a smarter 20-minute plan.",
->         "DOODLE_SRC": "../doodles/{running_no}-d-01.png",
->         "DOODLE_ALT": "A cracked hourglass"
->       }
->     }
->   ],
->   "doodle_prompts": [
->     {"running_no": {running_no}, "image_name": "{running_no}-d-01.png", "prompt": "..."},
->     {"running_no": {running_no}, "image_name": "{running_no}-d-02.png", "prompt": "..."}
->   ]
-> }
-> ```
->
-> Include all slides in the `slides` array. Do **not** write a `carousel.html` — the renderer does that. Do not write any other file.
->
-> Then respond ONLY with:
-> ```
-> DONE: /tmp/carousel_{uuid}.json — {N} slides
 > ```
 
 ---
