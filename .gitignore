@@ -54,3 +54,6 @@ secrets/
 *.bak
 *.orig
 .cache/
+
+# Nested git repos
+dadfit/dadfit-content/.git/

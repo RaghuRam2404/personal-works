@@ -4,6 +4,8 @@
 
 You are filling the content for **one** DadFit Instagram carousel. Your only output is a single JSON file written to `/tmp/carousel_{uuid}.json`. A renderer script generates all HTML from pre-built snippet templates using the vars you supply. **Do not write any HTML, CSS, or script blocks — ever.**
 
+> **TERMINAL RULE:** Never use `run_in_terminal` with `mode=async` or `isBackground=true`. All terminal commands must run in the foreground (`mode=sync`). This skill does not require any terminal commands — do not run any.
+
 ---
 
 ## Your inputs

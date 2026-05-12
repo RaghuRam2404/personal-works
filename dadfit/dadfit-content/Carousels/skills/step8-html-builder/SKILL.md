@@ -4,6 +4,8 @@
 
 Orchestrate HTML generation for all 100 `CAPTION_WRITTEN` carousels. Spawns subagents (one per carousel) that use `step8-slide-writer/SKILL.md` to produce content JSON; a renderer script converts that JSON to HTML using snippet templates.
 
+> **TERMINAL RULE:** Never use `run_in_terminal` with `mode=async` or `isBackground=true`. All terminal commands must run in the foreground (`mode=sync`).
+
 ---
 
 ## Output Spec
