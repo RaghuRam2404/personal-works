@@ -27,7 +27,7 @@ DB columns set after all 100 are done:
 
 ## Instructions
 
-> **This skill is recursive.** Each invocation handles exactly 10 carousels, then re-invokes itself for the next 10. Never process more than 10 carousels per invocation.
+> **This skill is recursive.** Each invocation handles exactly 1 carousel, spawns 1 subagent, then re-invokes itself for the next carousel. This loops until all 100 carousels are done.
 >
 > **Every invocation must start by reading `Carousels/skills/step8-html-builder/SKILL.md` in full before doing anything else.**
 
@@ -49,13 +49,13 @@ cd "/Users/raghu-2264/Raghu/Personal Works/dadfit/dadfit-content" && python3 Car
 ```
 
 - `ALL DONE` → skip to Step E
-- `PROCESS running_no X to Y` → proceed to Step B with those carousels
+- `PROCESS running_no X` → proceed to Step B with that carousel
 
 ---
 
-### Step B — Spawn 10 subagents simultaneously
+### Step B — Spawn 1 subagent
 
-Read `/tmp/batch_1_html_round.json` to get the 10 carousels for this round. Spawn all 10 **simultaneously** — one per carousel, no exceptions.
+Read `/tmp/batch_1_html_round.json` to get the 1 carousel for this round. Spawn **1 subagent** for it — do not spawn more than one at a time.
 
 Use this prompt for every subagent (fill in all `{placeholders}` from the carousel data):
 
@@ -89,7 +89,7 @@ cd "/Users/raghu-2264/Raghu/Personal Works/dadfit/dadfit-content" && \
   >> /tmp/html_round_results.json
 ```
 
-Run this for all 10 carousels. The renderer appends one result JSON line per run. Then wrap into an array and validate:
+Run this for the 1 carousel. The renderer appends one result JSON line per run. Then wrap into an array and validate:
 
 ```bash
 # Wrap renderer output lines into a JSON array
