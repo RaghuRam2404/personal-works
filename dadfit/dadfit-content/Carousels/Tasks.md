@@ -151,11 +151,13 @@ Track every task top to bottom. Do not move to the next phase until all tasks in
 ## Phase 4 — Publish & Monitor
 
 ### Step 12: Daily Publish Queue
-- [ ] **12.1** Create `Carousels/skills/step12-publish-queue/SKILL.md`
-  - Reads today's date, calculates which `running_no` values are due today (3-3-4 rhythm)
-  - Outputs a formatted checklist: carousel title, slide folder path, caption, CTA, music file
-  - After manual upload, update DB: `upload_status = PUBLISHED`, `current_stage = PUBLISHED`
-- [ ] **12.2** Test run: Dry-run for Day 1 — verify correct 10 carousels are selected
+- [x] **12.1** Create `Carousels/skills/step12-publish-queue/SKILL.md`
+  - Step 11 (music) skipped — `IMAGES_CREATED` is directly publishable
+  - `dry-run` mode: shows top N lowest `running_no` carousels (IMAGES_CREATED + PENDING), waits for user approval
+  - `publish` mode (manual trigger only): PNG→JPEG conversion, local HTTP server + ngrok tunnel, Instagram Graph API carousel upload, DB update to PUBLISHED
+  - Config: `Carousels/data/publish_config.env` (IG_USER_ID, IG_ACCESS_TOKEN)
+  - Script: `Carousels/scripts/step12_publisher.py`
+- [ ] **12.2** Test run: Dry-run for Day 1 — verify correct carousels are selected
 
 ### Step 13: Daily Performance Monitor
 - [ ] **13.1** Create `Carousels/skills/step13-daily-monitor/SKILL.md`

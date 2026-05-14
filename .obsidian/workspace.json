@@ -197,6 +197,11 @@
   },
   "active": "0356ccf574624382",
   "lastOpenFiles": [
+    "dadfit/dadfit-content/Carousels/requirements.txt",
+    "dadfit/dadfit-content/Carousels/data/publish_config.env.example",
+    "dadfit/dadfit-content/Carousels/skills/step12-publish-queue/SKILL.md",
+    "dadfit/dadfit-content/Carousels/skills/step12-publish-queue",
+    "dadfit/dadfit-content/Carousels/scripts/step12_publisher.py",
     "dadfit/dadfit-content/Carousels/data/batch_1_slides/1_35f5556f-f167-4bc9-aba0-d0c53fa4216b/slide-10.png",
     "dadfit/dadfit-content/Carousels/data/batch_1_slides/1_35f5556f-f167-4bc9-aba0-d0c53fa4216b/slide-09.png",
     "dadfit/dadfit-content/Carousels/data/batch_1_slides/1_35f5556f-f167-4bc9-aba0-d0c53fa4216b/slide-08.png",
@@ -214,9 +219,6 @@
     "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/@types/node/assert",
     "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/@types/node/worker_threads.d.ts",
     "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/@types/node/wasi.d.ts",
-    "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/@puppeteer/browsers/package.json",
-    "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/@types/node/vm.d.ts",
-    "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/@puppeteer/browsers/src/browser-data/types.ts",
     "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/puppeteer/README.md",
     "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/bare-url/README.md",
     "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/bare-fs/README.md",
@@ -240,8 +242,6 @@
     "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/socks/docs/migratingFromV1.md",
     "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/socks/docs/index.md",
     "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/ws/README.md",
-    "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/basic-ftp/README.md",
-    "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/cosmiconfig/README.md",
-    "dadfit/dadfit-content/Carousels/data/batch_1/doodles/3-d-10.png"
+    "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/basic-ftp/README.md"
   ]
 }
