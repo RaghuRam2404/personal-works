@@ -1,0 +1,13 @@
+{
+  "name": "step10-html-to-images",
+  "version": "1.0.0",
+  "description": "DadFit Step 10 — Batch HTML carousel to PNG slide exporter",
+  "main": "scripts/export_batch.js",
+  "scripts": {
+    "export": "node scripts/export_batch.js"
+  },
+  "dependencies": {
+    "puppeteer": "^22.0.0",
+    "sql.js": "^1.12.0"
+  }
+}

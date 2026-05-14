@@ -126,13 +126,14 @@ Track every task top to bottom. Do not move to the next phase until all tasks in
 - [ ] **9.5** Repeat 9.1–9.4 for all 100 carousels
 
 ### Step 10: Convert HTML to Slide Images
-- [ ] **10.1** Create `Carousels/skills/step10-html-to-images/SKILL.md`
-  - Imports existing Puppeteer skill
-  - For each carousel with `current_stage = DOODLES_DONE`:
+- [x] **10.1** Create `Carousels/skills/step10-html-to-images/SKILL.md`
+  - Uses Puppeteer + sql.js (same as server)
+  - For each carousel with `current_stage = HTML_APPROVED`:
     - Opens `carousel.html` in headless browser
-    - Screenshots each slide as PNG
-    - Saves to `Carousels/data/batch_{batch_no}/{folder_name}/slides/slide_{n}.png`
+    - Screenshots each slide as PNG (1080×1080)
+    - Saves to `Carousels/data/batch_{batch_no}/{folder_name}/slides/slide-NN.png`
     - Updates DB: `current_stage = IMAGES_CREATED`
+  - Always overwrites existing PNGs — safe to re-run after editing individual HTMLs
 - [ ] **10.2** Test: Verify slide PNGs exist for 5 carousels, check image quality and dimensions
 
 ### Step 11: Choose Music
