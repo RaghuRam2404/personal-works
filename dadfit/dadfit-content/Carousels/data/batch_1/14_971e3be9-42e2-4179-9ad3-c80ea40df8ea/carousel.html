@@ -294,6 +294,19 @@
       border: 2px dashed rgba(52,195,99,0.12);
     }
 
+    /* ── Gradient toggle ── */
+    html.flat-bg .s-bg[style] { background: var(--primary-bg) !important; }
+    html.flat-bg .gradient-glow { display: none !important; }
+    #gradient-toggle-btn {
+      position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+      padding: 10px 20px; border-radius: 8px; border: 1px solid #34C363;
+      background: #1a1a1a; color: #34C363; font-family: 'Inter',sans-serif;
+      font-size: 13px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+      transition: background 0.15s, color 0.15s;
+    }
+    #gradient-toggle-btn:hover { background: #34C363; color: #1a1a1a; }
+
   </style>
 </head>
 <body>
@@ -310,7 +323,8 @@
       <div class="slide-label"><strong>A1</strong> &mdash; Cover</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-A1"></div>
+<div class="s-bg slide-type-A1" style="background:linear-gradient(145deg,#0c1610 0%,#121e15 30%,#17211a 58%,#1c1e1c 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 75% 88%,rgba(52,195,99,0.10) 0%,rgba(52,195,99,0.02) 40%,transparent 65%);pointer-events:none;"></div>
 <div class="doodle-ph" style="right:150px;bottom:40px;">
   <img src="../doodles/14-d-01.png" alt="A clipboard with three numbered measurement icons" />
   <div class="doodle-ph-icon">
@@ -339,7 +353,8 @@
       <div class="slide-label"><strong>C1</strong> &mdash; Pain — Can't Confirm Fat Loss</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-C1"></div>
+<div class="s-bg slide-type-C1" style="background:linear-gradient(145deg,#1c1212 0%,#201616 35%,#1f1b1b 65%,#1E1E1E 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 20% 30%,rgba(255,107,107,0.06) 0%,transparent 55%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/14-d-02.png" alt="A frustrated man standing on a weighing scale with arms crossed" />
   <div class="doodle-ph-icon">
@@ -383,7 +398,8 @@
       <div class="slide-label"><strong>C3</strong> &mdash; Myth — Scale Weight Misleads</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-C3"></div>
+<div class="s-bg slide-type-C3" style="background:linear-gradient(160deg,#1c1212 0%,#1f1616 30%,#1e1c1c 60%,#1E1E1E 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(255,107,107,0.04) 0%,transparent 60%);pointer-events:none;"></div>
 <div class="doodle-ph" style="bottom: 700px; z-index: 100;">
   <img src="../doodles/14-d-03.png" alt="A weighing scale with a large question mark floating above the dial" />
   <div class="doodle-ph-icon">
@@ -425,7 +441,8 @@
       <div class="slide-label"><strong>E1</strong> &mdash; Bridge — 3 Numbers Reveal the Truth</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-E1"></div>
+<div class="s-bg slide-type-E1" style="background:linear-gradient(145deg,#1a1510 0%,#1e1810 35%,#1c1a14 60%,#1e1e1c 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(255,180,80,0.05) 0%,transparent 50%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/14-d-04.png" alt="A clipboard with three numbered rows each showing a bold checkmark" />
   <div class="doodle-ph-icon">
@@ -466,7 +483,8 @@
       <div class="slide-label"><strong>B1</strong> &mdash; Number 1 — Morning Weight</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-B1"></div>
+<div class="s-bg slide-type-B1" style="background:linear-gradient(150deg,#131520 0%,#171b26 35%,#1a1e24 60%,#1c1e22 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(52,195,99,0.06) 0%,transparent 50%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/14-d-05.png" alt="A bathroom scale with a 7-square weekly calendar row above it" />
   <div class="doodle-ph-icon">
@@ -510,7 +528,8 @@
       <div class="slide-label"><strong>B1</strong> &mdash; Number 2 — Waist Measurement</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-B1"></div>
+<div class="s-bg slide-type-B1" style="background:linear-gradient(150deg,#131520 0%,#171b26 35%,#1a1e24 60%,#1c1e22 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(52,195,99,0.06) 0%,transparent 50%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/14-d-06.png" alt="A measuring tape wrapped around a torso at waist level" />
   <div class="doodle-ph-icon">
@@ -554,7 +573,8 @@
       <div class="slide-label"><strong>B1</strong> &mdash; Number 3 — Waist-Height Ratio</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-B1"></div>
+<div class="s-bg slide-type-B1" style="background:linear-gradient(150deg,#131520 0%,#171b26 35%,#1a1e24 60%,#1c1e22 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(52,195,99,0.06) 0%,transparent 50%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/14-d-07.png" alt="A division fraction showing a tape measure icon over a vertical ruler icon" />
   <div class="doodle-ph-icon">
@@ -598,7 +618,8 @@
       <div class="slide-label"><strong>D1</strong> &mdash; Stat — The 0.5 Ratio Target</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-D1"></div>
+<div class="s-bg slide-type-D1" style="background:linear-gradient(145deg,#101a1c 0%,#141e20 30%,#181e1e 58%,#1c1e1e 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%,rgba(52,195,99,0.07) 0%,transparent 55%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/14-d-08.png" alt="A bold downward arrow crossing below a horizontal threshold line" />
   <div class="doodle-ph-icon">
@@ -643,7 +664,8 @@
       <div class="slide-label"><strong>G1</strong> &mdash; Recap — All 3 Numbers</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-G1"></div>
+<div class="s-bg slide-type-G1" style="background:linear-gradient(145deg,#0f1710 0%,#141e14 35%,#182018 60%,#1c1e1c 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 20%,rgba(52,195,99,0.08) 0%,transparent 50%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/14-d-09.png" alt="A notepad with three checked checkbox rows" />
   <div class="doodle-ph-icon">
@@ -687,7 +709,8 @@
       <div class="slide-label"><strong>H1</strong> &mdash; CTA</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-H1"></div>
+<div class="s-bg slide-type-H1" style="background:linear-gradient(145deg,#060c08 0%,#090f09 25%,#0c120d 50%,#0f1410 75%,#111512 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(52,195,99,0.08) 0%,rgba(52,195,99,0.02) 45%,transparent 65%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/14-d-10.png" alt="A hand pressing a save or bookmark button" />
   <div class="doodle-ph-icon">
@@ -855,6 +878,18 @@
   }
   //document.addEventListener('DOMContentLoaded',function(){
   //document.querySelectorAll('.s-bg').forEach(function(bg){bg.insertAdjacentHTML('beforeend',buildSVG());});  });
+
+  // ── Gradient toggle button ──
+  document.addEventListener('DOMContentLoaded', function() {
+    var btn = document.createElement('button');
+    btn.id = 'gradient-toggle-btn';
+    btn.textContent = 'Gradients: ON';
+    btn.addEventListener('click', function() {
+      var isFlat = document.documentElement.classList.toggle('flat-bg');
+      btn.textContent = isFlat ? 'Gradients: OFF' : 'Gradients: ON';
+    });
+    document.body.appendChild(btn);
+  });
 })();
 </script>
 </body>

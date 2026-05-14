@@ -294,6 +294,19 @@
       border: 2px dashed rgba(52,195,99,0.12);
     }
 
+    /* ── Gradient toggle ── */
+    html.flat-bg .s-bg[style] { background: var(--primary-bg) !important; }
+    html.flat-bg .gradient-glow { display: none !important; }
+    #gradient-toggle-btn {
+      position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+      padding: 10px 20px; border-radius: 8px; border: 1px solid #34C363;
+      background: #1a1a1a; color: #34C363; font-family: 'Inter',sans-serif;
+      font-size: 13px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+      transition: background 0.15s, color 0.15s;
+    }
+    #gradient-toggle-btn:hover { background: #34C363; color: #1a1a1a; }
+
   </style>
 </head>
 <body>
@@ -310,7 +323,8 @@
       <div class="slide-label"><strong>A1</strong> &mdash; Cover</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-A1"></div>
+<div class="s-bg slide-type-A1" style="background:linear-gradient(145deg,#0c1610 0%,#121e15 30%,#17211a 58%,#1c1e1c 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 75% 88%,rgba(52,195,99,0.10) 0%,rgba(52,195,99,0.02) 40%,transparent 65%);pointer-events:none;"></div>
 <div class="doodle-ph" style="right:150px;bottom:40px;">
   <img src="../doodles/84-d-01.png" alt="A hunched desk figure transforming into an upright open-chested posture" />
   <div class="doodle-ph-icon">
@@ -339,7 +353,8 @@
       <div class="slide-label"><strong>B1</strong> &mdash; Problem opener</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-B1"></div>
+<div class="s-bg slide-type-B1" style="background:linear-gradient(150deg,#131520 0%,#171b26 35%,#1a1e24 60%,#1c1e22 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(52,195,99,0.06) 0%,transparent 50%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/84-d-02.png" alt="A slouched figure at a desk with an exaggerated forward-curved spine" />
   <div class="doodle-ph-icon">
@@ -383,7 +398,8 @@
       <div class="slide-label"><strong>C1</strong> &mdash; Pain empathy</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-C1"></div>
+<div class="s-bg slide-type-C1" style="background:linear-gradient(145deg,#1c1212 0%,#201616 35%,#1f1b1b 65%,#1E1E1E 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 20% 30%,rgba(255,107,107,0.06) 0%,transparent 55%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/84-d-03.png" alt="A figure with forward head posture and hunched shoulders, hand on neck" />
   <div class="doodle-ph-icon">
@@ -427,7 +443,8 @@
       <div class="slide-label"><strong>C3</strong> &mdash; Myth vs Truth — real culprit</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-C3"></div>
+<div class="s-bg slide-type-C3" style="background:linear-gradient(160deg,#1c1212 0%,#1f1616 30%,#1e1c1c 60%,#1E1E1E 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(255,107,107,0.04) 0%,transparent 60%);pointer-events:none;"></div>
 <div class="doodle-ph" style="bottom: 700px; z-index: 100;">
   <img src="../doodles/84-d-04.png" alt="A back-view torso with the lower trapezius region circled and marked with a checkmark" />
   <div class="doodle-ph-icon">
@@ -469,7 +486,8 @@
       <div class="slide-label"><strong>B4</strong> &mdash; Move 1: Face Pulls</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-B4"></div>
+<div class="s-bg slide-type-B4" style="background:linear-gradient(145deg,#111a13 0%,#151f16 35%,#192118 58%,#1c1e1c 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(52,195,99,0.08) 0%,transparent 52%);pointer-events:none;"></div>
 <div class="doodle-ph" style="bottom:250px">
   <img src="../doodles/84-d-05.png" alt="A person performing face pulls with elbows flared high and wide" />
   <div class="doodle-ph-icon">
@@ -514,7 +532,8 @@
       <div class="slide-label"><strong>B4</strong> &mdash; Move 2: Wall Angels</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-B4"></div>
+<div class="s-bg slide-type-B4" style="background:linear-gradient(145deg,#111a13 0%,#151f16 35%,#192118 58%,#1c1e1c 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(52,195,99,0.08) 0%,transparent 52%);pointer-events:none;"></div>
 <div class="doodle-ph" style="bottom:250px">
   <img src="../doodles/84-d-06.png" alt="A person sliding arms up and down against a wall in wall angel position" />
   <div class="doodle-ph-icon">
@@ -559,7 +578,8 @@
       <div class="slide-label"><strong>B4</strong> &mdash; Move 3: Band Pull-Aparts</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-B4"></div>
+<div class="s-bg slide-type-B4" style="background:linear-gradient(145deg,#111a13 0%,#151f16 35%,#192118 58%,#1c1e1c 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(52,195,99,0.08) 0%,transparent 52%);pointer-events:none;"></div>
 <div class="doodle-ph" style="bottom:250px">
   <img src="../doodles/84-d-07.png" alt="A person pulling a resistance band apart with straight arms at chest height" />
   <div class="doodle-ph-icon">
@@ -604,7 +624,8 @@
       <div class="slide-label"><strong>B1</strong> &mdash; The protocol</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-B1"></div>
+<div class="s-bg slide-type-B1" style="background:linear-gradient(150deg,#131520 0%,#171b26 35%,#1a1e24 60%,#1c1e22 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(52,195,99,0.06) 0%,transparent 50%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/84-d-08.png" alt="A stopwatch showing 12 with four calendar checkboxes beside it" />
   <div class="doodle-ph-icon">
@@ -648,7 +669,8 @@
       <div class="slide-label"><strong>G1</strong> &mdash; Quick recap</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-G1"></div>
+<div class="s-bg slide-type-G1" style="background:linear-gradient(145deg,#0f1710 0%,#141e14 35%,#182018 60%,#1c1e1c 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 20%,rgba(52,195,99,0.08) 0%,transparent 50%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/84-d-09.png" alt="A clipboard with four checkboxes ticked and a pencil resting on it" />
   <div class="doodle-ph-icon">
@@ -692,7 +714,8 @@
       <div class="slide-label"><strong>H1</strong> &mdash; CTA</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-H1"></div>
+<div class="s-bg slide-type-H1" style="background:linear-gradient(145deg,#060c08 0%,#090f09 25%,#0c120d 50%,#0f1410 75%,#111512 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(52,195,99,0.08) 0%,rgba(52,195,99,0.02) 45%,transparent 65%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/84-d-10.png" alt="A bookmark icon with a small star above it" />
   <div class="doodle-ph-icon">
@@ -860,6 +883,18 @@
   }
   //document.addEventListener('DOMContentLoaded',function(){
   //document.querySelectorAll('.s-bg').forEach(function(bg){bg.insertAdjacentHTML('beforeend',buildSVG());});  });
+
+  // ── Gradient toggle button ──
+  document.addEventListener('DOMContentLoaded', function() {
+    var btn = document.createElement('button');
+    btn.id = 'gradient-toggle-btn';
+    btn.textContent = 'Gradients: ON';
+    btn.addEventListener('click', function() {
+      var isFlat = document.documentElement.classList.toggle('flat-bg');
+      btn.textContent = isFlat ? 'Gradients: OFF' : 'Gradients: ON';
+    });
+    document.body.appendChild(btn);
+  });
 })();
 </script>
 </body>

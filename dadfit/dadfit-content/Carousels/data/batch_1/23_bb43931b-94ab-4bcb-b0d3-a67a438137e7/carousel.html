@@ -294,6 +294,19 @@
       border: 2px dashed rgba(52,195,99,0.12);
     }
 
+    /* ── Gradient toggle ── */
+    html.flat-bg .s-bg[style] { background: var(--primary-bg) !important; }
+    html.flat-bg .gradient-glow { display: none !important; }
+    #gradient-toggle-btn {
+      position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+      padding: 10px 20px; border-radius: 8px; border: 1px solid #34C363;
+      background: #1a1a1a; color: #34C363; font-family: 'Inter',sans-serif;
+      font-size: 13px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+      transition: background 0.15s, color 0.15s;
+    }
+    #gradient-toggle-btn:hover { background: #34C363; color: #1a1a1a; }
+
   </style>
 </head>
 <body>
@@ -310,7 +323,8 @@
       <div class="slide-label"><strong>A1</strong> &mdash; Cover</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-A1"></div>
+<div class="s-bg slide-type-A1" style="background:linear-gradient(145deg,#0c1610 0%,#121e15 30%,#17211a 58%,#1c1e1c 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 75% 88%,rgba(52,195,99,0.10) 0%,rgba(52,195,99,0.02) 40%,transparent 65%);pointer-events:none;"></div>
 <div class="doodle-ph" style="right:150px;bottom:40px;">
   <img src="../doodles/23-d-01.png" alt="A human belly with a heavy padlock chained around it" />
   <div class="doodle-ph-icon">
@@ -339,7 +353,8 @@
       <div class="slide-label"><strong>C3</strong> &mdash; Myth vs Truth — Exercise burns belly fat</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-C3"></div>
+<div class="s-bg slide-type-C3" style="background:linear-gradient(160deg,#1c1212 0%,#1f1616 30%,#1e1c1c 60%,#1E1E1E 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(255,107,107,0.04) 0%,transparent 60%);pointer-events:none;"></div>
 <div class="doodle-ph" style="bottom: 700px; z-index: 100;">
   <img src="../doodles/23-d-02.png" alt="A dumbbell crossed out next to a fat cell growing larger" />
   <div class="doodle-ph-icon">
@@ -381,7 +396,8 @@
       <div class="slide-label"><strong>B1</strong> &mdash; How cortisol stores belly fat</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-B1"></div>
+<div class="s-bg slide-type-B1" style="background:linear-gradient(150deg,#131520 0%,#171b26 35%,#1a1e24 60%,#1c1e22 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(52,195,99,0.06) 0%,transparent 50%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/23-d-03.png" alt="A human body outline with a bold oval circling the belly area" />
   <div class="doodle-ph-icon">
@@ -425,7 +441,8 @@
       <div class="slide-label"><strong>D1</strong> &mdash; Big stat — 3–4x more fat storage</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-D1"></div>
+<div class="s-bg slide-type-D1" style="background:linear-gradient(145deg,#101a1c 0%,#141e20 30%,#181e1e 58%,#1c1e1e 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%,rgba(52,195,99,0.07) 0%,transparent 55%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/23-d-04.png" alt="Three small fat cell blobs next to one fat cell drawn 3–4 times larger" />
   <div class="doodle-ph-icon">
@@ -470,7 +487,8 @@
       <div class="slide-label"><strong>C1</strong> &mdash; Pain — The desk-dad cortisol trap</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-C1"></div>
+<div class="s-bg slide-type-C1" style="background:linear-gradient(145deg,#1c1212 0%,#201616 35%,#1f1b1b 65%,#1E1E1E 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 20% 30%,rgba(255,107,107,0.06) 0%,transparent 55%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/23-d-05.png" alt="A stressed man slumped at a desk with a teacup and a stack of papers" />
   <div class="doodle-ph-icon">
@@ -514,7 +532,8 @@
       <div class="slide-label"><strong>B1</strong> &mdash; Double Fat-Storage Signal</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-B1"></div>
+<div class="s-bg slide-type-B1" style="background:linear-gradient(150deg,#131520 0%,#171b26 35%,#1a1e24 60%,#1c1e22 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(52,195,99,0.06) 0%,transparent 50%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/23-d-06.png" alt="Two bold downward arrows converging into a rounded belly shape from different angles" />
   <div class="doodle-ph-icon">
@@ -558,7 +577,8 @@
       <div class="slide-label"><strong>E1</strong> &mdash; Bridge — Exercise alone fails</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-E1"></div>
+<div class="s-bg slide-type-E1" style="background:linear-gradient(145deg,#1a1510 0%,#1e1810 35%,#1c1a14 60%,#1e1e1c 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(255,180,80,0.05) 0%,transparent 50%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/23-d-07.png" alt="A bucket with water draining from the bottom while a large pour refills it from the top" />
   <div class="doodle-ph-icon">
@@ -599,7 +619,8 @@
       <div class="slide-label"><strong>B6</strong> &mdash; 3-Step Protocol — Lower cortisol in 7 days</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-B6"></div>
+<div class="s-bg slide-type-B6" style="background:linear-gradient(155deg,#131516 0%,#171a1c 35%,#1a1d1f 60%,#1E1E1E 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 15% 50%,rgba(52,195,99,0.05) 0%,transparent 45%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/23-d-08.png" alt="Three stacked icons: a crescent moon, a pair of footprints, and a pair of lungs" />
   <div class="doodle-ph-icon">
@@ -654,7 +675,8 @@
       <div class="slide-label"><strong>D1</strong> &mdash; Big stat — 2x faster belly fat loss</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-D1"></div>
+<div class="s-bg slide-type-D1" style="background:linear-gradient(145deg,#101a1c 0%,#141e20 30%,#181e1e 58%,#1c1e1e 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%,rgba(52,195,99,0.07) 0%,transparent 55%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/23-d-09.png" alt="Two stick figures side by side — one with a large belly, one with a reduced belly and a down arrow" />
   <div class="doodle-ph-icon">
@@ -699,7 +721,8 @@
       <div class="slide-label"><strong>H1</strong> &mdash; CTA</div>
       <div class="slide-wrapper">
         <div class="slide">
-<div class="s-bg slide-type-H1"></div>
+<div class="s-bg slide-type-H1" style="background:linear-gradient(145deg,#060c08 0%,#090f09 25%,#0c120d 50%,#0f1410 75%,#111512 100%);"></div>
+<div class="gradient-glow" style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(52,195,99,0.08) 0%,rgba(52,195,99,0.02) 45%,transparent 65%);pointer-events:none;"></div>
 <div class="doodle-ph">
   <img src="../doodles/23-d-10.png" alt="A flexing dad silhouette with arms raised and a calm expression" />
   <div class="doodle-ph-icon">
@@ -867,6 +890,18 @@
   }
   //document.addEventListener('DOMContentLoaded',function(){
   //document.querySelectorAll('.s-bg').forEach(function(bg){bg.insertAdjacentHTML('beforeend',buildSVG());});  });
+
+  // ── Gradient toggle button ──
+  document.addEventListener('DOMContentLoaded', function() {
+    var btn = document.createElement('button');
+    btn.id = 'gradient-toggle-btn';
+    btn.textContent = 'Gradients: ON';
+    btn.addEventListener('click', function() {
+      var isFlat = document.documentElement.classList.toggle('flat-bg');
+      btn.textContent = isFlat ? 'Gradients: OFF' : 'Gradients: ON';
+    });
+    document.body.appendChild(btn);
+  });
 })();
 </script>
 </body>
