@@ -1,0 +1,16 @@
+# Python virtual environment
+Carousels/.venv/
+
+# Credentials — never commit
+Carousels/data/publish_config.env
+
+# SQLite database (large binary, managed locally)
+Carousels/data/db.sqlite
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS metadata
+.DS_Store

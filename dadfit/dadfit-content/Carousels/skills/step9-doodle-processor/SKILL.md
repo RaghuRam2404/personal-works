@@ -78,8 +78,7 @@ These names map to the `image_name` field in `doodle_prompts.json` and are refer
 ## Dependencies
 
 - Python 3.x
-- `Pillow` (`pip install Pillow`)
-- `numpy` (`pip install numpy`)
+- `Pillow` and `numpy` (installed in the project venv — `source Carousels/.venv/bin/activate`)
 
 ---
 

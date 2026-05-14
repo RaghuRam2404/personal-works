@@ -17,8 +17,16 @@ Surfaces the next batch of ready-to-publish carousels, waits for your explicit *
 
 ### 1 — Python packages
 
+All Python dependencies are managed in the project venv. Activate it before running any script:
+
 ```bash
-pip install requests Pillow pyngrok
+source Carousels/.venv/bin/activate
+```
+
+If the venv is missing, create it from the workspace root:
+
+```bash
+python3 -m venv Carousels/.venv && Carousels/.venv/bin/pip install -r Carousels/requirements.txt
 ```
 
 ### 2 — ngrok binary
@@ -105,12 +113,12 @@ The script will:
 
 | Symptom | Fix |
 |---|---|
-| `pyngrok not installed` | `pip install pyngrok` |
+| `pyngrok not installed` | Activate venv: `source Carousels/.venv/bin/activate` |
 | `Config file not found` | Create `Carousels/data/publish_config.env` with IG credentials |
 | `Instagram API error 190` | Access token expired — generate a new long-lived token |
 | `Instagram API error 9007` | Publishing rate limit hit (100/day) — wait and retry |
 | Container stays `IN_PROGRESS` | Normal for first upload — the script polls up to 60 s per container |
-| No slides found | Step 10 hasn't run for this carousel — check `IMAGES_CREATED` stage |
+| No slides found | Step 10 hasn't run for this carousel — slides live at `Carousels/data/batch_{N}_slides/{folder_name}/` |
 | Images are 1:1 but Instagram crops | Expected — Instagram crops all carousel images to the ratio of the first image |
 
 ---

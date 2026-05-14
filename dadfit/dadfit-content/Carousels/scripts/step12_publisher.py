@@ -17,13 +17,10 @@ Usage:
 """
 
 import argparse
-import functools
 import os
 import sqlite3
 import sys
 import time
-import threading
-from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 
 import requests
@@ -111,7 +108,7 @@ def mark_published(conn, uuid):
 # ── Slide helpers ──────────────────────────────────────────────────────────────
 
 def get_slide_paths(batch_no, folder_name):
-    slides_dir = WORKSPACE / "Carousels" / "data" / f"batch_{batch_no}" / folder_name / "slides"
+    slides_dir = WORKSPACE / "Carousels" / "data" / f"batch_{batch_no}_slides" / folder_name
     if not slides_dir.exists():
         return []
     return sorted(slides_dir.glob("slide-*.png"))
@@ -122,7 +119,7 @@ def convert_png_to_jpeg(png_path: Path) -> Path:
     try:
         from PIL import Image
     except ImportError:
-        sys.exit("Pillow not installed. Run: pip install Pillow")
+        sys.exit("Pillow not installed. Activate venv: source Carousels/.venv/bin/activate")
 
     jpg_path = png_path.with_suffix(".jpg")
     if not jpg_path.exists() or jpg_path.stat().st_mtime < png_path.stat().st_mtime:
@@ -131,33 +128,22 @@ def convert_png_to_jpeg(png_path: Path) -> Path:
     return jpg_path
 
 
-# ── Local HTTP server ──────────────────────────────────────────────────────────
+# ── Temp image hosting ─────────────────────────────────────────────────────────
 
-def start_file_server(root: Path, port: int = 9191):
-    """Serve files from *root* directory on *port*. Returns the HTTPServer instance."""
-    handler = functools.partial(SimpleHTTPRequestHandler, directory=str(root))
-    # Silence request logs
-    handler.log_message = lambda *args: None   # type: ignore[method-assign]
-    server = HTTPServer(("127.0.0.1", port), handler)
-    t = threading.Thread(target=server.serve_forever, daemon=True)
-    t.start()
-    return server
-
-
-# ── ngrok tunnel ───────────────────────────────────────────────────────────────
-
-def open_ngrok_tunnel(port: int) -> str:
-    """Open an ngrok tunnel on *port*. Returns the public HTTPS URL."""
-    try:
-        from pyngrok import ngrok
-    except ImportError:
-        sys.exit(
-            "pyngrok is not installed. Run:\n"
-            "  pip install pyngrok\n"
-            "You also need the ngrok binary: https://ngrok.com/download\n"
+def upload_to_catbox(jpeg_path: Path) -> str:
+    """Upload a JPEG to catbox.moe (anonymous, free). Returns a permanent public URL."""
+    with open(jpeg_path, "rb") as f:
+        resp = requests.post(
+            "https://catbox.moe/user/api.php",
+            data={"reqtype": "fileupload"},
+            files={"fileToUpload": (jpeg_path.name, f, "image/jpeg")},
+            timeout=60,
         )
-    tunnel = ngrok.connect(port, "http")
-    return tunnel.public_url.replace("http://", "https://")
+    resp.raise_for_status()
+    url = resp.text.strip()
+    if not url.startswith("https://"):
+        sys.exit(f"catbox.moe upload failed: {url}")
+    return url
 
 
 # ── Instagram Graph API calls ──────────────────────────────────────────────────
@@ -296,14 +282,6 @@ def cmd_publish(args):
         conn.close()
         sys.exit("No publishable carousels found.")
 
-    # ── Start file server + ngrok ────────────────────────────────────────────
-    print("\nStarting local file server on port 9191 …")
-    server = start_file_server(WORKSPACE, port=9191)
-
-    print("Opening ngrok tunnel …")
-    public_url = open_ngrok_tunnel(9191)
-    print(f"  Public URL: {public_url}\n")
-
     results = []
 
     try:
@@ -317,11 +295,13 @@ def cmd_publish(args):
             print(f"   Converting {len(slide_paths)} slide(s) to JPEG …")
             jpeg_paths = [convert_png_to_jpeg(p) for p in slide_paths]
 
-            # Build public image URLs  (relative to WORKSPACE root served by HTTP server)
-            slide_urls = [
-                f"{public_url}/{jp.relative_to(WORKSPACE).as_posix()}"
-                for jp in jpeg_paths
-            ]
+            # Upload each JPEG to catbox.moe to get public URLs
+            print(f"   Uploading {len(jpeg_paths)} image(s) to catbox.moe …")
+            slide_urls = []
+            for i, jp in enumerate(jpeg_paths, 1):
+                url = upload_to_catbox(jp)
+                print(f"     Slide {i:02d}: {url}")
+                slide_urls.append(url)
 
             # Create item containers
             print(f"   Creating {len(slide_urls)} item container(s) …")
@@ -361,12 +341,6 @@ def cmd_publish(args):
                 results.append((c["running_no"], c["title"], media_id))
 
     finally:
-        server.shutdown()
-        try:
-            from pyngrok import ngrok as _ngrok
-            _ngrok.kill()
-        except Exception:
-            pass
         conn.close()
 
     # Summary
