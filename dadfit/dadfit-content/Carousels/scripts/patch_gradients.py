@@ -22,6 +22,7 @@ BATCH_DIR    = f"Carousels/data/batch_{args.batch}"
 
 # ── Gradient palette ──────────────────────────────────────────────────────────
 # (linear_gradient, radial_glow)
+# v1 intensity for A–G families; v2 (darkened) for H (CTA).
 GRADIENTS = {
     # A — Cover / Hook: deep forest green
     'A1': ('linear-gradient(145deg,#0c1610 0%,#121e15 30%,#17211a 58%,#1c1e1c 100%)',
@@ -91,7 +92,7 @@ GRADIENTS = {
     'G4': ('linear-gradient(145deg,#0f1710 0%,#141e14 35%,#182018 60%,#1c1e1c 100%)',
            'radial-gradient(ellipse at 50% 80%,rgba(52,195,99,0.08) 0%,transparent 50%)'),
 
-    # H — CTA: strong green sweep
+    # H — CTA: strong green sweep (v2 — darkened ~40%)
     'H1': ('linear-gradient(145deg,#060c08 0%,#090f09 25%,#0c120d 50%,#0f1410 75%,#111512 100%)',
            'radial-gradient(ellipse at 50% 100%,rgba(52,195,99,0.08) 0%,rgba(52,195,99,0.02) 45%,transparent 65%)'),
     'H2': ('linear-gradient(145deg,#060c08 0%,#090f09 25%,#0c120d 50%,#0f1410 75%,#111512 100%)',
