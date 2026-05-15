@@ -64,7 +64,7 @@ def detect_ink_color(arr: np.ndarray, is_ink: np.ndarray) -> tuple:
 
 def process_image(path: str, threshold: int, dry_run: bool = False) -> dict:
     """
-    Load image, remove background, recolor ink to its own median color.
+    Load image, remove background only — ink pixels keep their original colors.
     Overwrites the original file as RGBA PNG.
     """
     img = Image.open(path).convert("RGB")
@@ -83,20 +83,21 @@ def process_image(path: str, threshold: int, dry_run: bool = False) -> dict:
     is_bg  = dist <= threshold
     is_ink = ~is_bg
 
-    # 4. Auto-detect ink color from the minority (ink) pixels
-    ink_color = detect_ink_color(arr, is_ink)
-
-    # 5. Build RGBA output
+    # 4. Build RGBA output — preserve original ink colors, remove only background
     out = np.zeros((h, w, 4), dtype=np.uint8)
+    orig = arr.astype(np.uint8)
 
     # Background → fully transparent
     out[is_bg, 3] = 0
 
-    # Ink → detected ink color, fully opaque
-    out[is_ink, 0] = ink_color[0]
-    out[is_ink, 1] = ink_color[1]
-    out[is_ink, 2] = ink_color[2]
+    # Ink → original RGB, fully opaque
+    out[is_ink, 0] = orig[is_ink, 0]
+    out[is_ink, 1] = orig[is_ink, 1]
+    out[is_ink, 2] = orig[is_ink, 2]
     out[is_ink, 3] = 255
+
+    # Derive a representative ink color for reporting only
+    ink_color = detect_ink_color(arr, is_ink)
 
     result = Image.fromarray(out, "RGBA")
 
@@ -146,7 +147,7 @@ def main():
     print(f"  Folder    : {doodles_dir}")
     print(f"  Files     : {len(pngs)}")
     print(f"  Threshold : {args.threshold}")
-    print(f"  Ink color : auto-detected per image (minority color)")
+    print(f"  Ink color : original colors preserved (bg removed only)")
     print(f"  Dry run   : {'YES (no files saved)' if args.dry_run else 'NO (files will be overwritten)'}")
     print()
 

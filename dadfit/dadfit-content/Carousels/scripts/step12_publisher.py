@@ -130,13 +130,14 @@ def convert_png_to_jpeg(png_path: Path) -> Path:
 
 # ── Temp image hosting ─────────────────────────────────────────────────────────
 
-def upload_to_catbox(jpeg_path: Path) -> str:
-    """Upload a JPEG to catbox.moe (anonymous, free). Returns a permanent public URL."""
-    with open(jpeg_path, "rb") as f:
+def upload_to_catbox(img_path: Path) -> str:
+    """Upload an image to catbox.moe (anonymous, free). Returns a permanent public URL."""
+    mime = "image/png" if img_path.suffix.lower() == ".png" else "image/jpeg"
+    with open(img_path, "rb") as f:
         resp = requests.post(
             "https://catbox.moe/user/api.php",
             data={"reqtype": "fileupload"},
-            files={"fileToUpload": (jpeg_path.name, f, "image/jpeg")},
+            files={"fileToUpload": (img_path.name, f, mime)},
             timeout=60,
         )
     resp.raise_for_status()
@@ -291,14 +292,17 @@ def cmd_publish(args):
             # Instagram carousel max = 10 slides
             slide_paths = slide_paths[:10]
 
-            # Convert PNGs → JPEG
-            print(f"   Converting {len(slide_paths)} slide(s) to JPEG …")
-            jpeg_paths = [convert_png_to_jpeg(p) for p in slide_paths]
+            # Optionally convert PNGs → JPEG
+            if getattr(args, 'no_convert', False):
+                upload_paths = slide_paths
+                print(f"   Uploading {len(upload_paths)} PNG(s) to catbox.moe (no conversion) …")
+            else:
+                print(f"   Converting {len(slide_paths)} slide(s) to JPEG …")
+                upload_paths = [convert_png_to_jpeg(p) for p in slide_paths]
+                print(f"   Uploading {len(upload_paths)} image(s) to catbox.moe …")
 
-            # Upload each JPEG to catbox.moe to get public URLs
-            print(f"   Uploading {len(jpeg_paths)} image(s) to catbox.moe …")
             slide_urls = []
-            for i, jp in enumerate(jpeg_paths, 1):
+            for i, jp in enumerate(upload_paths, 1):
                 url = upload_to_catbox(jp)
                 print(f"     Slide {i:02d}: {url}")
                 slide_urls.append(url)
@@ -336,8 +340,11 @@ def cmd_publish(args):
                 print(f"   ✓  Published! Instagram Media ID: {media_id}")
 
                 # Update DB
-                mark_published(conn, c["uuid"])
-                print(f"   ✓  DB updated → upload_status=PUBLISHED, current_stage=PUBLISHED")
+                if not getattr(args, 'no_db_update', False):
+                    mark_published(conn, c["uuid"])
+                    print(f"   ✓  DB updated → upload_status=PUBLISHED, current_stage=PUBLISHED")
+                else:
+                    print(f"   ⚠  Skipping DB update (--no-db-update set)")
                 results.append((c["running_no"], c["title"], media_id))
 
     finally:
@@ -371,6 +378,8 @@ def main():
     # publish
     pub = sub.add_parser("publish", help="Publish specific carousels to Instagram")
     pub.add_argument("--uuids", required=True, help="Comma-separated list of carousel UUIDs")
+    pub.add_argument("--no-db-update", action="store_true", help="Publish but skip DB status update (for testing)")
+    pub.add_argument("--no-convert", action="store_true", help="Upload PNGs directly without converting to JPEG")
 
     args = parser.parse_args()
 

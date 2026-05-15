@@ -27,7 +27,9 @@ function parseArgs() {
   const get  = (flag) => { const i = args.indexOf(flag); return i !== -1 ? args[i + 1] : null; };
   const batchNo   = get('--batch');   // optional — falls back to latest in DB
   const workspace = get('--workspace') || process.cwd();
-  return { batchNo, workspace };
+  const uuidsArg  = get('--uuids');    // optional — comma-separated UUIDs to force-process
+  const forceUuids = uuidsArg ? uuidsArg.split(',').map(s => s.trim()).filter(Boolean) : null;
+  return { batchNo, workspace, forceUuids };
 }
 
 // ── SQLite helpers (sql.js — same approach as the web server) ───────────────
@@ -97,7 +99,7 @@ async function renderCarousel(page, htmlPath, slidesDir) {
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 async function main() {
-  const { batchNo: argBatch, workspace } = parseArgs();
+  const { batchNo: argBatch, workspace, forceUuids } = parseArgs();
 
   const dbPath = path.join(workspace, 'Carousels', 'data', 'db.sqlite');
   if (!fs.existsSync(dbPath)) { console.error(`❌  DB not found: ${dbPath}`); process.exit(1); }
@@ -117,17 +119,33 @@ async function main() {
   const batchDir = path.join(workspace, 'Carousels', 'data', `batch_${batchNo}`);
   if (!fs.existsSync(batchDir)) { console.error(`❌  Batch dir not found: ${batchDir}`); process.exit(1); }
 
-  const carousels = queryAll(db,
-    `SELECT uuid, running_no, folder_name, title
-     FROM Carousel
-     WHERE batch_no = ? AND current_stage = 'HTML_APPROVED'
-     ORDER BY running_no`,
-    [batchNo]
-  );
-
-  if (carousels.length === 0) {
-    console.log('ℹ️   No HTML_APPROVED carousels found for this batch.');
-    return;
+  let carousels;
+  if (forceUuids && forceUuids.length > 0) {
+    const placeholders = forceUuids.map(() => '?').join(',');
+    carousels = queryAll(db,
+      `SELECT uuid, running_no, folder_name, title
+       FROM Carousel
+       WHERE batch_no = ? AND uuid IN (${placeholders})
+       ORDER BY running_no`,
+      [batchNo, ...forceUuids]
+    );
+    if (carousels.length === 0) {
+      console.log('ℹ️   No matching carousels found for the provided UUIDs in this batch.');
+      return;
+    }
+    console.log(`⚡  Force mode: processing ${carousels.length} carousel(s) by UUID (stage check bypassed).\n`);
+  } else {
+    carousels = queryAll(db,
+      `SELECT uuid, running_no, folder_name, title
+       FROM Carousel
+       WHERE batch_no = ? AND current_stage = 'DOODLES_DONE'
+       ORDER BY running_no`,
+      [batchNo]
+    );
+    if (carousels.length === 0) {
+      console.log('ℹ️   No DOODLES_DONE carousels found for this batch.');
+      return;
+    }
   }
 
   console.log(`📦  Found ${carousels.length} HTML_APPROVED carousel(s) to process.\n`);
