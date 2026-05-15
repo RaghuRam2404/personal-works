@@ -5,7 +5,8 @@ process_doodles.py — DadFit Doodle Post-Processor
 For every PNG in Carousels/data/batch_{batch_no}/doodles/:
   1. Detect background by sampling 10×10 pixels at all four corners
   2. Make every pixel within `threshold` color-distance of the bg → fully transparent
-  3. Recolor remaining (ink) pixels to brand green #34C363
+  3. Recolor remaining (ink) pixels to their median color (auto-detected)
+     — preserves green doodles as green, red/orange doodles as red/orange
 
 Usage:
   python3 process_doodles.py                          # batch 1
@@ -23,9 +24,8 @@ from PIL import Image
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-BRAND_GREEN  = (0x34, 0xC3, 0x63)   # #34C363
-SAMPLE_SIZE  = 10                    # corner sample area (pixels)
-DEFAULT_THRESHOLD = 30               # Euclidean RGB distance cutoff
+SAMPLE_SIZE       = 10   # corner sample area (pixels)
+DEFAULT_THRESHOLD = 30   # Euclidean RGB distance cutoff
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Carousels/
 
@@ -50,9 +50,21 @@ def detect_bg_color(arr: np.ndarray) -> tuple:
 
 # ── Core processing ───────────────────────────────────────────────────────────
 
+def detect_ink_color(arr: np.ndarray, is_ink: np.ndarray) -> tuple:
+    """
+    Return the median RGB of all ink pixels as (r, g, b) ints.
+    Median is more robust than mean against anti-aliasing outliers.
+    """
+    ink_pixels = arr.astype(np.uint8)[is_ink]   # (n, 3)
+    r = int(np.median(ink_pixels[:, 0]))
+    g = int(np.median(ink_pixels[:, 1]))
+    b = int(np.median(ink_pixels[:, 2]))
+    return (r, g, b)
+
+
 def process_image(path: str, threshold: int, dry_run: bool = False) -> dict:
     """
-    Load image, remove background, recolor ink to brand green.
+    Load image, remove background, recolor ink to its own median color.
     Overwrites the original file as RGBA PNG.
     """
     img = Image.open(path).convert("RGB")
@@ -64,22 +76,26 @@ def process_image(path: str, threshold: int, dry_run: bool = False) -> dict:
     bg_arr = np.array(bg, dtype=np.float32)  # shape (3,)
 
     # 2. Euclidean distance of each pixel from background color
-    diff = arr - bg_arr                      # (h, w, 3)
+    diff = arr - bg_arr                        # (h, w, 3)
     dist = np.sqrt(np.sum(diff ** 2, axis=2))  # (h, w)
 
-    # 3. Build RGBA output
-    out = np.zeros((h, w, 4), dtype=np.uint8)
-
-    is_bg  = dist <= threshold               # True where pixel ≈ background
+    # 3. Classify pixels
+    is_bg  = dist <= threshold
     is_ink = ~is_bg
+
+    # 4. Auto-detect ink color from the minority (ink) pixels
+    ink_color = detect_ink_color(arr, is_ink)
+
+    # 5. Build RGBA output
+    out = np.zeros((h, w, 4), dtype=np.uint8)
 
     # Background → fully transparent
     out[is_bg, 3] = 0
 
-    # Ink → brand green, fully opaque
-    out[is_ink, 0] = BRAND_GREEN[0]
-    out[is_ink, 1] = BRAND_GREEN[1]
-    out[is_ink, 2] = BRAND_GREEN[2]
+    # Ink → detected ink color, fully opaque
+    out[is_ink, 0] = ink_color[0]
+    out[is_ink, 1] = ink_color[1]
+    out[is_ink, 2] = ink_color[2]
     out[is_ink, 3] = 255
 
     result = Image.fromarray(out, "RGBA")
@@ -87,12 +103,14 @@ def process_image(path: str, threshold: int, dry_run: bool = False) -> dict:
     ink_pixels   = int(is_ink.sum())
     total_pixels = h * w
     bg_hex       = "#{:02X}{:02X}{:02X}".format(*bg)
+    ink_hex      = "#{:02X}{:02X}{:02X}".format(*ink_color)
 
     if not dry_run:
         result.save(path)
 
     return {
         "bg_color":  bg_hex,
+        "ink_color": ink_hex,
         "ink_pct":   round(ink_pixels / total_pixels * 100, 1),
         "changed":   ink_pixels,
         "total":     total_pixels,
@@ -128,7 +146,7 @@ def main():
     print(f"  Folder    : {doodles_dir}")
     print(f"  Files     : {len(pngs)}")
     print(f"  Threshold : {args.threshold}")
-    print(f"  Ink color : #34C363 (brand green)")
+    print(f"  Ink color : auto-detected per image (minority color)")
     print(f"  Dry run   : {'YES (no files saved)' if args.dry_run else 'NO (files will be overwritten)'}")
     print()
 
@@ -138,7 +156,7 @@ def main():
         try:
             stats  = process_image(fpath, args.threshold, dry_run=args.dry_run)
             status = "DRY " if args.dry_run else "OK  "
-            print(f"  {status} {fname:20s}  bg={stats['bg_color']}  ink={stats['ink_pct']}%")
+            print(f"  {status} {fname:20s}  bg={stats['bg_color']}  ink={stats['ink_color']}  {stats['ink_pct']}%")
             ok += 1
         except Exception as e:
             print(f"  FAIL {fname}: {e}")

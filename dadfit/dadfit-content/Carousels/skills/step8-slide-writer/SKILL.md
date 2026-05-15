@@ -393,9 +393,14 @@ For every slide **except H1** write one doodle prompt entry. These go in the `do
 ### Prompt guidelines
 
 - **Subject**: the single most concrete object or scene that visualises this slide's idea. Be specific ("a cracked hourglass", "a barbell with a tiny figure underneath"). No abstract nouns.
-- **Style**: flat hand-drawn ink-line illustration, `#34C363` green ink only, ~3–5px stroke, no shading, no fill, no gradients.
+- **Style**: flat hand-drawn ink-line illustration, single ink color only, ~3–5px stroke, no shading, no fill, no gradients.
 - **Framing**: subject fills 70–80% of canvas, centered, generous empty space.
-- **End every prompt** with exactly: `Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style.`
+- **Ink color — choose based on slide sentiment:**
+  - **Positive / neutral slides** (A-types, B-types, D-types, E-types, F-types, G-types, H-types): use `#34C363` green ink.
+  - **Negative / pain / danger slides** (Eg: C1, C3, C4): use `#FF6B6B` red ink. Based on the script's tone — if the slide is empathising with a struggle, use red to show it's a "pain point". 
+- **End every prompt** with the matching closing line:
+  - Green slides: `Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style.`
+  - Red slides (C1, C3, C4): `Pure black background #000000. Flat red line art, #FF6B6B ink. No fill. No shading. No text. No typography. DadFit doodle style.`
 
 ### Example prompts
 
