@@ -65,7 +65,7 @@ async function renderCarousel(page, htmlPath, slidesDir) {
   if (slideCount === 0) throw new Error('No .slide-wrapper elements found');
 
   for (let i = 0; i < slideCount; i++) {
-    await page.setViewport({ width: 1080, height: 1080, deviceScaleFactor: 1 });
+    await page.setViewport({ width: 1080, height: 1080, deviceScaleFactor: 2 });
 
     await page.evaluate((idx) => {
       document.body.style.cssText = 'margin:0;padding:0;background:#1E1E1E;';

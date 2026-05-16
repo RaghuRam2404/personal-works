@@ -76,7 +76,7 @@ The script will:
 ls -1 "Carousels/data/batch_{N}/<folder_name>/slides/"
 ```
 
-Spot-check 3–5 carousels to confirm correct slide count and image dimensions (should be 1080×1080).
+Spot-check 3–5 carousels to confirm correct slide count and image dimensions (should be 2160×2160 — rendered at 2x device pixel ratio for retina clarity).
 
 ### Step 5 — Report to user
 
