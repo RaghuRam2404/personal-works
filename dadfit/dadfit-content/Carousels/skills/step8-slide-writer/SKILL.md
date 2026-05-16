@@ -50,9 +50,10 @@ Every slide is swiped in under 2 seconds. Cramming kills engagement.
 ### Slide count rules
 
 - Slide 1 = always A-type Cover. Last slide = always H-type CTA.
-- **Total: 8–10 slides** for a 10-line script. Never fewer than 7, never more than 11.
-- Rough pattern: 1 cover + 1–2 pain/bridge + 5–6 content + 1 recap (optional) + 1 CTA.
-- When in doubt, **add a slide** — shorter and cleaner wins.
+- **Total: 8–10 slides. Hard cap at 10. Never fewer than 7, never more than 10.**
+- Rough pattern: 1 cover + 1–2 pain/bridge + 5–7 content + 0–1 recap + 1 CTA.
+- **Recap (G-type) is the first thing to cut** if the slide map reaches 10 before adding it.
+- When in doubt, **merge or cut a slide** — do not exceed 10.
 
 **Write your slide map (type + one-line description per slide) in your thinking before producing any JSON.**
 
@@ -143,7 +144,7 @@ Choose based on what the script sentence is **trying to do**.
 
 > G2 (emoji grid) — only if 6 takeaways map cleanly to icons.  
 > G4 (habit tracker) — only for habit/routine carousels.  
-> **Skip G entirely** if carousel ≤7 slides or ideas are already distinct.
+> **Skip G entirely** if total slide count would exceed 10, if carousel ≤7 slides, or if ideas are already distinct. Recap is always the first slide to drop when trimming.
 
 ---
 

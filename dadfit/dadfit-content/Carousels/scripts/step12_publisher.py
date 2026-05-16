@@ -114,19 +114,6 @@ def get_slide_paths(batch_no, folder_name):
     return sorted(slides_dir.glob("slide-*.png"))
 
 
-def convert_png_to_jpeg(png_path: Path) -> Path:
-    """Convert PNG → JPEG (RGB). Returns path to .jpg file."""
-    try:
-        from PIL import Image
-    except ImportError:
-        sys.exit("Pillow not installed. Activate venv: source Carousels/.venv/bin/activate")
-
-    jpg_path = png_path.with_suffix(".jpg")
-    if not jpg_path.exists() or jpg_path.stat().st_mtime < png_path.stat().st_mtime:
-        img = Image.open(png_path).convert("RGB")
-        img.save(jpg_path, "JPEG", quality=95)
-    return jpg_path
-
 
 # ── Temp image hosting ─────────────────────────────────────────────────────────
 
@@ -292,14 +279,8 @@ def cmd_publish(args):
             # Instagram carousel max = 10 slides
             slide_paths = slide_paths[:10]
 
-            # Optionally convert PNGs → JPEG
-            if getattr(args, 'no_convert', False):
-                upload_paths = slide_paths
-                print(f"   Uploading {len(upload_paths)} PNG(s) to catbox.moe (no conversion) …")
-            else:
-                print(f"   Converting {len(slide_paths)} slide(s) to JPEG …")
-                upload_paths = [convert_png_to_jpeg(p) for p in slide_paths]
-                print(f"   Uploading {len(upload_paths)} image(s) to catbox.moe …")
+            upload_paths = slide_paths
+            print(f"   Uploading {len(upload_paths)} PNG(s) to catbox.moe …")
 
             slide_urls = []
             for i, jp in enumerate(upload_paths, 1):
@@ -379,7 +360,6 @@ def main():
     pub = sub.add_parser("publish", help="Publish specific carousels to Instagram")
     pub.add_argument("--uuids", required=True, help="Comma-separated list of carousel UUIDs")
     pub.add_argument("--no-db-update", action="store_true", help="Publish but skip DB status update (for testing)")
-    pub.add_argument("--no-convert", action="store_true", help="Upload PNGs directly without converting to JPEG")
 
     args = parser.parse_args()
 

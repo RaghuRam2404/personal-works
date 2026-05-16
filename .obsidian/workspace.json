@@ -11,14 +11,14 @@
             "id": "0356ccf574624382",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "split-diff-view",
               "state": {
-                "file": "learnings/ai-learnings/greg-isenberg/Notes on Agent Economy.md",
-                "mode": "source",
-                "source": false
+                "aFile": "dadfit/dadfit-content/Carousels/data/batch_1/100_616fe480-03c4-4b44-89e9-a72f0d30fd8a/carousel.html",
+                "bFile": "dadfit/dadfit-content/Carousels/data/batch_1/100_616fe480-03c4-4b44-89e9-a72f0d30fd8a/carousel.html",
+                "aRef": ""
               },
-              "icon": "lucide-file",
-              "title": "Notes on Agent Economy"
+              "icon": "diff",
+              "title": "Diff: carousel.html  (Working Tree)"
             }
           }
         ]
@@ -195,20 +195,20 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "00ce8c958ec62ab4",
+  "active": "0356ccf574624382",
   "lastOpenFiles": [
-    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-10.png",
-    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-09.png",
-    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-08.png",
-    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-07.png",
-    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-06.png",
-    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-05.png",
-    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-04.png",
-    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-03.png",
-    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-02.png",
-    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-01.png",
+    "learnings/ai-learnings/greg-isenberg/Notes on Agent Economy.md",
+    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-10.jpg",
+    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-09.jpg",
+    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-08.jpg",
+    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-07.jpg",
+    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-06.jpg",
+    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-05.jpg",
+    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-04.jpg",
+    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-03.jpg",
+    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-02.jpg",
+    "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111/slide-01.jpg",
     "dadfit/dadfit-content/Carousels/data/batch_1_slides/8_4abd15ef-6dd1-4380-a311-2ab33b600111",
-    "dadfit/dadfit-content/Carousels/data/batch_1_slides/7_95a443f9-896c-450d-bfc3-c5fbf455730a/slide-11.png",
     "dadfit/dadfit-content/Carousels/data/batch_1_slides/7_95a443f9-896c-450d-bfc3-c5fbf455730a",
     "dadfit/dadfit-content/Carousels/data/batch_1_slides/6_4959a78e-9b7b-4085-8753-716a74721a02",
     "dadfit/dadfit-content/Carousels/data/batch_1_slides/5_77549515-5a44-47a5-be11-d160960bc368",

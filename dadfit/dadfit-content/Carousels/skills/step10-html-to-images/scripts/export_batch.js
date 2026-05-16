@@ -29,7 +29,8 @@ function parseArgs() {
   const workspace = get('--workspace') || process.cwd();
   const uuidsArg  = get('--uuids');    // optional — comma-separated UUIDs to force-process
   const forceUuids = uuidsArg ? uuidsArg.split(',').map(s => s.trim()).filter(Boolean) : null;
-  return { batchNo, workspace, forceUuids };
+  const noDbUpdate = args.includes('--no-db-update');
+  return { batchNo, workspace, forceUuids, noDbUpdate };
 }
 
 // ── SQLite helpers (sql.js — same approach as the web server) ───────────────
@@ -65,7 +66,7 @@ async function renderCarousel(page, htmlPath, slidesDir) {
   if (slideCount === 0) throw new Error('No .slide-wrapper elements found');
 
   for (let i = 0; i < slideCount; i++) {
-    await page.setViewport({ width: 1080, height: 1080, deviceScaleFactor: 3 });
+    await page.setViewport({ width: 1080, height: 1080, deviceScaleFactor: 2 });
 
     await page.evaluate((idx) => {
       document.body.style.cssText = 'margin:0;padding:0;background:#1E1E1E;';
@@ -99,7 +100,7 @@ async function renderCarousel(page, htmlPath, slidesDir) {
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 async function main() {
-  const { batchNo: argBatch, workspace, forceUuids } = parseArgs();
+  const { batchNo: argBatch, workspace, forceUuids, noDbUpdate } = parseArgs();
 
   const dbPath = path.join(workspace, 'Carousels', 'data', 'db.sqlite');
   if (!fs.existsSync(dbPath)) { console.error(`❌  DB not found: ${dbPath}`); process.exit(1); }
@@ -182,8 +183,12 @@ async function main() {
       const count = await renderCarousel(page, htmlPath, slidesDir);
       console.log(`    ✅  ${count} slide(s) saved`);
 
-      runSql(db, `UPDATE Carousel SET current_stage = 'IMAGES_CREATED' WHERE uuid = ?`, [uuid]);
-      saveDb(db, dbPath);
+      if (noDbUpdate) {
+        console.log(`    ⚠  Skipping DB update (--no-db-update set)`);
+      } else {
+        runSql(db, `UPDATE Carousel SET current_stage = 'IMAGES_CREATED' WHERE uuid = ?`, [uuid]);
+        saveDb(db, dbPath);
+      }
       passed++;
     } catch (err) {
       console.error(`    ❌  Failed: ${err.message}`);

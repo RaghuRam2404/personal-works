@@ -97,7 +97,7 @@ The script will:
 2. Start a local HTTP server (port 9191) to serve slide images
 3. Open an ngrok tunnel to expose the server publicly
 4. For each carousel:
-   - Convert slide PNGs → JPEG (saved alongside PNGs, only regenerated if PNG is newer)
+   - Upload slide PNGs directly to the public image host
    - Create one Instagram item container per slide (`is_carousel_item=true`)
    - Poll each container until `status_code = FINISHED`
    - Create a carousel container (`media_type=CAROUSEL`) with all children
@@ -135,6 +135,6 @@ The script will:
 ## Notes
 
 - Carousel maximum: **10 slides** per post (Instagram limit). If a carousel has more, only the first 10 are published.
-- JPEG conversion is automatic — source PNGs are never deleted.
+- Images are always uploaded as **PNG**. No JPEG conversion — ever.
 - The ngrok tunnel is torn down immediately after all carousels are published.
 - To re-publish a carousel (e.g. after fixing slides), manually reset `upload_status = 'PENDING'` and `current_stage = 'IMAGES_CREATED'` in the DB, then re-run this skill.
