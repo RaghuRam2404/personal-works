@@ -128,6 +128,8 @@ def main():
                         help=f"Color distance cutoff for bg removal (default: {DEFAULT_THRESHOLD})")
     parser.add_argument("--dry-run",   action="store_true",
                         help="Preview only — do not save files")
+    parser.add_argument("--fs",        type=str, default=None,
+                        help="Only process files whose name starts with this string")
     args = parser.parse_args()
 
     doodles_dir = os.path.join(BASE_DIR, "data", f"batch_{args.batch}", "doodles")
@@ -137,6 +139,8 @@ def main():
         sys.exit(1)
 
     pngs = sorted(f for f in os.listdir(doodles_dir) if f.lower().endswith(".png"))
+    if args.fs:
+        pngs = [f for f in pngs if f.startswith(args.fs)]
 
     if not pngs:
         print(f"No PNG files found in: {doodles_dir}")
@@ -145,7 +149,7 @@ def main():
     print(f"\n  DadFit Doodle Processor")
     print(f"  Batch     : {args.batch}")
     print(f"  Folder    : {doodles_dir}")
-    print(f"  Files     : {len(pngs)}")
+    print(f"  Files     : {len(pngs)}{f'  (filtered by prefix: {args.fs!r})' if args.fs else ''}")
     print(f"  Threshold : {args.threshold}")
     print(f"  Ink color : original colors preserved (bg removed only)")
     print(f"  Dry run   : {'YES (no files saved)' if args.dry_run else 'NO (files will be overwritten)'}")
