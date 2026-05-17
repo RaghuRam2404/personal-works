@@ -97,10 +97,10 @@ def get_carousel_by_uuid(conn, uuid):
     return dict(zip(cols, row))
 
 
-def mark_published(conn, uuid):
+def mark_published(conn, uuid, instagram_post_id=None):
     conn.execute(
-        "UPDATE Carousel SET upload_status = 'PUBLISHED', current_stage = 'PUBLISHED' WHERE uuid = ?",
-        (uuid,),
+        "UPDATE Carousel SET upload_status = 'PUBLISHED', current_stage = 'PUBLISHED', instagram_post_id = ? WHERE uuid = ?",
+        (instagram_post_id, uuid),
     )
     conn.commit()
 
@@ -322,8 +322,8 @@ def cmd_publish(args):
 
                 # Update DB
                 if not getattr(args, 'no_db_update', False):
-                    mark_published(conn, c["uuid"])
-                    print(f"   ✓  DB updated → upload_status=PUBLISHED, current_stage=PUBLISHED")
+                    mark_published(conn, c["uuid"], instagram_post_id=media_id)
+                    print(f"   ✓  DB updated → upload_status=PUBLISHED, current_stage=PUBLISHED, instagram_post_id={media_id}")
                 else:
                     print(f"   ⚠  Skipping DB update (--no-db-update set)")
                 results.append((c["running_no"], c["title"], media_id))

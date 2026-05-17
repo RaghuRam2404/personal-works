@@ -33,6 +33,7 @@ def init():
             folder_name                 TEXT,
             upload_status               TEXT DEFAULT 'PENDING'
                                             CHECK(upload_status IN ('PENDING', 'PUBLISHED')),
+            instagram_post_id           TEXT,
             current_stage               TEXT DEFAULT 'TOPIC_FETCHED'
                                             CHECK(current_stage IN (
                                                 'TOPIC_FETCHED',
