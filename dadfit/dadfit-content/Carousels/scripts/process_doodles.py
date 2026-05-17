@@ -11,7 +11,7 @@ For every PNG in Carousels/data/batch_{batch_no}/doodles/:
 Usage:
   python3 process_doodles.py                          # batch 1
   python3 process_doodles.py --batch 2
-  python3 process_doodles.py --threshold 40           # looser bg removal
+  python3 process_doodles.py --threshold 40           # looser bg removal (feather zone = 40–80)
   python3 process_doodles.py --dry-run                # preview without saving
 """
 
@@ -65,6 +65,8 @@ def detect_ink_color(arr: np.ndarray, is_ink: np.ndarray) -> tuple:
 def process_image(path: str, threshold: int, dry_run: bool = False) -> dict:
     """
     Load image, remove background only — ink pixels keep their original colors.
+    Uses soft/feathered alpha at edges + background color decontamination to
+    eliminate white/light halos caused by anti-aliased edge pixels.
     Overwrites the original file as RGBA PNG.
     """
     img = Image.open(path).convert("RGB")
@@ -79,22 +81,30 @@ def process_image(path: str, threshold: int, dry_run: bool = False) -> dict:
     diff = arr - bg_arr                        # (h, w, 3)
     dist = np.sqrt(np.sum(diff ** 2, axis=2))  # (h, w)
 
-    # 3. Classify pixels
+    # 3. Soft alpha — feather zone between threshold and 2×threshold so
+    #    anti-aliased edge pixels fade out instead of appearing as solid traces.
+    soft_min = float(threshold)
+    soft_max = float(threshold) * 2.0
+    alpha_float = np.clip((dist - soft_min) / (soft_max - soft_min), 0.0, 1.0)  # (h, w)
+
+    # 4. Background color decontamination — each edge pixel is a blend of ink
+    #    and the background color.  Invert the blend to recover the pure ink RGB:
+    #      corrected = (orig - bg * (1 - alpha)) / alpha
+    #    This removes the dark/light background tint from edge pixels.
+    a3 = alpha_float[:, :, np.newaxis]            # (h, w, 1) broadcast
+    bg3 = bg_arr[np.newaxis, np.newaxis, :]        # (1, 1, 3) broadcast
+    safe_alpha = np.where(alpha_float > 0, alpha_float, 1.0)[:, :, np.newaxis]
+    corrected = (arr - bg3 * (1.0 - a3)) / safe_alpha
+    corrected = np.clip(corrected, 0, 255).astype(np.uint8)
+
+    # 5. Build RGBA output
+    out = np.zeros((h, w, 4), dtype=np.uint8)
+    out[:, :, :3] = corrected
+    out[:, :, 3]  = (alpha_float * 255).astype(np.uint8)
+
+    # Classify pixels (for reporting only)
     is_bg  = dist <= threshold
     is_ink = ~is_bg
-
-    # 4. Build RGBA output — preserve original ink colors, remove only background
-    out = np.zeros((h, w, 4), dtype=np.uint8)
-    orig = arr.astype(np.uint8)
-
-    # Background → fully transparent
-    out[is_bg, 3] = 0
-
-    # Ink → original RGB, fully opaque
-    out[is_ink, 0] = orig[is_ink, 0]
-    out[is_ink, 1] = orig[is_ink, 1]
-    out[is_ink, 2] = orig[is_ink, 2]
-    out[is_ink, 3] = 255
 
     # Derive a representative ink color for reporting only
     ink_color = detect_ink_color(arr, is_ink)
