@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Exclude dev/internal pages from indexing
+Disallow: /index_1.html
+Disallow: /responsive-test.html
+Disallow: /crm_assessment_webform.html
+Disallow: /CRM_webform.html
+Disallow: /contact_success.html
+
+Sitemap: https://dadfit.in/sitemap.xml
