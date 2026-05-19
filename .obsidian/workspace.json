@@ -4,21 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "77e65ab743272436",
+        "id": "e62f0450f32af450",
         "type": "tabs",
         "children": [
           {
-            "id": "0356ccf574624382",
+            "id": "9b33ab2849308ae8",
             "type": "leaf",
             "state": {
-              "type": "split-diff-view",
-              "state": {
-                "aFile": "dadfit/dadfit-content/Carousels/data/batch_1/100_616fe480-03c4-4b44-89e9-a72f0d30fd8a/carousel.html",
-                "bFile": "dadfit/dadfit-content/Carousels/data/batch_1/100_616fe480-03c4-4b44-89e9-a72f0d30fd8a/carousel.html",
-                "aRef": ""
-              },
-              "icon": "diff",
-              "title": "Diff: carousel.html  (Working Tree)"
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
             }
           }
         ]
@@ -195,7 +191,7 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "00ce8c958ec62ab4",
+  "active": "9b33ab2849308ae8",
   "lastOpenFiles": [
     "dadfit/dadfit-content/Site/images/pillar3-compressed.webp",
     "dadfit/dadfit-content/Site/images/pillar2-compressed.webp",
