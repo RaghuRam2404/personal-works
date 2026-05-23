@@ -172,13 +172,13 @@ Track every task top to bottom. Do not move to the next phase until all tasks in
 - [x] **13.2** Test: Insert mock metrics for 3 carousels, verify DB rows created
 
 ### Step 14: Weekly Analysis
-- [ ] **14.1** Create `Carousels/skills/step14-weekly-analysis/SKILL.md`
+- [x] **14.1** Create `Carousels/skills/step14-weekly-analysis/SKILL.md`
   - Reads all `CarouselPerformance` rows for the batch
   - Outputs: top 10 by saves, top 10 by reach, top 10 by follows_from_post
   - Outputs: TOFU vs MOFU vs BOFU engagement comparison
   - Outputs: growth trend per carousel (week-over-week)
   - Saves report to `Carousels/out/batch_{n}_week_{w}_report.md`
-- [ ] **14.2** Test: Run on mock data, verify report structure
+- [x] **14.2** Test: Run on mock data, verify report structure
 
 ---
 
