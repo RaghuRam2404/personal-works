@@ -158,18 +158,18 @@ Track every task top to bottom. Do not move to the next phase until all tasks in
   - After publishing: stores `instagram_post_id` and `published_date` (UTC timestamp) in DB
   - Config: `Carousels/data/publish_config.env` (IG_USER_ID, IG_ACCESS_TOKEN)
   - Script: `Carousels/scripts/step12_publisher.py`
-- [ ] **12.2** Test run: Dry-run for Day 1 — verify correct carousels are selected
+- [x] **12.2** Test run: Dry-run for Day 1 — verify correct carousels are selected
 - [x] **12.3** Store the instagram post IDs in the DB after publishing, for later reference in performance monitoring
 
 ### Step 13: Daily Performance Monitor
-- [ ] **13.1** Create `Carousels/skills/step13-daily-monitor/SKILL.md`
+- [x] **13.1** Create `Carousels/skills/step13-daily-monitor/SKILL.md`
   - Accepts metrics input (views, likes, comments, shares, saves, reach, profile_visits, follows_from_post) for each published carousel
   - Inserts a new row into `CarouselPerformance` table
   - Updates `last_performance_monitored` on the `Carousel` row
   - Updates `current_stage = MONITORED`
   - https://developers.facebook.com/docs/instagram-platform/insights/ - help doc for understanding metrics
   - Adjust the table and others based on the usecase.
-- [ ] **13.2** Test: Insert mock metrics for 3 carousels, verify DB rows created
+- [x] **13.2** Test: Insert mock metrics for 3 carousels, verify DB rows created
 
 ### Step 14: Weekly Analysis
 - [ ] **14.1** Create `Carousels/skills/step14-weekly-analysis/SKILL.md`
