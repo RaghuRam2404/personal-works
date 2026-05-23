@@ -78,48 +78,79 @@ def get_latest_batch(conn):
 MONITOR_WINDOW_DAYS = 15
 
 
-def get_published_carousels(conn, batch_no):
+def get_published_carousels(conn, batch_no=None):
     """
     Returns PUBLISHED carousels whose published_date is within the last
-    MONITOR_WINDOW_DAYS days. Carousels with no published_date are included
-    as a safety fallback.
+    MONITOR_WINDOW_DAYS days. When batch_no is None, scans ALL batches.
+    Carousels with no published_date are included as a safety fallback.
     """
-    rows = conn.execute(
-        """
-        SELECT uuid, running_no, title, category, instagram_post_id,
-               published_date, last_performance_monitored
-        FROM   Carousel
-        WHERE  batch_no      = ?
-          AND  upload_status = 'PUBLISHED'
-          AND  (
-                published_date IS NULL
-             OR published_date >= datetime('now', ? || ' days')
-          )
-        ORDER BY running_no ASC
-        """,
-        (batch_no, f"-{MONITOR_WINDOW_DAYS}"),
-    ).fetchall()
-    cols = ["uuid", "running_no", "title", "category", "instagram_post_id",
+    if batch_no is not None:
+        rows = conn.execute(
+            """
+            SELECT uuid, running_no, batch_no, title, category, instagram_post_id,
+                   published_date, last_performance_monitored
+            FROM   Carousel
+            WHERE  batch_no      = ?
+              AND  upload_status = 'PUBLISHED'
+              AND  (
+                    published_date IS NULL
+                 OR published_date >= datetime('now', ? || ' days')
+              )
+            ORDER BY batch_no ASC, running_no ASC
+            """,
+            (batch_no, f"-{MONITOR_WINDOW_DAYS}"),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            """
+            SELECT uuid, running_no, batch_no, title, category, instagram_post_id,
+                   published_date, last_performance_monitored
+            FROM   Carousel
+            WHERE  upload_status = 'PUBLISHED'
+              AND  (
+                    published_date IS NULL
+                 OR published_date >= datetime('now', ? || ' days')
+              )
+            ORDER BY batch_no ASC, running_no ASC
+            """,
+            (f"-{MONITOR_WINDOW_DAYS}",),
+        ).fetchall()
+    cols = ["uuid", "running_no", "batch_no", "title", "category", "instagram_post_id",
             "published_date", "last_performance_monitored"]
     return [dict(zip(cols, r)) for r in rows]
 
 
-def get_expired_carousels(conn, batch_no):
-    """Returns PUBLISHED carousels whose monitoring window has passed."""
-    rows = conn.execute(
-        """
-        SELECT uuid, running_no, title, category,
-               published_date, last_performance_monitored
-        FROM   Carousel
-        WHERE  batch_no      = ?
-          AND  upload_status = 'PUBLISHED'
-          AND  published_date IS NOT NULL
-          AND  published_date < datetime('now', ? || ' days')
-        ORDER BY running_no ASC
-        """,
-        (batch_no, f"-{MONITOR_WINDOW_DAYS}"),
-    ).fetchall()
-    cols = ["uuid", "running_no", "title", "category",
+def get_expired_carousels(conn, batch_no=None):
+    """Returns PUBLISHED carousels whose monitoring window has passed.
+    When batch_no is None, scans ALL batches."""
+    if batch_no is not None:
+        rows = conn.execute(
+            """
+            SELECT uuid, running_no, batch_no, title, category,
+                   published_date, last_performance_monitored
+            FROM   Carousel
+            WHERE  batch_no      = ?
+              AND  upload_status = 'PUBLISHED'
+              AND  published_date IS NOT NULL
+              AND  published_date < datetime('now', ? || ' days')
+            ORDER BY batch_no ASC, running_no ASC
+            """,
+            (batch_no, f"-{MONITOR_WINDOW_DAYS}"),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            """
+            SELECT uuid, running_no, batch_no, title, category,
+                   published_date, last_performance_monitored
+            FROM   Carousel
+            WHERE  upload_status = 'PUBLISHED'
+              AND  published_date IS NOT NULL
+              AND  published_date < datetime('now', ? || ' days')
+            ORDER BY batch_no ASC, running_no ASC
+            """,
+            (f"-{MONITOR_WINDOW_DAYS}",),
+        ).fetchall()
+    cols = ["uuid", "running_no", "batch_no", "title", "category",
             "published_date", "last_performance_monitored"]
     return [dict(zip(cols, r)) for r in rows]
 
@@ -334,10 +365,8 @@ def cmd_fetch(args):
     ver   = cfg["IG_API_VERSION"]
 
     conn     = get_conn()
-    batch_no = args.batch or get_latest_batch(conn)
-    if batch_no is None:
-        conn.close()
-        sys.exit("No batches found in DB.")
+    # None = all batches; explicit --batch N scopes to that batch only
+    batch_no = args.batch  # may be None
 
     carousels = get_published_carousels(conn, batch_no)   # already filtered to 15-day window
     expired   = get_expired_carousels(conn, batch_no)
@@ -366,7 +395,8 @@ def cmd_fetch(args):
         try:
             metrics = fetch_ig_insights(c["instagram_post_id"], token, ver)
             perf_uuid, ts = insert_performance(conn, c["uuid"], metrics)
-            print(f"  ✓  #{c['running_no']:>3}  {c['title']}")
+            batch_label = f"[b{c['batch_no']}] " if batch_no is None else ""
+            print(f"  ✓  {batch_label}#{c['running_no']:>3}  {c['title']}")
             print(f"       views={metrics.get('views',0)} reach={metrics.get('reach',0)} "
                   f"likes={metrics.get('likes',0)} saves={metrics.get('saves',0)} "
                   f"follows={metrics.get('follows',0)}")
