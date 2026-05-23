@@ -1082,7 +1082,7 @@
   {
     "running_no": 24,
     "image_name": "24-d-09.png",
-    "prompt": "A flat hand-drawn ink-line doodle of a simple bar chart with three vertical bars of increasing height from left to right — the rightmost bar being the tallest — with a small upward-pointing arrow above the tallest bar to indicate growth. A large Indian rupee symbol sits just above the arrow at the top. The chart has a clean horizontal baseline. No axis labels, just the three bars showing visible height progression. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Single object fills 70–80% of canvas height, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
+    "prompt": "A flat hand-drawn ink-line doodle of a small rupee coin circle at the bottom-left of the canvas and a large rupee coin circle at the top-right — the top coin is roughly three times the diameter of the bottom coin — connected by a single bold smooth curved arrow sweeping upward from the small coin to the large coin. The rupee symbol inside each coin is the Indian ₹ glyph drawn as two clean horizontal lines over a vertical stem. Three sizes in the scene only: small coin, arrow, large coin. Rendered in #34C363 green ink lines, stroke weight ~4px, no fill inside shapes. Composition fills 70–80% of canvas diagonally, centered. Pure black background #000000. Flat green line art, #34C363 ink. No fill. No shading. No text. No typography. DadFit doodle style."
   },
   {
     "running_no": 25,
