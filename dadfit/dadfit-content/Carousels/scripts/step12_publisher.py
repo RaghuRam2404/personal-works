@@ -32,7 +32,7 @@ DB_PATH     = WORKSPACE / "Carousels" / "data" / "db.sqlite"
 CONFIG_PATH = WORKSPACE / "Carousels" / "data" / "publish_config.env"
 GRAPH_HOST  = "https://graph.instagram.com"
 
-PUBLISHABLE_STAGES = ("IMAGES_CREATED",)
+PUBLISHABLE_STAGES = ("HTML_APPROVED",)
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 
@@ -71,7 +71,7 @@ def get_top_unpublished(conn, batch_no, count):
         SELECT uuid, running_no, title, category, caption, hook, cta, folder_name
         FROM   Carousel
         WHERE  batch_no = ?
-          AND  current_stage IN ('IMAGES_CREATED')
+          AND  current_stage IN ('HTML_APPROVED')
           AND  upload_status  = 'PENDING'
         ORDER BY running_no ASC
         LIMIT ?
@@ -99,7 +99,14 @@ def get_carousel_by_uuid(conn, uuid):
 
 def mark_published(conn, uuid, instagram_post_id=None):
     conn.execute(
-        "UPDATE Carousel SET upload_status = 'PUBLISHED', current_stage = 'PUBLISHED', instagram_post_id = ? WHERE uuid = ?",
+        """
+        UPDATE Carousel
+        SET    upload_status    = 'PUBLISHED',
+               current_stage    = 'PUBLISHED',
+               instagram_post_id = ?,
+               published_date   = datetime('now')
+        WHERE  uuid = ?
+        """,
         (instagram_post_id, uuid),
     )
     conn.commit()
@@ -218,7 +225,7 @@ def cmd_dry_run(args):
     conn.close()
 
     if not carousels:
-        print(f"\nNo unpublished IMAGES_CREATED carousels in batch {batch_no}.")
+        print(f"\nNo unpublished HTML_APPROVED carousels in batch {batch_no}.")
         return
 
     print(f"\nBatch {batch_no} — Next {len(carousels)} unpublished carousel(s):")
@@ -323,7 +330,7 @@ def cmd_publish(args):
                 # Update DB
                 if not getattr(args, 'no_db_update', False):
                     mark_published(conn, c["uuid"], instagram_post_id=media_id)
-                    print(f"   ✓  DB updated → upload_status=PUBLISHED, current_stage=PUBLISHED, instagram_post_id={media_id}")
+                    print(f"   ✓  DB updated → upload_status=PUBLISHED, current_stage=PUBLISHED, instagram_post_id={media_id}, published_date=now")
                 else:
                     print(f"   ⚠  Skipping DB update (--no-db-update set)")
                 results.append((c["running_no"], c["title"], media_id))

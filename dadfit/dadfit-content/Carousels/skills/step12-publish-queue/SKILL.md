@@ -1,6 +1,6 @@
 ---
 name: step12-publish-queue
-description: "Shows the next N unpublished IMAGES_CREATED carousels from the latest batch, asks for explicit user confirmation, then publishes them to Instagram as carousel posts via the Meta Graph API. Step 11 (music) is skipped — IMAGES_CREATED is directly publishable."
+description: "Shows the next N unpublished HTML_APPROVED carousels from the latest batch, asks for explicit user confirmation, then publishes them to Instagram as carousel posts via the Meta Graph API. Step 11 (music) is skipped — HTML_APPROVED is directly publishable."
 argument-hint: "Number of carousels to preview and publish (default: 3)"
 ---
 
@@ -54,7 +54,7 @@ To get your credentials:
 
 ## Publishable Stage
 
-Step 11 (music) is **skipped**. Carousels with `current_stage = IMAGES_CREATED` and `upload_status = PENDING` are directly publishable.
+Step 11 (music) is **skipped**. Carousels with `current_stage = HTML_APPROVED` and `upload_status = PENDING` are directly publishable.
 
 ---
 
@@ -70,7 +70,7 @@ python3 Carousels/scripts/step12_publisher.py dry-run --count 3
 
 This command:
 - Auto-detects the latest batch number
-- Queries the DB for the 3 lowest `running_no` carousels with `IMAGES_CREATED` + `PENDING`
+- Queries the DB for the 3 lowest `running_no` carousels with `HTML_APPROVED` + `PENDING`
 - Prints: `running_no`, title, category, folder name, slide count, caption preview
 - Prints the `--uuids` string ready to paste into the publish command
 
@@ -103,7 +103,7 @@ The script will:
    - Create a carousel container (`media_type=CAROUSEL`) with all children
    - Poll carousel container until `FINISHED`
    - Publish via `/{IG_ID}/media_publish`
-   - Update DB: `upload_status = PUBLISHED`, `current_stage = PUBLISHED`
+   - Update DB: `upload_status = PUBLISHED`, `current_stage = PUBLISHED`, `published_date = now`
 5. Shut down server and ngrok tunnel
 6. Print a summary with Instagram Media IDs
 
@@ -129,6 +129,8 @@ The script will:
 |---|---|
 | `upload_status` | `PUBLISHED` |
 | `current_stage` | `PUBLISHED` |
+| `instagram_post_id` | `<media_id from API>` |
+| `published_date` | `datetime('now')` (UTC) |
 
 ---
 
@@ -137,4 +139,4 @@ The script will:
 - Carousel maximum: **10 slides** per post (Instagram limit). If a carousel has more, only the first 10 are published.
 - Images are always uploaded as **PNG**. No JPEG conversion — ever.
 - The ngrok tunnel is torn down immediately after all carousels are published.
-- To re-publish a carousel (e.g. after fixing slides), manually reset `upload_status = 'PENDING'` and `current_stage = 'IMAGES_CREATED'` in the DB, then re-run this skill.
+- To re-publish a carousel (e.g. after fixing slides), manually reset `upload_status = 'PENDING'` and `current_stage = 'HTML_APPROVED'` in the DB, then re-run this skill.

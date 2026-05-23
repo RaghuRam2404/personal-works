@@ -45,12 +45,14 @@ def init():
                                                 'CAPTION_WRITTEN',
                                                 'HTML_CREATED',
                                                 'DOODLES_DONE',
+                                                'HTML_APPROVED',
                                                 'IMAGES_CREATED',
                                                 'MUSIC_CHOSEN',
                                                 'READY_TO_PUBLISH',
                                                 'PUBLISHED',
                                                 'MONITORED'
                                             )),
+            published_date              TEXT,
             last_performance_monitored  TEXT
         )
     """)

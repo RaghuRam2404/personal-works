@@ -152,9 +152,10 @@ Track every task top to bottom. Do not move to the next phase until all tasks in
 
 ### Step 12: Daily Publish Queue
 - [x] **12.1** Create `Carousels/skills/step12-publish-queue/SKILL.md`
-  - Step 11 (music) skipped — `IMAGES_CREATED` is directly publishable
-  - `dry-run` mode: shows top N lowest `running_no` carousels (IMAGES_CREATED + PENDING), waits for user approval
-  - `publish` mode (manual trigger only): PNG→JPEG conversion, local HTTP server + ngrok tunnel, Instagram Graph API carousel upload, DB update to PUBLISHED
+  - Step 11 (music) skipped — `HTML_APPROVED` is directly publishable
+  - `dry-run` mode: shows top N lowest `running_no` carousels (HTML_APPROVED + PENDING), waits for user approval
+  - `publish` mode (manual trigger only): uploads PNGs to catbox.moe, Instagram Graph API carousel upload, DB update to PUBLISHED
+  - After publishing: stores `instagram_post_id` and `published_date` (UTC timestamp) in DB
   - Config: `Carousels/data/publish_config.env` (IG_USER_ID, IG_ACCESS_TOKEN)
   - Script: `Carousels/scripts/step12_publisher.py`
 - [ ] **12.2** Test run: Dry-run for Day 1 — verify correct carousels are selected
