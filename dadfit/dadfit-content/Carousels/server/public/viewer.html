@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DadFit — Viewer</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="viewer-page">
+
+  <nav class="topnav">
+    <a class="topnav-brand" href="/">🎠 DadFit</a>
+    <div class="topnav-links">
+      <a href="/" class="topnav-link">Home</a>
+      <a href="/viewer" class="topnav-link active">Viewer</a>
+      <a href="/dashboard" class="topnav-link">Dashboard</a>
+      <a href="/analytics" class="topnav-link">Analytics</a>
+    </div>
+  </nav>
+
+  <div class="viewer-wrapper">
+
+    <!-- ── Left panel: carousel list ── -->
+    <aside id="sidebar">
+      <div id="sidebar-header">
+        <div id="brand-row">
+          <div id="brand">🎠 DadFit</div>
+          <div id="batch-row">
+            <label for="batch-select" class="batch-label">Batch</label>
+            <select id="batch-select" class="batch-select"></select>
+          </div>
+        </div>
+        <div id="progress-chips">
+          <span class="chip chip-created"  id="count-HTML_CREATED">—</span>
+          <span class="chip chip-doodles"  id="count-DOODLES_DONE">—</span>
+          <span class="chip chip-approved" id="count-HTML_APPROVED">—</span>
+        </div>
+        <input id="search" type="text" placeholder="Search…" autocomplete="off">
+      </div>
+      <ul id="carousel-list"></ul>
+    </aside>
+
+    <!-- ── Centre panel: preview + action ── -->
+    <main id="preview-panel">
+      <div id="preview-toolbar">
+        <div id="preview-meta">
+          <span id="preview-title">Select a carousel</span>
+          <span id="preview-badges"></span>
+          <span id="uuid-row" hidden>
+            <span id="uuid-text" class="uuid-text"></span>
+            <button id="uuid-copy-btn" class="copy-btn" title="Copy UUID"></button>
+            <span id="uuid-copy-status" class="copy-status"></span>
+          </span>
+        </div>
+        <button id="action-btn" class="action-btn" disabled>—</button>
+      </div>
+      <iframe id="preview-frame" src="about:blank" title="Carousel Preview"></iframe>
+    </main>
+
+    <!-- ── Right panel: doodle prompts ── -->
+    <aside id="doodle-panel">
+      <div id="doodle-header">
+        <span>Doodle Prompts</span>
+        <span id="doodle-count"></span>
+      </div>
+      <div id="doodle-list">
+        <p class="doodle-empty">Select a carousel to view its doodle prompts.</p>
+      </div>
+    </aside>
+
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

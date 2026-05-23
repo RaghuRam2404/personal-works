@@ -192,6 +192,106 @@ app.use('/assets', express.static(PROJECT_ROOT));
 // carousel.html uses relative paths like ../../../../Resources/… which resolve to /Resources/…
 app.use('/Resources', express.static(path.join(PROJECT_ROOT, 'Resources')));
 
+// ── Phase 5 page routes ───────────────────────────────────────────────────────
+['viewer', 'dashboard', 'analytics'].forEach(page => {
+  app.get(`/${page}`, (req, res) =>
+    res.sendFile(path.join(__dirname, 'public', `${page}.html`))
+  );
+});
+
+// ── Phase 5 APIs ──────────────────────────────────────────────────────────────
+
+// GET /api/summary?batch=N  — home page pipeline overview
+app.get('/api/summary', (req, res) => {
+  const batch    = parseInt(req.query.batch || '1');
+  const stageRows = query(
+    'SELECT current_stage, COUNT(*) as count FROM Carousel WHERE batch_no = ? GROUP BY current_stage',
+    [batch]
+  );
+  const stages = {};
+  stageRows.forEach(r => { stages[r.current_stage] = r.count; });
+  const total       = (query('SELECT COUNT(*) as n FROM Carousel WHERE batch_no = ?', [batch])[0] || {}).n || 0;
+  const published   = (query("SELECT COUNT(*) as n FROM Carousel WHERE batch_no = ? AND upload_status = 'PUBLISHED'", [batch])[0] || {}).n || 0;
+  const perfEntries = (query('SELECT COUNT(*) as n FROM CarouselPerformance cp JOIN Carousel c ON c.uuid = cp.carousel_uuid WHERE c.batch_no = ?', [batch])[0] || {}).n || 0;
+  res.json({ total, published, perfEntries, stages });
+});
+
+// GET /api/carousels-full?batch=N  — all fields for dashboard table
+app.get('/api/carousels-full', (req, res) => {
+  const batch = parseInt(req.query.batch || '1');
+  const rows  = query(
+    `SELECT running_no, uuid, folder_name, title, keyword, category,
+            current_stage, upload_status, hook, caption, cta, script_content,
+            instagram_post_id, published_date
+     FROM   Carousel WHERE batch_no = ? ORDER BY running_no`,
+    [batch]
+  );
+  res.json(rows);
+});
+
+// PATCH /api/carousel/:uuid  — inline edit (hook, caption, cta, script_content only)
+app.patch('/api/carousel/:uuid', (req, res) => {
+  const allowed = ['hook', 'caption', 'cta', 'script_content'];
+  const fields  = allowed.filter(k => req.body[k] !== undefined);
+  if (!fields.length) return res.status(400).json({ ok: false, error: 'No editable fields provided' });
+  try {
+    run(
+      `UPDATE Carousel SET ${fields.map(k => `${k} = ?`).join(', ')} WHERE uuid = ?`,
+      [...fields.map(k => req.body[k]), req.params.uuid]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// GET /api/performance?batch=N  — all perf entries for analytics
+app.get('/api/performance', (req, res) => {
+  const batch = parseInt(req.query.batch || '1');
+  const rows  = query(
+    `SELECT cp.carousel_uuid, cp.performance_taken_time,
+            cp.views, cp.likes, cp.comments, cp.shares,
+            cp.saves, cp.reach, cp.profile_visits, cp.follows_from_post,
+            c.running_no, c.title, c.category, c.published_date
+     FROM   CarouselPerformance cp
+     JOIN   Carousel c ON c.uuid = cp.carousel_uuid
+     WHERE  c.batch_no = ?
+     ORDER  BY c.running_no, cp.performance_taken_time`,
+    [batch]
+  );
+  res.json(rows);
+});
+
+// GET /api/performance/:uuid  — per-carousel history for chart
+app.get('/api/performance/:uuid', (req, res) => {
+  const rows = query(
+    'SELECT * FROM CarouselPerformance WHERE carousel_uuid = ? ORDER BY performance_taken_time ASC',
+    [req.params.uuid]
+  );
+  res.json(rows);
+});
+
+// GET /api/slides/:batch/:folder  — list slide filenames
+app.get('/api/slides/:batch/:folder', (req, res) => {
+  const { batch, folder } = req.params;
+  const p1  = path.join(DATA_DIR, `batch_${batch}_slides`, folder);
+  const p2  = path.join(DATA_DIR, `batch_${batch}`, folder, 'slides');
+  const dir = fs.existsSync(p1) ? p1 : (fs.existsSync(p2) ? p2 : null);
+  if (!dir) return res.json([]);
+  const files = fs.readdirSync(dir).filter(f => /\.(png|jpg|jpeg)$/i.test(f)).sort();
+  res.json(files);
+});
+
+// GET /slides/:batch/:folder/:file  — serve a slide image
+app.get('/slides/:batch/:folder/:file', (req, res) => {
+  const { batch, folder, file } = req.params;
+  const p1 = path.join(DATA_DIR, `batch_${batch}_slides`, folder, file);
+  const p2 = path.join(DATA_DIR, `batch_${batch}`, folder, 'slides', file);
+  const p  = fs.existsSync(p1) ? p1 : (fs.existsSync(p2) ? p2 : null);
+  if (!p) return res.status(404).end();
+  res.sendFile(p);
+});
+
 // ── Start ─────────────────────────────────────────────────────────────────────
 initDb().then(() => {
   app.listen(PORT, '127.0.0.1', () => {

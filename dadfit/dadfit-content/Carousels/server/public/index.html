@@ -3,12 +3,112 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DadFit Carousel Viewer</title>
+  <title>DadFit Carousel Pipeline</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <!-- ── Left panel: carousel list ── -->
-  <aside id="sidebar">
+
+  <nav class="topnav">
+    <a class="topnav-brand" href="/">🎠 DadFit</a>
+    <div class="topnav-links">
+      <a href="/" class="topnav-link active">Home</a>
+      <a href="/viewer" class="topnav-link">Viewer</a>
+      <a href="/dashboard" class="topnav-link">Dashboard</a>
+      <a href="/analytics" class="topnav-link">Analytics</a>
+    </div>
+    <div class="topnav-right">
+      <label class="batch-label">Batch</label>
+      <select class="batch-select" id="batch-select"></select>
+    </div>
+  </nav>
+
+  <div class="home-body">
+
+    <div class="home-hero">
+      <h1 class="home-title">Carousel Pipeline</h1>
+      <p class="home-subtitle" id="home-subtitle">Loading…</p>
+    </div>
+
+    <div id="stat-row" class="home-stat-row"></div>
+
+    <div class="home-stage-section">
+      <div class="section-title">Stage Distribution</div>
+      <div class="stage-grid" id="stage-grid"></div>
+    </div>
+
+    <div class="home-tools-section">
+      <div class="section-title">Tools</div>
+      <div class="tool-grid">
+        <a href="/viewer" class="tool-card">
+          <div class="tool-icon">🔍</div>
+          <div class="tool-name">Viewer</div>
+          <div class="tool-desc">Review carousels, mark doodles done, approve for publishing</div>
+          <div class="tool-cta">Open Viewer →</div>
+        </a>
+        <a href="/dashboard" class="tool-card">
+          <div class="tool-icon">✏️</div>
+          <div class="tool-name">Dashboard</div>
+          <div class="tool-desc">Browse all carousels, edit hooks, captions, CTAs, scripts inline</div>
+          <div class="tool-cta">Open Dashboard →</div>
+        </a>
+        <a href="/analytics" class="tool-card">
+          <div class="tool-icon">📊</div>
+          <div class="tool-name">Analytics</div>
+          <div class="tool-desc">Top performers, category comparison, week-over-week charts</div>
+          <div class="tool-cta">Open Analytics →</div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const STAGE_ORDER = [
+      'TOPIC_FETCHED','CATEGORIZED','ORDER_SET','HOOK_WRITTEN','SCRIPT_WRITTEN',
+      'CTA_WRITTEN','CAPTION_WRITTEN','HTML_CREATED','DOODLES_DONE','HTML_APPROVED',
+      'IMAGES_CREATED','MUSIC_CHOSEN','READY_TO_PUBLISH','PUBLISHED','MONITORED',
+    ];
+
+    let currentBatch = '1';
+
+    async function init() {
+      const res     = await fetch('/api/batches');
+      const batches = await res.json();
+      const sel     = document.getElementById('batch-select');
+      batches.forEach(b => {
+        const opt = document.createElement('option');
+        opt.value = b; opt.textContent = `Batch ${b}`;
+        if (String(b) === currentBatch) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener('change', () => { currentBatch = sel.value; loadSummary(); });
+      loadSummary();
+    }
+
+    async function loadSummary() {
+      const res  = await fetch(`/api/summary?batch=${currentBatch}`);
+      const data = await res.json();
+
+      document.getElementById('home-subtitle').textContent =
+        `Batch ${currentBatch} · ${data.total} carousels`;
+
+      document.getElementById('stat-row').innerHTML = `
+        <div class="stat-card"><div class="stat-value">${data.total}</div><div class="stat-label">Total</div></div>
+        <div class="stat-card accent-green"><div class="stat-value">${data.published}</div><div class="stat-label">Published</div></div>
+        <div class="stat-card accent-blue"><div class="stat-value">${data.stages['HTML_APPROVED'] || 0}</div><div class="stat-label">Approved</div></div>
+        <div class="stat-card accent-yellow"><div class="stat-value">${data.perfEntries}</div><div class="stat-label">Perf Entries</div></div>
+      `;
+
+      document.getElementById('stage-grid').innerHTML = STAGE_ORDER.map(s => {
+        const n = data.stages[s] || 0;
+        return `<span class="stage-pill${n > 0 ? ' has-data' : ''}">${s}: ${n}</span>`;
+      }).join('');
+    }
+
+    init();
+  </script>
+</body>
+</html>
     <div id="sidebar-header">
       <div id="brand-row">
         <div id="brand">🎠 DadFit</div>

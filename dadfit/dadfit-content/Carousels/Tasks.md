@@ -184,19 +184,19 @@ Track every task top to bottom. Do not move to the next phase until all tasks in
 
 ## Phase 5 — Visualizer Web UI
 
-- [ ] **15.1** Design the UI layout on paper / wireframe before coding:
+- [x] **15.1** Design the UI layout on paper / wireframe before coding:
   - Batch selector dropdown
   - Table view: all 100 carousels with columns (running_no, title, category, current_stage, upload_status)
   - Inline edit for: hook, caption, cta, script_content
   - Per-carousel detail view: slide images preview + performance chart
   - Top performers board (sortable by any metric)
-- [ ] **15.2** Build the web UI (HTML/CSS/JS or framework of choice)
+- [x] **15.2** Build the web UI (HTML/CSS/JS or framework of choice)
   - Connect to `Carousels/data/db.sqlite` via a local API or direct SQLite read
-- [ ] **15.3** Implement batch selector → carousel table view
-- [ ] **15.4** Implement inline edit and save back to DB
-- [ ] **15.5** Implement per-carousel performance chart (week-over-week)
-- [ ] **15.6** Implement top performers board
-- [ ] **15.7** Test end-to-end with real batch data
+- [x] **15.3** Implement batch selector → carousel table view
+- [x] **15.4** Implement inline edit and save back to DB
+- [x] **15.5** Implement per-carousel performance chart (week-over-week)
+- [x] **15.6** Implement top performers board
+- [x] **15.7** Test end-to-end with real batch data
 
 ---
 

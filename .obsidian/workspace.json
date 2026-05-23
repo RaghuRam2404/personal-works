@@ -193,6 +193,9 @@
   },
   "active": "00ce8c958ec62ab4",
   "lastOpenFiles": [
+    "dadfit/dadfit-content/Carousels/server/public/analytics.html",
+    "dadfit/dadfit-content/Carousels/server/public/dashboard.html",
+    "dadfit/dadfit-content/Carousels/server/public/viewer.html",
     "dadfit/dadfit-content/Carousels/out/batch_1_week_2_report.md",
     "dadfit/dadfit-content/Carousels/skills/step14-weekly-analysis/SKILL.md",
     "dadfit/dadfit-content/Carousels/skills/step14-weekly-analysis",
@@ -213,9 +216,7 @@
     "dadfit/dadfit-content/Site/robots.txt",
     "dadfit/dadfit-content/Site/sitemap.xml",
     "dadfit/dadfit-content/Carousels/data/batch_1/doodles/20-d-09.png",
-    "dadfit/dadfit-content/Carousels/data/batch_1/doodles/Unconfirmed 420479.crdownload",
     "dadfit/dadfit-content/Carousels/data/batch_1/doodles/20-d-08.png",
-    "dadfit/dadfit-content/Carousels/data/batch_1/doodles/Unconfirmed 79231.crdownload",
     "dadfit/dadfit-content/Carousels/skills/trim-carousel-slides/SKILL.md",
     "learnings/ai-learnings/greg-isenberg/Notes on Agent Economy.md",
     "dadfit/dadfit-content/Carousels/templates/design 1/Notes.md",
@@ -237,7 +238,6 @@
     "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/socks/docs/examples/typescript/connectExample.md",
     "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/socks/docs/examples/typescript/bindExample.md",
     "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/socks/docs/examples/typescript/associateExample.md",
-    "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/socks/docs/examples/javascript/connectExample.md",
-    "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/socks/docs/examples/javascript/bindExample.md"
+    "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/socks/docs/examples/javascript/connectExample.md"
   ]
 }

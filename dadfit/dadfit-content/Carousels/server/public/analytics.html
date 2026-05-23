@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DadFit — Analytics</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+</head>
+<body class="analytics-page">
+
+  <nav class="topnav">
+    <a class="topnav-brand" href="/">🎠 DadFit</a>
+    <div class="topnav-links">
+      <a href="/" class="topnav-link">Home</a>
+      <a href="/viewer" class="topnav-link">Viewer</a>
+      <a href="/dashboard" class="topnav-link">Dashboard</a>
+      <a href="/analytics" class="topnav-link active">Analytics</a>
+    </div>
+    <div class="topnav-right">
+      <label class="batch-label">Batch</label>
+      <select class="batch-select" id="batch-select"></select>
+    </div>
+  </nav>
+
+  <div class="analytics-body">
+
+    <!-- Top Performers -->
+    <div class="analytics-section">
+      <div class="analytics-section-title">Top Performers</div>
+      <div class="top-tables-grid">
+        <div class="top-table-card">
+          <div class="top-table-header">🏆 Top 10 by Saves</div>
+          <div id="top-saves"></div>
+        </div>
+        <div class="top-table-card">
+          <div class="top-table-header">📡 Top 10 by Reach</div>
+          <div id="top-reach"></div>
+        </div>
+        <div class="top-table-card">
+          <div class="top-table-header">👥 Top 10 by Follows</div>
+          <div id="top-follows"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Comparison -->
+    <div class="analytics-section">
+      <div class="analytics-section-title">Category Comparison</div>
+      <div class="cat-grid" id="cat-grid"></div>
+    </div>
+
+    <!-- Carousel Detail -->
+    <div class="analytics-section">
+      <div class="analytics-section-title">Carousel Detail</div>
+      <div class="detail-controls">
+        <select class="detail-select" id="carousel-select">
+          <option value="">— Select a carousel —</option>
+        </select>
+      </div>
+      <div class="detail-grid" id="detail-grid" style="display:none">
+        <div class="detail-slides-panel">
+          <div class="detail-slides-title">Slides</div>
+          <div class="detail-slides-grid" id="detail-slides"></div>
+        </div>
+        <div class="chart-panel" id="chart-panel">
+          <div class="chart-title">Performance Over Time</div>
+          <div class="chart-container" id="chart-container">
+            <canvas id="perf-chart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div id="detail-empty" class="empty-state">
+        <div class="empty-state-icon">📈</div>
+        <div class="empty-state-text">Select a carousel above to view its slides and performance chart.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" style="display:none">
+    <img id="lightbox-img" src="" alt="Slide preview">
+  </div>
+
+  <script>
+    const CAT_COLOR = { TOFU: '#4a9eff', MOFU: '#e67e22', BOFU: '#34C363' };
+    let currentBatch = '1';
+    let allCarousels = [];
+    let allPerf      = [];
+    let perfChart    = null;
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    async function init() {
+      const res     = await fetch('/api/batches');
+      const batches = await res.json();
+      const sel     = document.getElementById('batch-select');
+      batches.forEach(b => {
+        const opt = document.createElement('option');
+        opt.value = b; opt.textContent = `Batch ${b}`;
+        if (String(b) === currentBatch) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener('change', () => { currentBatch = sel.value; loadAll(); });
+      await loadAll();
+    }
+
+    async function loadAll() {
+      const [carRes, perfRes] = await Promise.all([
+        fetch(`/api/carousels-full?batch=${currentBatch}`),
+        fetch(`/api/performance?batch=${currentBatch}`),
+      ]);
+      allCarousels = await carRes.json();
+      allPerf      = await perfRes.json();
+      renderTopTables();
+      renderCategoryComparison();
+      populateCarouselSelect();
+    }
+
+    // ── Aggregation ───────────────────────────────────────────────────────────
+    function aggregateByCarousel() {
+      const totals = {};
+      allPerf.forEach(p => {
+        if (!totals[p.carousel_uuid]) {
+          totals[p.carousel_uuid] = { views:0,likes:0,comments:0,shares:0,saves:0,reach:0,profile_visits:0,follows_from_post:0 };
+        }
+        const t = totals[p.carousel_uuid];
+        ['views','likes','comments','shares','saves','reach','profile_visits','follows_from_post']
+          .forEach(k => { t[k] += (p[k] || 0); });
+      });
+      return totals;
+    }
+
+    // ── Top 10 Tables ─────────────────────────────────────────────────────────
+    function renderTopTables() {
+      const totals = aggregateByCarousel();
+      renderTopTable('top-saves',   totals, 'saves',             'Saves');
+      renderTopTable('top-reach',   totals, 'reach',             'Reach');
+      renderTopTable('top-follows', totals, 'follows_from_post', 'Follows');
+    }
+
+    function renderTopTable(containerId, totals, metric, label) {
+      const el = document.getElementById(containerId);
+      if (!Object.keys(totals).length) {
+        el.innerHTML = `<div class="empty-state" style="padding:20px">
+          <div class="empty-state-icon" style="font-size:22px">📭</div>
+          <div class="empty-state-text">No performance data yet.<br>Run Step 13 to record metrics.</div>
+        </div>`;
+        return;
+      }
+      const ranked = Object.entries(totals)
+        .sort((a,b) => (b[1][metric]||0) - (a[1][metric]||0))
+        .slice(0, 10);
+
+      let html = `<table class="perf-table"><thead>
+        <tr><th>#</th><th>Title</th><th>Cat</th><th style="text-align:right">${label}</th></tr>
+      </thead><tbody>`;
+      ranked.forEach(([uuid, m], i) => {
+        const c  = allCarousels.find(x => x.uuid === uuid);
+        if (!c) return;
+        const cc = CAT_COLOR[c.category] || '#888';
+        html += `<tr>
+          <td style="color:#555;font-size:11px;width:22px">${i+1}</td>
+          <td style="max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="#${c.running_no} ${c.title}">#${c.running_no} ${c.title}</td>
+          <td><span class="badge" style="background:${cc};color:#000;font-size:10px">${c.category}</span></td>
+          <td class="metric-val">${(m[metric]||0).toLocaleString()}</td>
+        </tr>`;
+      });
+      el.innerHTML = html + '</tbody></table>';
+    }
+
+    // ── Category Comparison ───────────────────────────────────────────────────
+    function renderCategoryComparison() {
+      const totals = aggregateByCarousel();
+      const cats   = { TOFU:{}, MOFU:{}, BOFU:{} };
+      allCarousels.forEach(c => { if (cats[c.category]) cats[c.category][c.uuid] = totals[c.uuid] || null; });
+
+      const metrics = ['views','reach','likes','saves','follows_from_post'];
+      const labels  = { views:'Avg Views', reach:'Avg Reach', likes:'Avg Likes', saves:'Avg Saves', follows_from_post:'Avg Follows' };
+
+      document.getElementById('cat-grid').innerHTML = ['TOFU','MOFU','BOFU'].map(cat => {
+        const entries = Object.entries(cats[cat]);
+        const n       = entries.length;
+        const withPerf = entries.filter(([,v]) => v);
+        const np      = withPerf.length;
+        const metricRows = metrics.map(m => {
+          const avg = np ? withPerf.reduce((s,[,v]) => s + (v?.[m]||0), 0) / np : 0;
+          return `<div class="cat-metric-row">
+            <span class="cat-metric-label">${labels[m]}</span>
+            <span class="cat-metric-val">${np ? avg.toFixed(1) : '—'}</span>
+          </div>`;
+        }).join('');
+        return `<div class="cat-card">
+          <div class="cat-card-header">
+            <span class="cat-badge-lg" style="background:${CAT_COLOR[cat]||'#888'};color:#000">${cat}</span>
+            <span class="cat-card-count">${n} carousel(s)</span>
+          </div>
+          <div class="cat-metrics">${metricRows}</div>
+        </div>`;
+      }).join('');
+    }
+
+    // ── Carousel Detail ───────────────────────────────────────────────────────
+    function populateCarouselSelect() {
+      const sel  = document.getElementById('carousel-select');
+      const prev = sel.value;
+      sel.innerHTML = '<option value="">— Select a carousel —</option>';
+      allCarousels.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.uuid;
+        opt.textContent = `#${c.running_no} ${c.title}`;
+        sel.appendChild(opt);
+      });
+      if (prev) { sel.value = prev; if (sel.value) triggerDetail(prev); }
+    }
+
+    document.getElementById('carousel-select').addEventListener('change', e => {
+      const uuid = e.target.value;
+      if (!uuid) {
+        document.getElementById('detail-grid').style.display = 'none';
+        document.getElementById('detail-empty').style.display = 'block';
+        return;
+      }
+      triggerDetail(uuid);
+    });
+
+    function triggerDetail(uuid) {
+      document.getElementById('detail-grid').style.display  = 'grid';
+      document.getElementById('detail-empty').style.display = 'none';
+      const c = allCarousels.find(x => x.uuid === uuid);
+      if (c) { loadDetailSlides(c); renderChart(uuid); }
+    }
+
+    async function loadDetailSlides(c) {
+      const grid = document.getElementById('detail-slides');
+      grid.innerHTML = '<span style="color:#555;font-size:12px">Loading…</span>';
+      if (!c.folder_name) { grid.innerHTML = '<span style="color:#555;font-size:12px">No slides yet</span>'; return; }
+      const res   = await fetch(`/api/slides/${currentBatch}/${c.folder_name}`);
+      const files = await res.json();
+      if (!files.length) { grid.innerHTML = '<span style="color:#555;font-size:12px">No slides found</span>'; return; }
+      grid.innerHTML = files
+        .map(f => `<img class="detail-slide-thumb" src="/slides/${currentBatch}/${c.folder_name}/${f}" loading="lazy" alt="${f}">`)
+        .join('');
+      grid.querySelectorAll('.detail-slide-thumb').forEach(img => {
+        img.onclick = () => openLightbox(img.src);
+      });
+    }
+
+    function renderChart(uuid) {
+      const container = document.getElementById('chart-container');
+      if (perfChart) { perfChart.destroy(); perfChart = null; }
+
+      const entries = allPerf.filter(p => p.carousel_uuid === uuid);
+      if (!entries.length) {
+        container.innerHTML = `<div class="chart-empty">No performance entries yet for this carousel.<br>Run Step 13 to log metrics.</div>`;
+        return;
+      }
+
+      // Rebuild canvas (may have been replaced by empty message)
+      container.innerHTML = '<canvas id="perf-chart"></canvas>';
+
+      const labels   = entries.map(e => e.performance_taken_time.substring(0, 10));
+      const datasets = [
+        { label:'Views',   data: entries.map(e=>e.views||0),              borderColor:'#4a9eff', backgroundColor:'rgba(74,158,255,0.08)', tension:0.3, fill:true },
+        { label:'Saves',   data: entries.map(e=>e.saves||0),              borderColor:'#34C363', backgroundColor:'rgba(52,195,99,0.08)',  tension:0.3, fill:true },
+        { label:'Reach',   data: entries.map(e=>e.reach||0),              borderColor:'#e67e22', backgroundColor:'rgba(230,126,34,0.08)', tension:0.3, fill:true },
+        { label:'Follows', data: entries.map(e=>e.follows_from_post||0),  borderColor:'#9b59b6', backgroundColor:'rgba(155,89,182,0.08)', tension:0.3, fill:true },
+      ];
+
+      perfChart = new Chart(document.getElementById('perf-chart'), {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color:'#aaa', font:{ size:11 }, boxWidth:12, padding:12 } },
+          },
+          scales: {
+            x: { ticks:{ color:'#555', font:{ size:10 } }, grid:{ color:'#222' } },
+            y: { ticks:{ color:'#555', font:{ size:10 } }, grid:{ color:'#222' }, beginAtZero:true },
+          },
+        },
+      });
+    }
+
+    // ── Lightbox ──────────────────────────────────────────────────────────────
+    function openLightbox(src) {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox').style.display = 'flex';
+    }
+    document.getElementById('lightbox').addEventListener('click', () => {
+      document.getElementById('lightbox').style.display = 'none';
+    });
+
+    init();
+  </script>
+</body>
+</html>
