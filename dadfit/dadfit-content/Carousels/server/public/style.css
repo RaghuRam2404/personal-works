@@ -70,10 +70,9 @@ body.viewer-page {
   flex-shrink: 0;
 }
 .sidebar-logo {
-  height: 24px;
+  height: 18px;
   width: auto;
   display: block;
-  border-radius: 3px;
 }
 
 #batch-row {
@@ -459,10 +458,9 @@ body.viewer-page {
   align-items: center;
 }
 .topnav-logo {
-  height: 28px;
+  height: 20px;
   width: auto;
   display: block;
-  border-radius: 4px;
 }
 .topnav-links {
   display: flex;
