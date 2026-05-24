@@ -22,21 +22,33 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ── SQLite helpers (sql.js loads the file as a Buffer) ────────────────────────
 
-let SQL;   // sql.js module (async init once)
-let db;    // sql.js Database instance
+let SQL;         // sql.js module (async init once)
+let db;          // sql.js Database instance
+let dbMtime = 0; // mtime of the last loaded DB file
 
 async function initDb() {
   SQL = await initSqlJs();
-  const buf = fs.readFileSync(DB_PATH);
-  db = new SQL.Database(buf);
+  reloadDb();
+}
+
+function reloadDb() {
+  const mtime = fs.statSync(DB_PATH).mtimeMs;
+  if (mtime !== dbMtime) {
+    const buf = fs.readFileSync(DB_PATH);
+    if (db) db.close();
+    db = new SQL.Database(buf);
+    dbMtime = mtime;
+  }
 }
 
 function saveDb() {
   const data = db.export();
   fs.writeFileSync(DB_PATH, Buffer.from(data));
+  dbMtime = fs.statSync(DB_PATH).mtimeMs;
 }
 
 function query(sql, params = []) {
+  reloadDb(); // pick up any changes written by Python scripts
   const stmt = db.prepare(sql);
   stmt.bind(params);
   const rows = [];

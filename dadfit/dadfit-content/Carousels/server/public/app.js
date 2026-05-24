@@ -9,12 +9,14 @@ const STAGE_LABEL = {
   HTML_CREATED:  'HTML Created',
   DOODLES_DONE:  'Doodles Done',
   HTML_APPROVED: 'Approved',
+  PUBLISHED:     'Published',
 };
 const CAT_COLOR = { TOFU: '#4a9eff', MOFU: '#e67e22', BOFU: '#34C363' };
 const STAGE_COLOR = {
   HTML_CREATED:  '#666',
   DOODLES_DONE:  '#e6a817',
   HTML_APPROVED: '#34C363',
+  PUBLISHED:     '#4a9eff',
 };
 
 let allCarousels = [];
@@ -103,7 +105,7 @@ async function loadCarousels() {
 async function loadCounts() {
   const res    = await fetch(`/api/stages?batch=${currentBatch}`);
   const counts = await res.json();
-  ['HTML_CREATED', 'DOODLES_DONE', 'HTML_APPROVED'].forEach(s => {
+  ['HTML_CREATED', 'DOODLES_DONE', 'HTML_APPROVED', 'PUBLISHED'].forEach(s => {
     const el = document.getElementById(`count-${s}`);
     if (el) el.textContent = `${STAGE_LABEL[s]}: ${counts[s] || 0}`;
   });
