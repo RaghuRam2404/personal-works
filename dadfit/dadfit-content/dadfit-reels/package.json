@@ -1,0 +1,22 @@
+{
+  "name": "dadfit-reels",
+  "version": "1.0.0",
+  "description": "DadFit Instagram Reels — Remotion video",
+  "scripts": {
+    "start": "remotion studio",
+    "build": "remotion render 75KG-FATTER out/dadfit-reel.mp4 --codec=h264",
+    "still": "remotion still 75KG-FATTER public/preview.png --frame=30",
+    "upgrade": "remotion upgrade"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.291",
+    "@remotion/google-fonts": "4.0.291",
+    "remotion": "4.0.291",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "typescript": "^5.4.5"
+  }
+}
