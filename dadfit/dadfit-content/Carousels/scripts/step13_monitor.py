@@ -39,7 +39,8 @@ CONFIG_PATH = WORKSPACE / "Carousels" / "data" / "publish_config.env"
 GRAPH_HOST  = "https://graph.instagram.com"
 
 # Metrics available from Instagram Media Insights API for carousel/feed posts
-IG_METRICS = "impressions,reach,likes,comments,shares,saved,profile_visits,follows"
+# NOTE: 'impressions' is not supported for CAROUSEL_ALBUM — use 'reach' instead
+IG_METRICS = "reach,likes,comments,shares,saved,profile_visits,follows"
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 
@@ -231,9 +232,9 @@ def fetch_ig_insights(media_id: str, access_token: str, api_version: str) -> dic
     )
 
     # Instagram returns 400 for unsupported metrics on some media types;
-    # try a reduced set if that happens
+    # try a reduced set (drop follows) if that happens
     if resp.status_code == 400:
-        reduced = "impressions,reach,likes,comments,shares,saved,profile_visits"
+        reduced = "reach,likes,comments,shares,saved,profile_visits"
         resp = requests.get(
             url,
             params={"metric": reduced, "access_token": access_token},
@@ -249,7 +250,6 @@ def fetch_ig_insights(media_id: str, access_token: str, api_version: str) -> dic
     data = resp.json().get("data", [])
     # Map Instagram metric names → our DB column names
     name_map = {
-        "impressions":    "views",
         "reach":          "reach",
         "likes":          "likes",
         "comments":       "comments",

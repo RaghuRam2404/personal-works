@@ -11,10 +11,14 @@
             "id": "9b33ab2849308ae8",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "learnings/X/2026-05-24 Clickup Zeb Evans.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "2026-05-24 Clickup Zeb Evans"
             }
           }
         ]
@@ -191,8 +195,11 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "00ce8c958ec62ab4",
+  "active": "9b33ab2849308ae8",
   "lastOpenFiles": [
+    "learnings/X/2026-05-24 Clickup Zeb Evans.md",
+    "learnings/X",
+    "dadfit/dadfit-content/Carousels/out/batch_1_week_1_report.md",
     "dadfit/dadfit-content/Carousels/data/batch_1/doodles/30-d-04.png",
     "dadfit/dadfit-content/Carousels/data/batch_1/doodles/30-d-09.png",
     "dadfit/dadfit-content/Carousels/data/batch_1/doodles/Unconfirmed 381568.crdownload",
@@ -209,11 +216,9 @@
     "dadfit/dadfit-content/Carousels/data/batch_1/doodles/30-d-01.png",
     "dadfit/dadfit-content/Carousels/data/batch_1/doodles/visit.png",
     "dadfit/dadfit-content/Carousels/data/batch_1/doodles/Unconfirmed 617248.crdownload",
-    "dadfit/dadfit-content/Carousels/data/batch_1/doodles/29-d-10.png",
     "dadfit/dadfit-content/Carousels/data/batch_1/doodles/Unconfirmed 811866.crdownload",
     "dadfit/dadfit-content/Carousels/data/batch_1/doodles/Unconfirmed 905271.crdownload",
     "dadfit/dadfit-content/Carousels/data/batch_1/doodles/Unconfirmed 79117.crdownload",
-    "dadfit/dadfit-content/Carousels/data/batch_1/doodles/Unconfirmed 420488.crdownload",
     "dadfit/dadfit-content/Carousels/out/batch_1_week_2_report.md",
     "dadfit/dadfit-content/Carousels/skills/step14-weekly-analysis/SKILL.md",
     "dadfit/dadfit-content/Carousels/skills/step13-daily-monitor/SKILL.md",
@@ -237,7 +242,6 @@
     "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/get-uri/README.md",
     "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/socks/docs/examples/typescript/connectExample.md",
     "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/socks/docs/examples/typescript/bindExample.md",
-    "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/socks/docs/examples/typescript/associateExample.md",
-    "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/socks/docs/examples/javascript/connectExample.md"
+    "dadfit/dadfit-content/Carousels/skills/step10-html-to-images/node_modules/socks/docs/examples/typescript/associateExample.md"
   ]
 }
