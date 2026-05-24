@@ -136,15 +136,15 @@ Track every task top to bottom. Do not move to the next phase until all tasks in
   - Always overwrites existing PNGs — safe to re-run after editing individual HTMLs
 - [ ] **10.2** Test: Verify slide PNGs exist for 5 carousels, check image quality and dimensions
 
-### Step 11: Choose Music
-- [ ] **11.1** Audit `Resources/Sounds/` — list all available tracks and their mood/energy level
-- [ ] **11.2** Create `Carousels/skills/step11-music-chooser/SKILL.md`
-  - Spawns 10 agents (1 per 10 carousels)
-  - For each carousel, reads `category` + `title` from DB
-  - Picks a suitable track from `Resources/Sounds/` based on mood/energy
-  - Copies track to `Carousels/data/batch_{batch_no}/{folder_name}/music/`
-  - Updates DB: `current_stage = MUSIC_CHOSEN`, then `current_stage = READY_TO_PUBLISH`
-- [ ] **11.3** Test: Verify music file exists in each carousel's folder
+### ~~Step 11: Choose Music~~ *(CANCELLED — not feasible)*
+- ~~[ ] **11.1** Audit `Resources/Sounds/` — list all available tracks and their mood/energy level~~
+- ~~[ ] **11.2** Create `Carousels/skills/step11-music-chooser/SKILL.md`~~
+  - ~~Spawns 10 agents (1 per 10 carousels)~~
+  - ~~For each carousel, reads `category` + `title` from DB~~
+  - ~~Picks a suitable track from `Resources/Sounds/` based on mood/energy~~
+  - ~~Copies track to `Carousels/data/batch_{batch_no}/{folder_name}/music/`~~
+  - ~~Updates DB: `current_stage = MUSIC_CHOSEN`, then `current_stage = READY_TO_PUBLISH`~~
+- ~~[ ] **11.3** Test: Verify music file exists in each carousel's folder~~
 
 ---
 
@@ -214,7 +214,7 @@ Once the pipeline is built, use this for every new batch:
 - [ ] Run Step 8 (HTML builder)
 - [ ] Step 9 (manual, via web viewer): place doodles → Mark Doodles Done → `DOODLES_DONE`, then Approve → `HTML_APPROVED`
 - [ ] Run Step 10 (HTML → images)
-- [ ] Run Step 11 (music chooser)
+- ~~[ ] Run Step 11 (music chooser)~~ *(CANCELLED)*
 - [ ] Each day: Run Step 12 (publish queue) → upload manually → update DB
 - [ ] Each day: Run Step 13 (monitor) → input metrics
 - [ ] Each week: Run Step 14 (weekly analysis)
