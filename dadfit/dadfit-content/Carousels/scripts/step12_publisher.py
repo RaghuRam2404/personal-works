@@ -32,7 +32,7 @@ DB_PATH     = WORKSPACE / "Carousels" / "data" / "db.sqlite"
 CONFIG_PATH = WORKSPACE / "Carousels" / "data" / "publish_config.env"
 GRAPH_HOST  = "https://graph.instagram.com"
 
-PUBLISHABLE_STAGES = ("HTML_APPROVED",)
+PUBLISHABLE_STAGES = ("HTML_APPROVED", "IMAGES_CREATED")
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 
@@ -71,7 +71,7 @@ def get_top_unpublished(conn, batch_no, count):
         SELECT uuid, running_no, title, category, caption, hook, cta, folder_name
         FROM   Carousel
         WHERE  batch_no = ?
-          AND  current_stage IN ('HTML_APPROVED')
+          AND  current_stage IN ('HTML_APPROVED', 'IMAGES_CREATED')
           AND  upload_status  = 'PENDING'
         ORDER BY running_no ASC
         LIMIT ?
