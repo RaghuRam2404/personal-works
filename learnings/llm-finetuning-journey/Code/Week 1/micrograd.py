@@ -37,8 +37,8 @@ class Value:
     def __add__(self, data, label=""):
         out = Value(self.data + data.data, label, op="+", children=(self, data))
         def backward():
-            self.grad += out.grad
-            data.grad += out.grad        
+            self.grad += 1.0 * out.grad
+            data.grad += 1.0 * out.grad        
         self._backward = backward
         
         return out
@@ -58,7 +58,7 @@ class Value:
         out = Value(tanh, op='tanh', children=(self,))
         
         def backward():
-            self.grad += 1 - tanh**2
+            self.grad += (1 - tanh**2) * out.grad
         
         self._backward = backward
         
@@ -87,8 +87,9 @@ class Value:
         
         nodes = topo(self) #sorted ones in the nodes variable
         
-        for n in reversed(nodes):
+        for n in nodes:
             n._backward()
+            #print(n, n.grad)
         
     def __repr__(self):
         return f"Value of {self.label}: {self.data}"
@@ -142,3 +143,5 @@ print(f"w2.grad: {w2.grad}, x2.grad: {x2.grad}")
 
 # Backward pass in a single function
 o.backward()
+print(f"w1.grad: {w1.grad}, x1.grad: {x1.grad}")
+print(f"w2.grad: {w2.grad}, x2.grad: {x2.grad}")
