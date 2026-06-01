@@ -119,16 +119,24 @@
 
     // ── Aggregation ───────────────────────────────────────────────────────────
     function aggregateByCarousel() {
-      const totals = {};
+      // Each row contains the latest cumulative metrics, not deltas.
+      // So we take the most recent entry (latest performance_taken_time) per carousel.
+      const latest = {};
       allPerf.forEach(p => {
-        if (!totals[p.carousel_uuid]) {
-          totals[p.carousel_uuid] = { views:0,likes:0,comments:0,shares:0,saves:0,reach:0,profile_visits:0,follows_from_post:0 };
+        if (!latest[p.carousel_uuid] || p.performance_taken_time > latest[p.carousel_uuid].performance_taken_time) {
+          latest[p.carousel_uuid] = {
+            views: p.views || 0,
+            likes: p.likes || 0,
+            comments: p.comments || 0,
+            shares: p.shares || 0,
+            saves: p.saves || 0,
+            reach: p.reach || 0,
+            profile_visits: p.profile_visits || 0,
+            follows_from_post: p.follows_from_post || 0
+          };
         }
-        const t = totals[p.carousel_uuid];
-        ['views','likes','comments','shares','saves','reach','profile_visits','follows_from_post']
-          .forEach(k => { t[k] += (p[k] || 0); });
       });
-      return totals;
+      return latest;
     }
 
     // ── Top 10 Tables ─────────────────────────────────────────────────────────
