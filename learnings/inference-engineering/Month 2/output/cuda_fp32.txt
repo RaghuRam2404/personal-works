@@ -1,0 +1,24 @@
+Python: 3.13.15
+PyTorch: 2.11.0+cu128
+CUDA build: 12.8
+CUDA available: True
+GPU: NVIDIA L4
+Capability: (8, 9)
+BF16 native: True
+cuDNN: 91900
+Epoch [  1/  5] : Loss 2.30210 in 9244.232654571533ms
+Epoch [  2/  5] : Loss 2.28733 in 8980.050086975098ms
+Epoch [  3/  5] : Loss 2.16803 in 8980.971097946167ms
+Epoch [  4/  5] : Loss 1.97616 in 8950.053453445435ms
+Epoch [  5/  5] : Loss 1.85888 in 8763.112545013428ms
+Accuracy: 0.3458
+True
+tensor(0., device='cuda:0')
+
+Epoch [  6/ 10] : Loss 1.75977 in 8857.411861419678ms
+Epoch [  7/ 10] : Loss 1.65841 in 8813.966035842896ms
+Epoch [  8/ 10] : Loss 1.58733 in 8782.381057739258ms
+Epoch [  9/ 10] : Loss 1.54513 in 8790.992975234985ms
+Epoch [ 10/ 10] : Loss 1.50724 in 8627.938032150269ms
+Accuracy: 0.4501
+

@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photoelectric Effect — Visual Story</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;scroll-snap-type:y mandatory;}
+body{background:#05050f;color:#e8e8f2;font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden;}
+
+/* ── SECTIONS ── */
+.panel{
+  width:100vw;min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:40px 20px;
+  position:relative;overflow:hidden;scroll-snap-align:start;
+}
+
+/* ── PROGRESS DOTS ── */
+#dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:99;display:flex;flex-direction:column;gap:10px;}
+.dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer;transition:all .3s;border:1px solid rgba(255,255,255,0.3);}
+.dot.on{background:#f0c060;box-shadow:0 0 8px #f0c060;transform:scale(1.3);}
+
+/* ── SCROLL HINT ── */
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
+.scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
+  color:rgba(255,255,255,0.35);font-size:.85rem;text-align:center;animation:bounce 2s infinite;}
+
+/* ── TYPOGRAPHY ── */
+.big-title{font-size:clamp(2rem,5vw,3.5rem);font-weight:800;line-height:1.15;text-align:center;}
+.section-label{font-size:.78rem;letter-spacing:3px;text-transform:uppercase;opacity:.5;margin-bottom:14px;}
+.body-text{font-size:clamp(.9rem,2vw,1.1rem);line-height:1.8;color:#c0c0d8;max-width:680px;text-align:center;}
+.highlight{color:#f0c060;font-weight:700;}
+.blue-hl{color:#58cfff;font-weight:700;}
+.green-hl{color:#56e89a;font-weight:700;}
+.red-hl{color:#ff6060;font-weight:700;}
+
+/* ── CARDS ── */
+.card-row{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin:24px 0;width:100%;max-width:900px;}
+.card{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;padding:24px 20px;flex:1;min-width:220px;max-width:300px;
+  text-align:center;transition:transform .3s,box-shadow .3s;
+}
+.card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.4);}
+.card-icon{font-size:2.5rem;margin-bottom:12px;}
+.card-title{font-size:1rem;font-weight:700;margin-bottom:8px;}
+.card-body{font-size:.88rem;color:#9090b8;line-height:1.6;}
+
+/* ── CANVAS CONTAINERS ── */
+.canvas-wrap{position:relative;width:100%;max-width:820px;}
+canvas{display:block;border-radius:16px;}
+
+/* ── WAVE vs PHOTON comparison ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:860px;width:100%;}
+.compare-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:20px;text-align:center;position:relative;overflow:hidden;}
+.compare-box .tag{font-size:.72rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;opacity:.6;}
+.cross-badge{
+  position:absolute;top:12px;right:12px;
+  background:#ff4040;color:#fff;border-radius:50%;width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;
+}
+.check-badge{
+  position:absolute;top:12px;right:12px;
+  background:#40c070;color:#fff;border-radius:50%;width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;
+}
+
+/* ── OBSERVATION CARDS ── */
+.obs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:900px;width:100%;}
+@media(max-width:700px){.obs-grid{grid-template-columns:1fr;} .compare-grid{grid-template-columns:1fr;}}
+.obs-card{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;padding:24px;position:relative;overflow:hidden;
+  opacity:0;transform:translateY(30px);transition:opacity .6s,transform .6s;
+}
+.obs-card.show{opacity:1;transform:translateY(0);}
+.obs-number{font-size:3rem;font-weight:900;position:absolute;right:16px;top:8px;opacity:.08;}
+.obs-icon{font-size:2rem;margin-bottom:10px;}
+.obs-head{font-size:1rem;font-weight:700;margin-bottom:8px;}
+.obs-body{font-size:.85rem;color:#9090b8;line-height:1.6;}
+
+/* ── FORMULA VISUAL ── */
+.formula-display{
+  background:rgba(255,255,255,.06);border:1px solid rgba(240,192,96,.3);
+  border-radius:16px;padding:28px 36px;margin:24px 0;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center;
+  font-size:clamp(1.1rem,3vw,1.6rem);font-weight:700;
+}
+.formula-part{
+  background:rgba(255,255,255,.07);border-radius:10px;padding:10px 20px;
+  text-align:center;line-height:1.4;
+}
+.op{color:rgba(255,255,255,.4);font-size:1.4em;}
+
+/* ── ENERGY BAR ── */
+.energy-visual{display:flex;flex-direction:column;align-items:center;gap:8px;margin:20px 0;}
+.e-label{font-size:.8rem;color:#9090b8;}
+.e-track{width:260px;height:22px;background:rgba(255,255,255,.1);border-radius:11px;overflow:hidden;position:relative;}
+.e-fill{height:100%;border-radius:11px;transition:width .8s ease;position:relative;}
+.e-mark{position:absolute;top:0;height:100%;width:3px;background:#f0c060;}
+.e-mark-label{position:absolute;top:-20px;font-size:.7rem;color:#f0c060;transform:translateX(-50%);}
+
+/* ── APPLICATION TILES ── */
+.app-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;max-width:800px;width:100%;margin-top:20px;}
+.app-tile{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:22px 16px;text-align:center;}
+.app-icon{font-size:2.8rem;margin-bottom:10px;}
+.app-title{font-size:.95rem;font-weight:700;margin-bottom:6px;}
+.app-desc{font-size:.8rem;color:#8080a8;line-height:1.5;}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 20px rgba(240,192,96,.3);}50%{box-shadow:0 0 40px rgba(240,192,96,.7);}}
+@keyframes spin-slow{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes ripple{0%{transform:scale(0);opacity:.8;}100%{transform:scale(3);opacity:0;}}
+@keyframes float-up{0%{transform:translateY(0);opacity:1;}100%{transform:translateY(-60px);opacity:0;}}
+
+.anim-fadeup{animation:fadeUp .7s both;}
+.anim-delay1{animation-delay:.2s;}
+.anim-delay2{animation-delay:.4s;}
+.anim-delay3{animation-delay:.6s;}
+
+/* ── STAGE INDICATORS ── */
+.stage-bar{display:flex;gap:8px;margin-bottom:20px;}
+.stage-pill{padding:4px 14px;border-radius:20px;font-size:.75rem;background:rgba(255,255,255,.08);color:#8080a8;cursor:pointer;transition:all .25s;}
+.stage-pill.active{background:#f0c060;color:#000;font-weight:700;}
+
+/* ── VENDING MACHINE ANALOGY ── */
+.vend-container{display:flex;gap:30px;align-items:flex-start;flex-wrap:wrap;justify-content:center;margin:24px 0;}
+.vend-case{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:20px;min-width:240px;text-align:center;}
+.vend-case .case-title{font-size:.78rem;letter-spacing:2px;text-transform:uppercase;opacity:.5;margin-bottom:12px;}
+.vend-arrow{font-size:2rem;opacity:.4;align-self:center;}
+
+/* ── SECTION-SPECIFIC BACKGROUNDS ── */
+#s0{background:radial-gradient(ellipse at 50% 40%, #0a0a2a 0%, #05050f 70%);}
+#s1{background:radial-gradient(ellipse at 20% 60%, #0d0a1a 0%, #05050f 60%);}
+#s2{background:radial-gradient(ellipse at 80% 30%, #0a1020 0%, #05050f 60%);}
+#s3{background:radial-gradient(ellipse at 50% 80%, #0a1a14 0%, #05050f 60%);}
+#s4{background:radial-gradient(ellipse at 30% 50%, #1a1000 0%, #05050f 60%);}
+#s5{background:radial-gradient(ellipse at 70% 50%, #100820 0%, #05050f 60%);}
+#s6{background:radial-gradient(ellipse at 50% 20%, #0a1a0a 0%, #05050f 60%);}
+
+</style>
+</head>
+<body>
+
+<!-- ── PROGRESS DOTS ── -->
+<div id="dots"></div>
+
+<!-- ══════════════════════════════════════ S0: HERO ══ -->
+<div class="panel" id="s0">
+  <div class="section-label">Physics · Phase 8 · PHYS-166</div>
+  <h1 class="big-title" style="margin-bottom:16px">
+    The <span class="highlight">Photoelectric</span><br>Effect
+  </h1>
+  <p class="body-text" style="margin-bottom:28px">
+    When light hits metal, electrons can fly out.<br>
+    But <em>only certain light</em>. And the rule will surprise you.
+  </p>
+  <div class="canvas-wrap">
+    <canvas id="heroCanvas" height="260"></canvas>
+    <div id="heroLabel" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+      background:rgba(0,0,0,.7);padding:6px 18px;border-radius:20px;font-size:.85rem;
+      color:#e0e0ff;white-space:nowrap;transition:opacity .4s;pointer-events:none;"></div>
+  </div>
+  <div class="scroll-hint">▼ scroll to explore</div>
+</div>
+
+<!-- ══════════════════════════════════════ S1: THE MYSTERY ══ -->
+<div class="panel" id="s1">
+  <div class="section-label">The Mystery</div>
+  <h2 class="big-title" style="margin-bottom:16px">
+    Here's the <span class="red-hl">weird</span> part
+  </h2>
+  <p class="body-text" style="margin-bottom:32px">
+    Physicists expected brightness to matter.<br>
+    But brightness had <em>nothing to do with it</em>.
+  </p>
+
+  <div class="compare-grid">
+    <div class="compare-box">
+      <div class="cross-badge">✗</div>
+      <div class="tag">Red Light (Low Frequency)</div>
+      <canvas id="waveRedCanvas" width="340" height="130" style="border-radius:10px;margin-bottom:12px;"></canvas>
+      <div style="font-size:.88rem;color:#9090b8;line-height:1.6;">
+        Shine it for <strong style="color:#ff8888">10 hours</strong>.<br>
+        Make it <strong style="color:#ff8888">blindingly bright</strong>.<br>
+        <em>Zero electrons. Ever.</em>
+      </div>
+    </div>
+    <div class="compare-box">
+      <div class="check-badge">✓</div>
+      <div class="tag">UV Light (High Frequency)</div>
+      <canvas id="waveUVCanvas" width="340" height="130" style="border-radius:10px;margin-bottom:12px;"></canvas>
+      <div style="font-size:.88rem;color:#9090b8;line-height:1.6;">
+        Use it <strong style="color:#88ffcc">incredibly dim</strong>.<br>
+        Electrons pop out <strong style="color:#88ffcc">instantly</strong>.<br>
+        <em>Every single time.</em>
+      </div>
+    </div>
+  </div>
+
+  <p class="body-text" style="margin-top:20px;font-size:1rem;">
+    🤔 <span class="highlight">What determines whether electrons escape?</span><br>
+    It's not brightness. It's something else entirely.
+  </p>
+  <div class="scroll-hint">▼</div>
+</div>
+
+<!-- ══════════════════════════════════════ S2: THREE OBSERVATIONS ══ -->
+<div class="panel" id="s2">
+  <div class="section-label">What Experiments Showed</div>
+  <h2 class="big-title" style="margin-bottom:14px">
+    Three <span class="blue-hl">clues</span> that broke<br>classical physics
+  </h2>
+  <p class="body-text" style="margin-bottom:28px">
+    These three observations had no explanation — until 1905.
+  </p>
+
+  <div class="obs-grid">
+    <div class="obs-card" id="obs0">
+      <div class="obs-number">1</div>
+      <div class="obs-icon">🎚️</div>
+      <div class="obs-head" style="color:#f0c060">Threshold Frequency</div>
+      <div class="obs-body">
+        Each metal has a <strong>cut-off frequency</strong>. Below it — <em>nothing</em>, no matter how bright. Above it — electrons always fly out.<br><br>
+        <strong style="color:#f0c060">Wave theory says:</strong> any color should work if bright enough.<br>
+        <strong style="color:#ff6060">Reality:</strong> Nope.
+      </div>
+    </div>
+    <div class="obs-card" id="obs1" style="transition-delay:.2s">
+      <div class="obs-number">2</div>
+      <div class="obs-icon">⚡</div>
+      <div class="obs-head" style="color:#58cfff">Instantaneous</div>
+      <div class="obs-body">
+        Electrons appear in less than <strong>0.000000001 seconds</strong> — even from incredibly faint light.<br><br>
+        <strong style="color:#f0c060">Wave theory says:</strong> faint light needs time to "charge up" an electron.<br>
+        <strong style="color:#ff6060">Reality:</strong> Instant. No delay.
+      </div>
+    </div>
+    <div class="obs-card" id="obs2" style="transition-delay:.4s">
+      <div class="obs-number">3</div>
+      <div class="obs-icon">🎯</div>
+      <div class="obs-head" style="color:#56e89a">Frequency, Not Brightness</div>
+      <div class="obs-body">
+        Electrons fly out <strong>faster</strong> when the light is more blue/violet — not when it's brighter.<br><br>
+        <strong style="color:#f0c060">Wave theory says:</strong> brighter light → faster electrons.<br>
+        <strong style="color:#ff6060">Reality:</strong> Frequency determines speed.
+      </div>
+    </div>
+  </div>
+
+  <canvas id="obsCanvas" width="700" height="80" style="margin-top:24px;border-radius:12px;"></canvas>
+  <div style="font-size:.78rem;color:#6060a0;margin-top:6px;">▲ Sodium metal threshold: green light (~5.5 × 10¹⁴ Hz). Red never works. UV always works.</div>
+  <div class="scroll-hint">▼</div>
+</div>
+
+<!-- ══════════════════════════════════════ S3: WAVE THEORY FAILS ══ -->
+<div class="panel" id="s3">
+  <div class="section-label">Classical Physics · 1800s</div>
+  <h2 class="big-title" style="margin-bottom:14px">
+    Why the <span class="red-hl">Wave Theory</span><br>was confidently wrong
+  </h2>
+
+  <div class="canvas-wrap" style="max-width:780px">
+    <canvas id="waveFailCanvas" width="780" height="200" style="margin-bottom:16px;border-radius:14px;"></canvas>
+  </div>
+
+  <div class="card-row">
+    <div class="card" style="border-color:rgba(255,96,96,.3)">
+      <div class="card-icon">🌊</div>
+      <div class="card-title" style="color:#ff8888">Wave Theory Predicted</div>
+      <div class="card-body">Energy spreads as a continuous wave. More brightness = more energy. Any color should eventually work if you wait long enough or use bright enough light.</div>
+    </div>
+    <div class="card" style="border-color:rgba(86,232,154,.3)">
+      <div class="card-icon">🔬</div>
+      <div class="card-title" style="color:#56e89a">What Actually Happened</div>
+      <div class="card-body">Red light on zinc? Nothing. <em>Ever.</em> Faint UV on zinc? Electrons immediately. Bright red × 10 hours? Still nothing. The wave theory was completely wrong.</div>
+    </div>
+    <div class="card" style="border-color:rgba(240,192,96,.3)">
+      <div class="card-icon">💡</div>
+      <div class="card-title" style="color:#f0c060">The Conclusion</div>
+      <div class="card-body">Light cannot be a continuous wave that accumulates energy slowly. Something else is going on. Einstein figured it out in 1905.</div>
+    </div>
+  </div>
+  <div class="scroll-hint">▼</div>
+</div>
+
+<!-- ══════════════════════════════════════ S4: EINSTEIN ══ -->
+<div class="panel" id="s4">
+  <div class="section-label">Einstein · 1905</div>
+  <h2 class="big-title" style="margin-bottom:14px">
+    "Light is made of<br><span class="highlight">packets of energy</span>"
+  </h2>
+  <p class="body-text" style="margin-bottom:24px">
+    Einstein proposed that light doesn't spread out as a smooth wave.<br>
+    It comes in <strong class="highlight">discrete chunks</strong> called <strong class="highlight">photons</strong>.
+  </p>
+
+  <div class="canvas-wrap" style="max-width:760px">
+    <canvas id="transformCanvas" width="760" height="180" style="border-radius:14px;margin-bottom:20px;"></canvas>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;justify-content:center">
+    <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:14px 24px;text-align:center;">
+      <div style="font-size:.75rem;color:#8080a8;margin-bottom:6px">Each photon's energy</div>
+      <div style="font-size:1.8rem;font-weight:800;color:#f0c060">E = hf</div>
+      <div style="font-size:.78rem;color:#8080a8;margin-top:6px">h = Planck's constant &nbsp;|&nbsp; f = frequency</div>
+    </div>
+    <div style="background:rgba(255,255,255,.06);border:1px solid rgba(88,207,255,.3);border-radius:12px;padding:14px 24px;text-align:center;">
+      <div style="font-size:.75rem;color:#8080a8;margin-bottom:6px">Higher frequency =</div>
+      <div style="font-size:1.1rem;font-weight:700;color:#58cfff">More energetic photon</div>
+      <div style="font-size:.78rem;color:#8080a8;margin-top:4px">Red photon: weak &nbsp;→&nbsp; UV photon: powerful</div>
+    </div>
+  </div>
+
+  <div id="photon-demo" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;justify-content:center">
+    <!-- rendered by JS -->
+  </div>
+  <div class="scroll-hint">▼</div>
+</div>
+
+<!-- ══════════════════════════════════════ S5: THE FORMULA ══ -->
+<div class="panel" id="s5">
+  <div class="section-label">How It All Fits Together</div>
+  <h2 class="big-title" style="margin-bottom:14px">
+    The <span class="highlight">vending machine</span><br>analogy
+  </h2>
+  <p class="body-text" style="margin-bottom:24px">
+    Every electron in a metal needs a minimum energy to escape — called the <strong class="highlight">work function (φ)</strong>. Think of it as the <em>price of admission</em>.
+  </p>
+
+  <div class="vend-container">
+    <div class="vend-case" style="border-color:rgba(255,96,96,.3)">
+      <div class="case-title" style="color:#ff8888">Coin too small (hf &lt; φ)</div>
+      <canvas id="vendCanvas0" width="220" height="150" style="border-radius:8px;"></canvas>
+      <div style="font-size:.85rem;color:#9090b8;margin-top:8px;line-height:1.5">
+        Photon energy < work function.<br>
+        <strong style="color:#ff6060">Electron stays put. No ejection.</strong>
+      </div>
+    </div>
+    <div class="vend-case" style="border-color:rgba(240,192,96,.3)">
+      <div class="case-title" style="color:#f0c060">Exact price (hf = φ)</div>
+      <canvas id="vendCanvas1" width="220" height="150" style="border-radius:8px;"></canvas>
+      <div style="font-size:.85rem;color:#9090b8;margin-top:8px;line-height:1.5">
+        Photon just barely pays the price.<br>
+        <strong style="color:#f0c060">Electron escapes with zero KE.</strong>
+      </div>
+    </div>
+    <div class="vend-case" style="border-color:rgba(86,232,154,.3)">
+      <div class="case-title" style="color:#56e89a">More than enough (hf &gt; φ)</div>
+      <canvas id="vendCanvas2" width="220" height="150" style="border-radius:8px;"></canvas>
+      <div style="font-size:.85rem;color:#9090b8;margin-top:8px;line-height:1.5">
+        Leftover energy becomes speed.<br>
+        <strong style="color:#56e89a">KE = hf − φ &nbsp;✓</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="formula-display" style="margin-top:8px">
+    <div class="formula-part" style="border:1px solid rgba(88,207,255,.4)">
+      <div style="font-size:.7rem;color:#58cfff;margin-bottom:2px">Photon energy</div>
+      <div style="color:#58cfff">hf</div>
+    </div>
+    <div class="op">−</div>
+    <div class="formula-part" style="border:1px solid rgba(240,192,96,.4)">
+      <div style="font-size:.7rem;color:#f0c060;margin-bottom:2px">Work function</div>
+      <div style="color:#f0c060">φ</div>
+    </div>
+    <div class="op">=</div>
+    <div class="formula-part" style="border:1px solid rgba(86,232,154,.4)">
+      <div style="font-size:.7rem;color:#56e89a;margin-bottom:2px">KE of electron</div>
+      <div style="color:#56e89a">KE<sub>max</sub></div>
+    </div>
+  </div>
+  <div class="scroll-hint">▼</div>
+</div>
+
+<!-- ══════════════════════════════════════ S6: APPLICATIONS ══ -->
+<div class="panel" id="s6">
+  <div class="section-label">Why This Matters</div>
+  <h2 class="big-title" style="margin-bottom:14px">
+    You use this<br><span class="green-hl">every day</span>
+  </h2>
+  <p class="body-text" style="margin-bottom:8px">
+    The photoelectric effect isn't just a physics curiosity.<br>
+    It's the operating principle behind technology all around you.
+  </p>
+
+  <div class="app-grid">
+    <div class="app-tile">
+      <div class="app-icon">☀️</div>
+      <div class="app-title" style="color:#f0c060">Solar Panels</div>
+      <div class="app-desc">Photons from sunlight knock electrons loose in silicon. Those electrons flow as electric current. Your phone charges from this.</div>
+    </div>
+    <div class="app-tile">
+      <div class="app-icon">📸</div>
+      <div class="app-title" style="color:#58cfff">Digital Cameras</div>
+      <div class="app-desc">Each pixel in a camera sensor is a tiny metal surface. Photons hit it → electrons → the image is recorded. Every photo uses this.</div>
+    </div>
+    <div class="app-tile">
+      <div class="app-icon">🚪</div>
+      <div class="app-title" style="color:#56e89a">Automatic Doors</div>
+      <div class="app-desc">A light beam crosses the doorway. When you walk through, photons are blocked → fewer electrons → current drops → door opens.</div>
+    </div>
+    <div class="app-tile">
+      <div class="app-icon">🏥</div>
+      <div class="app-title" style="color:#bc8cff">Medical Scanners</div>
+      <div class="app-desc">X-ray detectors use the photoelectric effect. High-energy photons knock electrons from detector material → creates the image.</div>
+    </div>
+  </div>
+
+  <div style="background:rgba(240,192,96,.08);border:1px solid rgba(240,192,96,.3);border-radius:16px;padding:24px;max-width:620px;margin-top:28px;text-align:center;">
+    <div style="font-size:1rem;font-weight:700;color:#f0c060;margin-bottom:8px">🏆 What you can now explain (PHYS-166)</div>
+    <div style="font-size:.88rem;color:#c0c0d0;line-height:2">
+      ✅ Threshold frequency (why red light never works on zinc)<br>
+      ✅ Instantaneous emission (no time delay, even for faint light)<br>
+      ✅ Frequency, not intensity, determines electron speed<br>
+      ✅ Why these observations destroy the wave theory<br>
+      ✅ Einstein's photon hypothesis: <strong>E = hf</strong><br>
+      🔜 Next: PHYS-167 — calculate KE using <strong>KE<sub>max</sub> = hf − φ</strong>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════ UTILITIES ════════════════════════
+function freqToColor(t) {
+  // t: 0=red, 1=UV violet
+  t = Math.max(0, Math.min(1, t));
+  if (t < 0.17) return `hsl(0,100%,55%)`;          // red
+  if (t < 0.33) return `hsl(30,100%,55%)`;          // orange
+  if (t < 0.50) return `hsl(55,100%,55%)`;          // yellow
+  if (t < 0.67) return `hsl(120,80%,50%)`;          // green
+  if (t < 0.83) return `hsl(220,100%,60%)`;         // blue
+  return `hsl(270,100%,65%)`;                       // violet/UV
+}
+function freqToLabel(t) {
+  if (t < 0.17) return 'Red';
+  if (t < 0.33) return 'Orange';
+  if (t < 0.50) return 'Yellow';
+  if (t < 0.67) return 'Green';
+  if (t < 0.83) return 'Blue';
+  return 'UV / Violet';
+}
+
+const WORK = 0.55; // normalized threshold for sodium
+
+// ════════════════════════════════ SECTION NAVIGATION ════════════════
+const sectionIds = ['s0','s1','s2','s3','s4','s5','s6'];
+let currentSection = 0;
+
+const dotsEl = document.getElementById('dots');
+sectionIds.forEach((id, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' on':'');
+  d.title = ['Hero','Mystery','3 Clues','Wave Fails','Einstein','Formula','Apps'][i];
+  d.onclick = () => document.getElementById(id).scrollIntoView({behavior:'smooth'});
+  dotsEl.appendChild(d);
+});
+
+function updateDots(idx) {
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('on', i===idx));
+  currentSection = idx;
+}
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting && e.intersectionRatio > 0.5) {
+      const idx = sectionIds.indexOf(e.target.id);
+      if (idx>=0) {
+        updateDots(idx);
+        onSectionEnter(idx);
+      }
+    }
+  });
+}, { threshold: 0.5 });
+sectionIds.forEach(id => observer.observe(document.getElementById(id)));
+
+function onSectionEnter(idx) {
+  if (idx === 2) triggerObsCards();
+  if (idx === 3) startWaveFailAnim();
+  if (idx === 4) startTransformAnim();
+  if (idx === 5) drawVendingMachines();
+}
+
+// ════════════════════════════════ HERO CANVAS ════════════════════════
+(function(){
+  const canvas = document.getElementById('heroCanvas');
+  const W = canvas.width = canvas.parentElement.offsetWidth || 760;
+  canvas.width = Math.min(W, 820);
+  const H = canvas.height;
+  const ctx = canvas.getContext('2d');
+  const metalX = canvas.width * 0.62;
+  const metalW = 18;
+
+  let photons = [], electrons = [], pulses = [];
+  let stateTimer = 0, state = 0;
+  const label = document.getElementById('heroLabel');
+
+  const states = [
+    { freq: 0.15, intensity: 3, label: '🔴  Red light — below threshold — no electrons' },
+    { freq: 0.20, intensity: 7, label: '🔴  Much brighter red — still no electrons!' },
+    { freq: 0.80, intensity: 2, label: '🔵  UV light — above threshold — electrons fly out!' },
+    { freq: 0.80, intensity: 7, label: '🔵  Brighter UV — more electrons, same speed each' },
+  ];
+
+  class Photon {
+    constructor(canvas, freq) {
+      this.canvas = canvas;
+      this.x = -20 + Math.random() * (canvas.width * 0.15);
+      this.y = 40 + Math.random() * (H - 80);
+      this.freq = freq;
+      this.color = freqToColor(freq);
+      this.speed = 2.8 + Math.random() * 0.8;
+      this.r = 6.5;
+      this.done = false;
+      this.trail = [];
+    }
+    update() {
+      this.trail.push({x:this.x, y:this.y});
+      if (this.trail.length > 10) this.trail.shift();
+      this.x += this.speed;
+    }
+    draw(ctx) {
+      // trail
+      this.trail.forEach((p, i) => {
+        ctx.globalAlpha = (i/this.trail.length)*0.35;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, this.r * (i/this.trail.length) * 0.7, 0, Math.PI*2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+      // glow
+      ctx.shadowBlur = 16; ctx.shadowColor = this.color;
+      ctx.fillStyle = this.color;
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  class Electron {
+    constructor(x, y, energy) {
+      this.x = x; this.y = y;
+      this.vx = 1.5 + energy * 3;
+      this.vy = (Math.random() - 0.5) * 3;
+      this.life = 1; this.r = 5;
+    }
+    update() { this.x += this.vx; this.y += this.vy; this.life -= 0.018; }
+    draw(ctx) {
+      ctx.globalAlpha = this.life;
+      ctx.shadowBlur = 14; ctx.shadowColor = '#80ccff';
+      ctx.fillStyle = '#aadeff';
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  class Pulse {
+    constructor(x, y, ejected) {
+      this.x = x; this.y = y; this.r = 0; this.ejected = ejected; this.life = 1;
+    }
+    update() { this.r += ejected ? 4 : 2.5; this.life -= ejected ? 0.06 : 0.08; }
+    draw(ctx) {
+      ctx.globalAlpha = this.life * 0.6;
+      ctx.strokeStyle = this.ejected ? '#56e89a' : '#ff6060';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI*2); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function spawnPhotons() {
+    const st = states[state];
+    for (let i = 0; i < st.intensity; i++) {
+      photons.push(new Photon(canvas, st.freq + (Math.random()-0.5)*0.05));
+    }
+  }
+
+  let frameCount = 0;
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, H);
+
+    // Background gradient
+    const bg = ctx.createLinearGradient(0,0,canvas.width,H);
+    bg.addColorStop(0,'#05050f'); bg.addColorStop(1,'#080820');
+    ctx.fillStyle = bg; ctx.fillRect(0,0,canvas.width,H);
+
+    // Light source glyph
+    const src = states[state];
+    ctx.save();
+    ctx.shadowBlur = 30; ctx.shadowColor = freqToColor(src.freq);
+    ctx.fillStyle = freqToColor(src.freq);
+    ctx.beginPath(); ctx.arc(36, H/2, 16, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.font='bold 14px sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('💡', 36, H/2);
+    ctx.restore();
+
+    // Metal plate
+    const grad = ctx.createLinearGradient(metalX, 0, metalX+metalW, 0);
+    grad.addColorStop(0,'#3a4050'); grad.addColorStop(0.5,'#6a7080'); grad.addColorStop(1,'#3a4050');
+    ctx.fillStyle = grad; ctx.fillRect(metalX, 20, metalW, H-40);
+    ctx.fillStyle='#8090a0'; ctx.font='10px monospace'; ctx.textAlign='center';
+    ctx.fillText('Na', metalX+metalW/2, 13);
+    ctx.fillText('metal', metalX+metalW/2, H-4);
+
+    // Detector plate (right)
+    ctx.fillStyle='rgba(88,207,255,.15)';
+    ctx.fillRect(canvas.width-20, 20, 6, H-40);
+    ctx.fillStyle='rgba(88,207,255,.5)'; ctx.font='9px monospace'; ctx.textAlign='center';
+    ctx.fillText('detector', canvas.width-17, H/2);
+
+    // Draw particles
+    pulses.forEach(p => { p.update(); p.draw(ctx); });
+    pulses = pulses.filter(p => p.life > 0);
+
+    photons.forEach(ph => {
+      ph.update();
+      ph.draw(ctx);
+      if (ph.x >= metalX && !ph.done) {
+        ph.done = true;
+        const ejected = ph.freq >= WORK;
+        pulses.push(new Pulse(metalX, ph.y, ejected));
+        if (ejected) electrons.push(new Electron(metalX+metalW, ph.y, ph.freq - WORK));
+      }
+    });
+    photons = photons.filter(p => !p.done && p.x < canvas.width);
+
+    electrons.forEach(e => { e.update(); e.draw(ctx); });
+    electrons = electrons.filter(e => e.life > 0 && e.x < canvas.width);
+
+    // Spawn photons periodically
+    frameCount++;
+    if (frameCount % 22 === 0) spawnPhotons();
+
+    // Advance state every ~5 seconds
+    stateTimer++;
+    if (stateTimer > 300) {
+      stateTimer = 0;
+      state = (state+1) % states.length;
+      label.textContent = states[state].label;
+    }
+    if (frameCount === 1) label.textContent = states[0].label;
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+// ════════════════════════════════ WAVE CANVASES (S1) ════════════════
+function drawWaveCanvas(canvasId, freq, numWaves, labelText) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  let t = 0;
+
+  // electron particles (only for UV)
+  let electrons_uv = [];
+  const metalX = W * 0.68;
+
+  function drawFrame() {
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#07071a'; ctx.fillRect(0,0,W,H);
+
+    // Draw multiple wave lines
+    const color = freqToColor(freq);
+    for (let w = 0; w < numWaves; w++) {
+      const amplitude = 18 + w * 8;
+      const yOffset = H/2 + (w - numWaves/2) * 14;
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = 0.5 + (w/numWaves)*0.5;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      for (let x = 0; x < metalX - 10; x += 2) {
+        const y = yOffset + Math.sin((x * 0.04 * (1+freq)) - t) * amplitude;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    // Metal plate
+    const g2 = ctx.createLinearGradient(metalX,0,metalX+10,0);
+    g2.addColorStop(0,'#3a4050'); g2.addColorStop(1,'#6a7080');
+    ctx.fillStyle = g2; ctx.fillRect(metalX,8,10,H-16);
+
+    if (freq >= WORK) {
+      // UV — eject electrons occasionally
+      if (Math.random() < 0.05) {
+        electrons_uv.push({x:metalX+12, y:H/2+(Math.random()-0.5)*40, vx:2.5, vy:(Math.random()-0.5)*2, life:1});
+      }
+      electrons_uv.forEach(e => {
+        ctx.globalAlpha = e.life;
+        ctx.shadowBlur = 10; ctx.shadowColor = '#80ccff';
+        ctx.fillStyle = '#aadeff';
+        ctx.beginPath(); ctx.arc(e.x, e.y, 5, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0; ctx.globalAlpha=1;
+        e.x += e.vx; e.y += e.vy; e.life -= 0.03;
+      });
+      electrons_uv = electrons_uv.filter(e => e.life > 0 && e.x < W);
+
+      ctx.fillStyle = '#56e89a'; ctx.font='bold 11px sans-serif'; ctx.textAlign='right';
+      ctx.fillText('⚡ electrons!', W-4, H-8);
+    } else {
+      // Red — show X
+      ctx.strokeStyle = '#ff6060'; ctx.lineWidth = 3;
+      [H*0.35, H*0.65].forEach(yc => {
+        ctx.beginPath(); ctx.moveTo(metalX+18,yc-8); ctx.lineTo(metalX+30,yc+8); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(metalX+30,yc-8); ctx.lineTo(metalX+18,yc+8); ctx.stroke();
+      });
+      ctx.fillStyle='#ff6060'; ctx.font='bold 11px sans-serif'; ctx.textAlign='right';
+      ctx.fillText('✗ no electrons', W-4, H-8);
+    }
+
+    // Label
+    ctx.fillStyle = freqToColor(freq); ctx.font='bold 11px sans-serif'; ctx.textAlign='left';
+    ctx.fillText(labelText, 6, H-8);
+
+    t += 0.06;
+    requestAnimationFrame(drawFrame);
+  }
+  drawFrame();
+}
+drawWaveCanvas('waveRedCanvas', 0.12, 4, 'Red light (bright)');
+drawWaveCanvas('waveUVCanvas', 0.82, 1, 'UV light (dim)');
+
+// ════════════════════════════════ THRESHOLD SPECTRUM (S2) ════════════
+(function(){
+  const canvas = document.getElementById('obsCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  let t = 0;
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#070716'; ctx.fillRect(0,0,W,H);
+
+    // Spectrum gradient
+    const g = ctx.createLinearGradient(20, 0, W-80, 0);
+    const colors = ['#ff0000','#ff7700','#ffff00','#00ff00','#0044ff','#8800ff','#cc00ff'];
+    colors.forEach((c,i) => g.addColorStop(i/(colors.length-1), c));
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.roundRect(20, H*0.3, W-100, H*0.4, 6); ctx.fill();
+
+    // Labels
+    const labels = [['Red',0],['Orange',.17],['Yellow',.33],['Green',.5],['Blue',.67],['Violet',.85]];
+    labels.forEach(([name,pos]) => {
+      const x = 20 + pos*(W-100);
+      ctx.fillStyle='rgba(255,255,255,.5)'; ctx.font='9px sans-serif'; ctx.textAlign='center';
+      ctx.fillText(name, x, H*0.22);
+    });
+
+    // Threshold line (sodium)
+    const threshX = 20 + 0.53 * (W-100);
+    ctx.strokeStyle = '#f0c060'; ctx.lineWidth = 2.5;
+    ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(threshX, H*0.1); ctx.lineTo(threshX, H*0.95); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#f0c060'; ctx.font='bold 10px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('← No electrons', threshX-40, H*0.92);
+    ctx.fillText('Electrons →', threshX+40, H*0.92);
+    ctx.fillText('Threshold', threshX, H*0.08);
+
+    // Animated electron popping out above threshold
+    const eCount = 4;
+    for (let i = 0; i < eCount; i++) {
+      const px = threshX + 20 + i * ((W-100-threshX-30)/eCount);
+      const phase = (t + i * 1.2) % 3;
+      if (phase < 2) {
+        const ey = H*0.5 - phase * 22;
+        ctx.globalAlpha = 1 - phase/2;
+        ctx.shadowBlur=10; ctx.shadowColor='#80ccff';
+        ctx.fillStyle='#aadeff';
+        ctx.beginPath(); ctx.arc(px, ey, 5, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0; ctx.globalAlpha=1;
+      }
+    }
+
+    t += 0.025;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ════════════════════════════════ OBSERVATION CARDS (S2) ════════════
+function triggerObsCards() {
+  ['obs0','obs1','obs2'].forEach((id,i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if(el) el.classList.add('show');
+    }, i*250);
+  });
+}
+
+// ════════════════════════════════ WAVE FAIL CANVAS (S3) ════════════
+let waveFailStarted = false;
+function startWaveFailAnim() {
+  if (waveFailStarted) return;
+  waveFailStarted = true;
+  const canvas = document.getElementById('waveFailCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const metalX = W * 0.6;
+  let t = 0, phase = 0, phaseTimer = 0;
+  // phase 0: bright wave → no electron
+  // phase 1: label flashes WRONG
+  // phase 2: UV wave → electrons
+  let electrons_wf = [];
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#05050f'; ctx.fillRect(0,0,W,H);
+
+    phaseTimer++;
+    if (phaseTimer > 200) { phaseTimer = 0; phase = (phase+1)%3; electrons_wf=[]; }
+
+    // Title
+    const phaseLabels = ['Wave gets BRIGHTER...', 'Wave gets BRIGHTER still...', 'UV wave — same brightness as first'];
+    ctx.fillStyle='rgba(255,255,255,.4)'; ctx.font='12px sans-serif'; ctx.textAlign='left';
+    ctx.fillText(phaseLabels[phase], 16, 18);
+
+    // Wave
+    const brightness = phase < 2 ? 1 + phaseTimer/100 : 0.8;
+    const amplitude = phase < 2 ? 20 + (phaseTimer/6) : 20;
+    const freq = phase < 2 ? 0.10 : 0.82;
+    const color = freqToColor(freq);
+    const numLines = phase < 2 ? (phase === 0 ? 1 : 4) : 1;
+
+    for (let w = 0; w < numLines; w++) {
+      const yOff = H/2 + (w - numLines/2) * 14;
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = Math.min(1, 0.4 + brightness*0.3);
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      for (let x = 30; x < metalX-5; x+=2) {
+        const y = yOff + Math.sin((x*0.05*(1+freq))-t)*amplitude;
+        x===30 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      }
+      ctx.stroke(); ctx.globalAlpha=1;
+    }
+
+    // Metal
+    const mg = ctx.createLinearGradient(metalX,0,metalX+14,0);
+    mg.addColorStop(0,'#3a4050'); mg.addColorStop(1,'#6a7080');
+    ctx.fillStyle=mg; ctx.fillRect(metalX,10,14,H-20);
+    ctx.fillStyle='#8090a0'; ctx.font='10px monospace'; ctx.textAlign='center';
+    ctx.fillText('Zn metal', metalX+7, H-4);
+
+    // Ripple / hit effect
+    if (phaseTimer > 30) {
+      const rippleAlpha = Math.max(0, 0.6 - (phaseTimer%40)*0.015);
+      ctx.globalAlpha = rippleAlpha;
+      ctx.strokeStyle = phase<2 ? '#ff8080' : '#56e89a';
+      ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(metalX, H/2, 8+(phaseTimer%40)*0.8, 0, Math.PI*2); ctx.stroke();
+      ctx.globalAlpha=1;
+    }
+
+    if (phase < 2) {
+      // No ejection
+      ctx.fillStyle='#ff5050'; ctx.font='bold 13px sans-serif'; ctx.textAlign='left';
+      const alpha = Math.min(1, (phaseTimer-60)/40);
+      if(alpha>0){ctx.globalAlpha=alpha; ctx.fillText('✗  Still no electrons', metalX+24, H/2+5); ctx.globalAlpha=1;}
+
+      // Wave theory expected label
+      if (phaseTimer > 80) {
+        ctx.fillStyle='rgba(255,200,80,.6)'; ctx.font='11px sans-serif'; ctx.textAlign='left';
+        ctx.fillText('Wave theory expected: electrons any moment...', 20, H-10);
+      }
+    } else {
+      // UV → electrons
+      if (Math.random()<0.04) electrons_wf.push({x:metalX+16,y:H/2+(Math.random()-0.5)*50,vx:2.2,vy:(Math.random()-0.5)*2.5,life:1});
+      electrons_wf.forEach(e=>{
+        ctx.globalAlpha=e.life;
+        ctx.shadowBlur=12;ctx.shadowColor='#80ccff';ctx.fillStyle='#aadeff';
+        ctx.beginPath();ctx.arc(e.x,e.y,5.5,0,Math.PI*2);ctx.fill();
+        ctx.shadowBlur=0;ctx.globalAlpha=1;
+        e.x+=e.vx;e.y+=e.vy;e.life-=0.022;
+      });
+      electrons_wf=electrons_wf.filter(e=>e.life>0&&e.x<W);
+      if(phaseTimer>60){
+        ctx.fillStyle='#56e89a';ctx.font='bold 13px sans-serif';ctx.textAlign='left';
+        ctx.fillText('✓  Electrons! UV works.', metalX+24, H/2+5);
+      }
+    }
+
+    t+=0.07;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ════════════════════════════════ TRANSFORM CANVAS (S4 — Wave→Photons) ════
+let transformStarted = false;
+function startTransformAnim() {
+  if (transformStarted) return;
+  transformStarted = true;
+  const canvas = document.getElementById('transformCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  let t = 0, phase = 0, phaseT = 0;
+  // phase 0: wave
+  // phase 1: wave breaking into packets
+  // phase 2: discrete photon packets flying
+
+  function drawPhotonDemoSection() {
+    const demo = document.getElementById('photon-demo');
+    if (!demo || demo.children.length > 0) return;
+    const freqs = [{f:0.1,label:'Red photon',e:'low'},{f:0.5,label:'Green photon',e:'medium'},{f:0.88,label:'UV photon',e:'high'}];
+    freqs.forEach(({f, label, e}) => {
+      const div = document.createElement('div');
+      div.style.cssText=`background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:18px 22px;text-align:center;min-width:160px;`;
+      const col = freqToColor(f);
+      div.innerHTML=`
+        <div style="width:40px;height:40px;border-radius:50%;background:${col};margin:0 auto 10px;
+          box-shadow:0 0 20px ${col};"></div>
+        <div style="font-size:.85rem;font-weight:700;color:${col};margin-bottom:4px">${label}</div>
+        <div style="font-size:.78rem;color:#8080a8">Energy: <strong style="color:${col}">${e}</strong></div>
+        <div style="font-size:.78rem;color:#8080a8">${f>=WORK?'<span style="color:#56e89a">✓ can eject electron</span>':'<span style="color:#ff6060">✗ too weak</span>'}</div>
+      `.replace(/\n/g,'');
+      demo.appendChild(div);
+    });
+  }
+  drawPhotonDemoSection();
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#05050f'; ctx.fillRect(0,0,W,H);
+
+    phaseT++;
+    if (phaseT > 180) { phaseT=0; phase=(phase+1)%3; }
+
+    if (phase === 0) {
+      // Continuous wave
+      ctx.fillStyle='rgba(255,255,255,.35)'; ctx.font='12px sans-serif'; ctx.textAlign='left';
+      ctx.fillText('Old view: light = continuous wave', 12, 20);
+      ctx.strokeStyle='#58cfff'; ctx.lineWidth=2; ctx.globalAlpha=0.8;
+      ctx.beginPath();
+      for(let x=10;x<W-10;x+=2) {
+        const y=H/2+Math.sin((x*0.03)-t)*28;
+        x===10?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.stroke(); ctx.globalAlpha=1;
+    } else if (phase === 1) {
+      // Breaking into packets
+      ctx.fillStyle='rgba(255,255,255,.35)'; ctx.font='12px sans-serif'; ctx.textAlign='left';
+      ctx.fillText('Einstein: wait... what if it breaks into packets?', 12, 20);
+      const breakProgress = phaseT/180;
+      const packetSize = 50;
+      for(let px=20; px < W-20; px += packetSize) {
+        const alpha = Math.max(0, 0.8 - breakProgress * px/W);
+        ctx.strokeStyle='#58cfff'; ctx.lineWidth=2; ctx.globalAlpha=alpha;
+        ctx.beginPath();
+        for(let x=px;x<px+packetSize-2;x+=2){
+          const y=H/2+Math.sin((x*0.03)-t)*28;
+          x===px?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        ctx.stroke();
+
+        // Growing ball
+        const ballAlpha = breakProgress;
+        const cx2 = px + packetSize/2;
+        ctx.globalAlpha = ballAlpha;
+        ctx.shadowBlur=18; ctx.shadowColor='#f0c060';
+        ctx.fillStyle='#f0c060';
+        ctx.beginPath(); ctx.arc(cx2, H/2, breakProgress*10, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0;
+      }
+      ctx.globalAlpha=1;
+    } else {
+      // Discrete photon packets
+      ctx.fillStyle='rgba(255,255,255,.35)'; ctx.font='12px sans-serif'; ctx.textAlign='left';
+      ctx.fillText('Each packet = one photon with energy E = hf', 12, 20);
+      const freqs2 = [0.1, 0.5, 0.85, 0.3, 0.72, 0.18, 0.95, 0.55];
+      freqs2.forEach((f, i) => {
+        const x0 = 40 + i * (W-80)/freqs2.length;
+        const px = x0 + (phaseT/180 * 80);
+        if (px > W) return;
+        const c = freqToColor(f);
+        const r = 6 + f * 8;
+        ctx.shadowBlur=16; ctx.shadowColor=c;
+        ctx.fillStyle=c;
+        ctx.beginPath(); ctx.arc(px%W, H*0.4 + Math.sin(i*1.3)*30, r, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0;
+        ctx.fillStyle=c; ctx.font='bold 9px monospace'; ctx.textAlign='center';
+        ctx.fillText('E=hf', px%W, H*0.4 + Math.sin(i*1.3)*30 + r + 12);
+      });
+    }
+
+    t+=0.05;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ════════════════════════════════ VENDING MACHINE CANVASES (S5) ════
+function drawVendingMachines() {
+  const cases = [
+    {id:'vendCanvas0', scenario:'below', photonFreq:0.25, color:'#ff6060'},
+    {id:'vendCanvas1', scenario:'exact', photonFreq:0.56, color:'#f0c060'},
+    {id:'vendCanvas2', scenario:'above', photonFreq:0.88, color:'#56e89a'},
+  ];
+  cases.forEach(({id, scenario, photonFreq, color}) => {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    let t = 0;
+    let phaseTick = 0;
+    let electronOut = false, eX = 0, eY = 0, eAlpha = 1;
+
+    function drawFrame() {
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle='#07071a'; ctx.fillRect(0,0,W,H);
+      phaseTick++;
+
+      // Draw bowl (potential well)
+      const cx = W/2, by = H*0.55, bw = 70, bh = 48;
+      ctx.strokeStyle='rgba(160,160,200,.5)'; ctx.lineWidth=2.5;
+      ctx.beginPath();
+      ctx.moveTo(cx-bw, by-bh); ctx.quadraticCurveTo(cx-bw, by, cx, by);
+      ctx.quadraticCurveTo(cx+bw, by, cx+bw, by-bh);
+      ctx.stroke();
+
+      // Work function label
+      ctx.strokeStyle='rgba(240,192,96,.4)'; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(cx-bw-10,by-bh); ctx.lineTo(cx+bw+10,by-bh); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='#f0c060'; ctx.font='9px sans-serif'; ctx.textAlign='right';
+      ctx.fillText('φ = work function (barrier)', cx-bw-14, by-bh+4);
+
+      // Photon energy bar
+      const barX = cx - bw - 40, barH = bh;
+      const photonE = (photonFreq - 0.05) / 0.9;
+      const fillH = Math.min(1, photonE) * barH;
+      ctx.fillStyle='rgba(255,255,255,.08)';
+      ctx.fillRect(barX-10, by-barH, 16, barH);
+      ctx.fillStyle = freqToColor(photonFreq);
+      ctx.shadowBlur=8; ctx.shadowColor=freqToColor(photonFreq);
+      ctx.fillRect(barX-10, by-fillH, 16, fillH);
+      ctx.shadowBlur=0;
+      ctx.fillStyle='rgba(255,255,255,.4)'; ctx.font='8px sans-serif'; ctx.textAlign='center';
+      ctx.fillText('photon', barX-2, by+12);
+      ctx.fillText('energy', barX-2, by+22);
+
+      // Electron in bowl
+      const amplitude = scenario === 'below' ? 8 : (scenario === 'exact' ? 12 : 0);
+      const ey = by - 10 - Math.abs(Math.sin(t*1.5)) * amplitude;
+
+      if (scenario === 'above') {
+        // Electron escapes
+        if (!electronOut) {
+          if (phaseTick > 60 && phaseTick < 120) {
+            const escProgress = (phaseTick-60)/60;
+            const elyAnim = by - 10 - escProgress * (bh+30);
+            ctx.shadowBlur=14; ctx.shadowColor='#aadeff';
+            ctx.fillStyle='#aadeff';
+            ctx.beginPath(); ctx.arc(cx, elyAnim, 7, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur=0;
+          } else if (phaseTick >= 120) {
+            electronOut = true; eX=cx; eY=by-10-bh-30; eAlpha=1;
+          } else {
+            ctx.shadowBlur=14; ctx.shadowColor='#aadeff';
+            ctx.fillStyle='#aadeff';
+            ctx.beginPath(); ctx.arc(cx, by-10, 7, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur=0;
+          }
+        } else {
+          eX += 1.5; eY -= 1; eAlpha -= 0.02;
+          if (eAlpha <= 0 || eX > W) { electronOut=false; phaseTick=0; }
+          ctx.globalAlpha = Math.max(0,eAlpha);
+          ctx.shadowBlur=14; ctx.shadowColor='#aadeff'; ctx.fillStyle='#aadeff';
+          ctx.beginPath(); ctx.arc(eX, eY, 7, 0, Math.PI*2); ctx.fill();
+          ctx.shadowBlur=0; ctx.globalAlpha=1;
+
+          ctx.fillStyle='#56e89a'; ctx.font='bold 10px sans-serif'; ctx.textAlign='center';
+          ctx.fillText('escaped! →', eX, eY-14);
+        }
+      } else {
+        // Electron stays in bowl (oscillates)
+        ctx.shadowBlur=12; ctx.shadowColor='#aadeff';
+        ctx.fillStyle='#aadeff';
+        ctx.beginPath(); ctx.arc(cx, ey, 7, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0;
+        // Bounce back with X
+        if (scenario === 'below' && phaseTick%80 === 40) {
+          ctx.fillStyle='#ff6060'; ctx.font='bold 18px sans-serif'; ctx.textAlign='center';
+          ctx.fillText('✗', cx+bw+20, by-bh+8);
+        }
+      }
+
+      t += 0.05;
+      requestAnimationFrame(drawFrame);
+    }
+    drawFrame();
+  });
+}
+
+// ════════════════════════════════ INITIAL SECTION CHECK ════════════
+// Trigger for any section already visible on load
+setTimeout(() => {
+  sectionIds.forEach((id, i) => {
+    const el = document.getElementById(id);
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) onSectionEnter(i);
+  });
+}, 300);
+</script>
+</body>
+</html>

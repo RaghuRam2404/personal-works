@@ -1,0 +1,19 @@
+Python: 3.14.0
+PyTorch: 2.13.0
+CUDA build: None
+CUDA available: False
+Epoch [  1/  5] : Loss 2.30210 in 9574.403047561646ms
+Epoch [  2/  5] : Loss 2.28733 in 9434.667110443115ms
+Epoch [  3/  5] : Loss 2.16801 in 9404.34718132019ms
+Epoch [  4/  5] : Loss 1.97619 in 9632.646083831787ms
+Epoch [  5/  5] : Loss 1.85886 in 9683.666944503784ms
+Accuracy: 0.3464
+True
+tensor(0.)
+
+Epoch [  6/ 10] : Loss 1.75978 in 9798.865795135498ms
+Epoch [  7/ 10] : Loss 1.65841 in 9513.469219207764ms
+Epoch [  8/ 10] : Loss 1.58739 in 9652.310848236084ms
+Epoch [  9/ 10] : Loss 1.54514 in 9566.334009170532ms
+Epoch [ 10/ 10] : Loss 1.50730 in 9547.092914581299ms
+Accuracy: 0.4500

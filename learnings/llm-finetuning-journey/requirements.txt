@@ -9,3 +9,5 @@ trl
 bitsandbytes
 wandb
 matplotlib
+h5py==3.16.0
+ipykernel
