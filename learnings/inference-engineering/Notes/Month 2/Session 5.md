@@ -95,3 +95,35 @@ STAGE 4 — ONE WARP (32 threads, lockstep / SIMT)
 │  can read/write the SM's shared memory if the kernel uses it │
 └────────────────────────────────────────────────────────────┘
 ```
+
+### Some Questions
+
+#### Question
+
+Finish by answering these without notes:
+
+1. Starting from `torch.add(a, b)`, describe the path from the CPU call to GPU execution.
+2. What is an SM?
+3. What is the difference between a block and a warp?
+4. How many warps are in a 256-thread block on NVIDIA hardware?
+5. Why can an elementwise operation be memory-bound even though the GPU has many arithmetic units?
+6. Why can several tiny kernels be slower than one fused kernel?
+7. Why can a GPU show low utilization even when its kernel is fast?
+8. In tiled matrix multiplication, what data is reused and where is it temporarily stored?
+
+You are done only when answers 1–7 can be explained aloud in plain language and the answer to question 4 can be derived rather than recalled. Question 8 may remain partially uncertain at this point, but the explanation should identify shared-memory reuse. The session's architectural goal is reasoning about computation, data movement, launch overhead, and input preparation—not writing an optimized CUDA kernel.[^1]
+
+#### Answer check
+
+Use this only after attempting the checkpoint:
+
+1. Python runs on the CPU; PyTorch dispatches a CUDA operation; the CPU enqueues a kernel; the GPU schedules its blocks onto SMs; each SM divides blocks into warps and issues their instructions.
+2. An SM is a GPU execution cluster containing scheduling, arithmetic, register, and shared-memory resources.
+3. A block is a programmer-defined cooperating group assigned to one SM; a warp is the hardware scheduling group formed from threads in that block.
+4. `ceil(256 / 32) = 8` warps.
+5. Each element may require only a small amount of arithmetic but still has to be read and written, so data transfer can finish more slowly than the arithmetic capacity can be used.
+6. Fusion removes some launches and avoids writing and rereading intermediate tensors.
+7. The GPU can finish quickly and then wait for CPU preprocessing, data transfer, synchronization, or the next request.
+8. Tiles from the input matrices are loaded into shared memory and reused for multiple multiply-accumulate operations before the next tiles are loaded.
+
+A warp is the NVIDIA scheduling/execution grouping of 32 threads, and divergent paths within a warp can require masking inactive threads.[^6][^3]

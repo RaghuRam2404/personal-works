@@ -421,7 +421,7 @@ Use this rule:
 
 #### Part C — Complete the AMP recipe
 
-Work through PyTorch's official Automatic Mixed Precision recipe once.
+Work through PyTorch's official Automatic Mixed Precision recipe once. https://docs.pytorch.org/tutorials/recipes/recipes/amp_recipe.html
 
 Record:
 
