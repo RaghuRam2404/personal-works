@@ -184,126 +184,190 @@ Create a short `lecture1-notes.md` containing:
 
 ### Session 5 — Lecture 4 and the GPU mental model
 
-#### Objective
+#### Goal
 
-Understand enough GPU architecture to reason about why an operation may be limited by computation, memory movement, kernel-launch overhead, or input preparation.
+Build enough of a GPU mental model to distinguish four possible limits: computation, memory movement, kernel-launch overhead, and input preparation.[^1]
 
-#### Part A — Pre-read
+The assigned material is GPU MODE Lecture 4, **"Intro to Compute and Memory Architecture,"** taught by Thomas Viehmann; the official repository provides its notebook and slides in `lecture_004`.[^2]
 
-Before watching Lecture 4, learn this hierarchy:
+#### Timebox
+
+Plan for **about 2 hours**. Do not try to master CUDA kernel writing today; the target is to explain where work runs, how it is grouped, and why a workload can be slow.
+
+| Time | Task | Required output |
+|---|---|---|
+| 0–15 min | Build the execution hierarchy from memory | One hand-drawn or Markdown diagram |
+| 15–75 min | Watch GPU MODE Lecture 4 | Short timestamped notes |
+| 75–100 min | Inspect one available GPU | Device facts and a memory calculation |
+| 100–120 min | Classify bottlenecks and answer the checkpoint | Completed notes file |
+
+#### Pre-watch
+
+Write this hierarchy **without copying it first**:
 
 ```text
-CPU program
+Python/PyTorch program on CPU
   -> launches a GPU kernel
 GPU
   -> contains streaming multiprocessors (SMs)
 SM
-  -> schedules thread blocks and warps
+  -> receives thread blocks and schedules warps
 Thread block
-  -> group of cooperating threads assigned to one SM
+  -> cooperating threads; stays on one SM
 Warp
-  -> 32 NVIDIA GPU threads scheduled together
+  -> 32 NVIDIA threads scheduled as a group
 Thread
-  -> one logical execution instance with per-thread state
+  -> executes the kernel on its own data
 ```
 
-Learn the memory hierarchy conceptually:
+The curriculum explicitly introduces the path from CPU program to GPU, then GPU to SMs, SMs to thread blocks and warps, and defines an NVIDIA warp as 32 threads. NVIDIA's programming guide confirms that blocks are divided into 32-thread warps using the SIMT execution model.[^3][^1]
+
+Before starting the lecture, answer these from first principles:
+
+1. If Python calls `torch.add`, which processor runs Python and which processor performs the tensor arithmetic when the tensors are on CUDA?
+2. Why does a GPU need thousands of lightweight threads instead of one extremely powerful thread?
+3. If a block has 256 threads, how many warps does it contain?
+4. Why must a thread block fit on one SM rather than being split across SMs?
+
+Do not look up polished answers yet. Mark each answer as **confident**, **uncertain**, or **guess**.
+
+#### Watch Lecture 4
+
+Open the official Lecture 4 notebook, slides, and recording from the GPU MODE materials. Watch for concepts rather than copying implementation details; the lecture covers compute and memory architecture and demonstrates fusion, launch latency, naive matrix multiplication, tiled matrix multiplication, shared memory, synchronization, coalescing, and occupancy.[^4][^5][^2]
+
+Pause and write one or two sentences at each of these points:
+
+- **CPU versus GPU:** CPU optimizes latency for a few complex tasks; GPU optimizes throughput across many parallel tasks.
+- **Kernel launch:** The CPU submits work; the launch itself has non-zero overhead, even if the kernel does almost nothing.
+- **SM, block, warp, thread:** Explain each term and the containment/assignment relationship.
+- **Memory hierarchy:** At minimum distinguish registers, shared memory/cache, and global GPU memory.
+- **Fusion:** Explain why replacing several elementwise kernels with one kernel can reduce both launch overhead and repeated memory traffic.
+- **Tiling:** Explain why loading a tile once into shared memory can allow many arithmetic operations to reuse it.
+- **Occupancy:** Treat it as the amount of potentially runnable work resident on an SM, not as a guarantee of speed.
+
+Do **not** spend the session debugging or rewriting the CUDA extension. Running the notebook is optional; understanding what each experiment demonstrates is mandatory.
+
+#### GPU inspection
+
+Run this in the same environment used for Month 2:
+
+```bash
+nvidia-smi
+```
+
+Then run:
+
+```python
+import torch
+
+assert torch.cuda.is_available()
+p = torch.cuda.get_device_properties(0)
+
+print("GPU:", p.name)
+print("SM count:", p.multi_processor_count)
+print("Total VRAM GiB:", p.total_memory / 1024**3)
+print("Max threads/block:", p.max_threads_per_block)
+print("Warp size:", p.warp_size)
+```
+
+Record the output. Then calculate:
 
 ```text
-Registers
-  -> fastest and smallest; private to a thread
-Shared memory / on-chip SRAM
-  -> fast and shared by threads in a block
-L1/L2 caches
-  -> hardware-managed reuse
-Global GPU memory
-  -> large device memory containing tensors
-CPU/host memory
-  -> outside the GPU, reached over an interconnect
+warps per 256-thread block = ceil(256 / warp_size)
 ```
 
-Do not memorize architecture-specific capacities or latency numbers.
+On an NVIDIA GPU with a warp size of 32, the result should be 8. NVIDIA documents that block sizes are converted into warps by grouping threads in sets of 32.[^3]
 
-#### Part B — Watch GPU MODE Lecture 4
+If no CUDA GPU is available, use the displayed RTX 3090 example from the lecture notes instead and label the values as **lecture hardware, not my hardware**.[^4]
 
-Focus on this causal chain:
+#### Bottleneck exercise
 
-```text
-Operation and tensor shape
-  -> amount of arithmetic and data movement
-  -> one or more kernel launches
-  -> blocks and warps execute on SMs
-  -> data moves through the memory hierarchy
-  -> one resource becomes the main limitation
-```
+For each scenario, choose the **first bottleneck hypothesis** and justify it in one sentence. This is a hypothesis, not a profiler-confirmed conclusion.
 
-Pay attention to the lecture's examples of:
+| Scenario | First hypothesis to test | Reasoning target |
+|---|---|---|
+| Add two very large tensors | Memory movement | Very little arithmetic is performed per value loaded and stored |
+| Launch hundreds of tiny elementwise operations | Kernel-launch overhead | Fixed launch cost can dominate tiny kernels |
+| Perform one large dense matrix multiplication | Computation, or memory depending on shape/reuse | Each loaded value can participate in many operations |
+| GPU waits while the next batch is decoded on CPU | Input preparation | The accelerator has no ready work |
+| Replace several elementwise GELU operations with one fused kernel | Lower launch and memory overhead | Intermediate values need not repeatedly travel through global memory |
 
-- Kernel-launch overhead.
-- Unfused versus fused elementwise work.
-- Global memory versus on-chip memory.
-- Tiled matrix multiplication.
-- Occupancy.
-
-You only need conceptual understanding this month. Do not implement or tune tiled matrix multiplication.
-
-#### Part C — Required concepts
-
-| Concept | Month 2 understanding |
-|---|---|
-| SM | A GPU processing unit that schedules and executes blocks and warps |
-| Warp | 32 threads scheduled together on NVIDIA GPUs |
-| Registers | Very fast storage private to a thread |
-| Shared memory | Fast on-chip memory shared by threads in one block |
-| Global memory | Large device memory used for tensors, parameters, and activations |
-| Memory bandwidth | Rate at which data can move between memory and compute units |
-| Compute-bound | Arithmetic throughput is the main limitation |
-| Memory-bound | Data movement is the main limitation |
-| Launch-bound | Kernel-launch and dispatch overhead dominate because operations are small |
-| Input-bound | The GPU waits for the CPU, DataLoader, storage, or host-to-device transfer |
-| Fusion | Combining operations to reduce kernel launches and intermediate memory traffic |
-| Occupancy | How much potential warp capacity is occupied by active warps; not the same as performance |
-| GPU utilization | A busy-time signal; not a direct measurement of useful arithmetic efficiency |
-
-#### Assignment M2.2
-
-Answer these questions:
-
-1. Why are registers and shared memory faster but smaller than global memory?
-2. Why might a simple elementwise operation be memory-bound?
-3. Why can matrix multiplication perform more useful arithmetic per byte loaded than vector addition?
-4. Why can operation fusion improve performance even if the mathematics is unchanged?
-5. Why can many tiny kernels become launch-bound?
-6. Why can a GPU show high utilization while still executing inefficiently?
-7. How would a slow DataLoader appear differently from a slow convolution?
-
-For each workload, make only a qualitative hypothesis:
-
-| Workload | Likely first hypothesis |
-|---|---|
-| Vector addition over a large tensor | Memory-bound |
-| Large matrix multiplication | Potentially compute-bound |
-| Very small matrix multiplication | Potentially launch-bound |
-| Long chain of elementwise operations | Memory- and launch-bound |
-| CNN with a slow DataLoader | Input-bound |
-
-These are hypotheses, not universal truths. Profiling is used to test them.
+The lecture's approximate-GELU and empty-kernel experiments are designed to expose fusion benefits and launch latency, while its naive and tiled matrix-multiplication examples introduce data reuse through shared memory.[^5][^4]
 
 #### Deliverable
 
-Create `gpu-architecture-notes.md` containing:
+Create `session5-gpu-mental-model.md` with exactly these sections:
 
-- The execution hierarchy.
-- The memory hierarchy.
-- Definitions of the required concepts.
-- Answers to the seven questions.
-- One paragraph explaining fusion.
+```markdown
+# Session 5 — GPU Mental Model
 
-#### Exit criteria
+## My GPU
+- Name:
+- SM count:
+- VRAM:
+- Warp size:
+- Max threads per block:
 
-- You can draw the GPU execution and memory hierarchies without notes.
-- You can distinguish compute-, memory-, launch-, and input-bound behavior at a basic level.
-- You can explain why high GPU utilization does not prove high efficiency.
+## Execution hierarchy
+[my diagram]
+
+## Terms in my words
+- Kernel:
+- SM:
+- Thread block:
+- Warp:
+- Thread:
+- Register:
+- Shared memory:
+- Global memory:
+
+## Four bottlenecks
+| Bottleneck | What is limiting progress? | Example | Profiler clue |
+|---|---|---|---|
+| Compute | | | |
+| Memory movement | | | |
+| Kernel launch | | | |
+| Input preparation | | | |
+
+## Lecture observations
+- Empty kernel:
+- GELU fusion:
+- Naive matmul:
+- Tiled matmul:
+
+## Checkpoint answers
+1. ...
+```
+
+#### Checkpoint
+
+Finish by answering these without notes:
+
+1. Starting from `torch.add(a, b)`, describe the path from the CPU call to GPU execution.
+2. What is an SM?
+3. What is the difference between a block and a warp?
+4. How many warps are in a 256-thread block on NVIDIA hardware?
+5. Why can an elementwise operation be memory-bound even though the GPU has many arithmetic units?
+6. Why can several tiny kernels be slower than one fused kernel?
+7. Why can a GPU show low utilization even when its kernel is fast?
+8. In tiled matrix multiplication, what data is reused and where is it temporarily stored?
+
+You are done only when answers 1–7 can be explained aloud in plain language and the answer to question 4 can be derived rather than recalled. Question 8 may remain partially uncertain at this point, but the explanation should identify shared-memory reuse. The session's architectural goal is reasoning about computation, data movement, launch overhead, and input preparation—not writing an optimized CUDA kernel.[^1]
+
+#### Answer check
+
+Use this only after attempting the checkpoint:
+
+1. Python runs on the CPU; PyTorch dispatches a CUDA operation; the CPU enqueues a kernel; the GPU schedules its blocks onto SMs; each SM divides blocks into warps and issues their instructions.
+2. An SM is a GPU execution cluster containing scheduling, arithmetic, register, and shared-memory resources.
+3. A block is a programmer-defined cooperating group assigned to one SM; a warp is the hardware scheduling group formed from threads in that block.
+4. `ceil(256 / 32) = 8` warps.
+5. Each element may require only a small amount of arithmetic but still has to be read and written, so data transfer can finish more slowly than the arithmetic capacity can be used.
+6. Fusion removes some launches and avoids writing and rereading intermediate tensors.
+7. The GPU can finish quickly and then wait for CPU preprocessing, data transfer, synchronization, or the next request.
+8. Tiles from the input matrices are loaded into shared memory and reused for multiple multiply-accumulate operations before the next tiles are loaded.
+
+A warp is the NVIDIA scheduling/execution grouping of 32 threads, and divergent paths within a warp can require masking inactive threads.[^6][^3]
 
 ---
 
