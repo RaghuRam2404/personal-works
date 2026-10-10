@@ -7,6 +7,7 @@
 - [learn-inference.com](https://learn-inference.com/chapters/inference/three-layers)
 - [Baseten - Inference Engineering EBook](https://simple-download.vercel.app/api/download/Inference%20Engineering.pdf?_hsenc=p2ANqtz-91To3u7jlAgcJPGNFhQhiLm7enIkV5MpkcUM1sG6jqZ9W0h0SiWq39uXob4VW4VTh2Yoyvg2InFb6oteBI6TbTdySAJA&_hsmi=416411559) or [local pdf copy](./Inference%20Engineering.pdf)
 - [How to become an Inference Engineer - Podcast](https://www.youtube.com/watch?v=LUGxx1XNqcM&pp=ygUZaW5mZXJlcm5jZSBlbmdpbmVlciByb2xlINIHCQkTDAGHKiGM7w%3D%3D)
+- [Support uploading local files to Colab servers. #223](https://github.com/googlecolab/colab-vscode/issues/223#issuecomment-3688061120)
 
 ## Tutorial kind of videos
 

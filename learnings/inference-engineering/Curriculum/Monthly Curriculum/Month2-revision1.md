@@ -523,7 +523,7 @@ Learn the minimum PyTorch Profiler workflow needed to capture and narrate Projec
 
 #### Part A — Complete the profiler recipe
 
-Work through the official PyTorch Profiler recipe. Focus on:
+Work through the [official PyTorch Profiler recipe](https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html). Focus on:
 
 - CPU time versus CUDA time.
 - Self time versus total time.
@@ -535,24 +535,32 @@ Work through the official PyTorch Profiler recipe. Focus on:
 - Exporting a Chrome/Perfetto JSON trace.
 - Profiling a short steady-state window instead of an entire training run.
 
+Keep the [PyTorch Profiler API reference](https://docs.pytorch.org/docs/stable/profiler.html) available for looking up parameters and methods.
+
 You may skip deep stack-trace and memory-allocation analysis unless needed to diagnose a problem.
 
 #### Part B — Instrument the trainer
+
+Refer to the named-region examples in the [profiler recipe](https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html).
 
 Add named regions:
 
 ```python
 from torch.profiler import record_function
 
+
 with record_function("data_loading"):
     images, targets = next(data_iter)
+
 
 with record_function("host_to_device"):
     images = images.to(device, non_blocking=True)
     targets = targets.to(device, non_blocking=True)
 
+
 with record_function("zero_grad"):
     optimizer.zero_grad(set_to_none=True)
+
 
 with record_function("forward_and_loss"):
     with torch.autocast(
@@ -563,8 +571,10 @@ with record_function("forward_and_loss"):
         logits = model(images)
         loss = criterion(logits, targets)
 
+
 with record_function("backward"):
     backward_step(loss)
+
 
 with record_function("optimizer_step"):
     optimizer_step()
@@ -574,6 +584,8 @@ Use an explicit iterator if you want DataLoader waiting to appear inside `data_l
 
 #### Part C — Capture a smoke-test trace
 
+Read the scheduled-profiling example in the [profiler recipe](https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html). Use the [API reference](https://docs.pytorch.org/docs/stable/profiler.html) to look up `schedule`, `on_trace_ready`, `export_chrome_trace`, and `profiler.step()`.
+
 Profile only a short window:
 
 ```python
@@ -581,6 +593,7 @@ activities = [
     torch.profiler.ProfilerActivity.CPU,
     torch.profiler.ProfilerActivity.CUDA,
 ]
+
 
 with torch.profiler.profile(
     activities=activities,
@@ -601,7 +614,12 @@ with torch.profiler.profile(
         profiler.step()
 ```
 
-Open the exported trace in Perfetto or `chrome://tracing`.
+Open the exported trace in [Perfetto](https://ui.perfetto.dev/) or `chrome://tracing`.
+
+Supporting resources:
+
+- [Perfetto UI guide](https://perfetto.dev/docs/visualization/perfetto-ui): Loading and navigating a trace.
+- [Perfetto external-format guide](https://perfetto.dev/docs/getting-started/other-formats): Chrome JSON trace support and flow events.
 
 #### Assignment M2.4
 
@@ -621,6 +639,8 @@ Answer:
 3. Why should the final benchmark run without the profiler enabled?
 4. Why should only a few steady-state steps be traced?
 5. What does `record_shapes=True` add?
+
+Use the [profiler recipe](https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html) to interpret the timing tables, and read the profiling-overhead warning in the [API reference](https://docs.pytorch.org/docs/stable/profiler.html).
 
 #### Deliverable
 

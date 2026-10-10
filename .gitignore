@@ -90,6 +90,24 @@ secrets/
 *.bak
 *.orig
 .cache/
+tmp/
+**/tmp/
+**/[Tt]mp/
+**/[Tt]emp/
+
+# Large archives / binaries (git has no size-based ignore; list common large-file types)
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.gz
+*.7z
+*.rar
+*.dylib
+*.so
+*.dll
+*.bin
+*.whl
 
 # Nested git repos
 dadfit/dadfit-content/.git/
