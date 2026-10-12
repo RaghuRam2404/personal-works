@@ -1,4 +1,4 @@
-import torch
+import torch, random
 from torch.amp import autocast
 from torch.profiler import profile, ProfilerActivity, record_function
 from torch.amp import GradScaler
@@ -126,7 +126,7 @@ loss_fn(logits, rand_target)
 
 ### Training Loop ###
 
-def train_one_loop(model, data_loader, optim, loss_fn, device):
+def train_one_loop(model, data_loader, optim, scaler, loss_fn, device):
     #with profile(activities=activities, profile_memory=True, record_shapes=True) as prof:
     tlosses = []
     start, end, elapsed_ms = None, None, None
@@ -140,17 +140,19 @@ def train_one_loop(model, data_loader, optim, loss_fn, device):
     for batch_no, (x,y) in enumerate(data_loader):
         x = x.to(device)
         y = y.to(device)
+        
         with autocast(device_type=device, dtype=torch.float16, enabled=True):
             logits = model(x)
+            print(logits.dtype)
             batch_loss = loss_fn(logits, y)
             tlosses.append(batch_loss.item())
         
-        
-        
-        batch_loss.backward()
-        optim.step()
+        scaler.scale(batch_loss).backward()
+        scaler.step(optim)
+        scaler.update()
         
         optim.zero_grad(set_to_none=True)
+        #break #uncomment for profiling
         
     if device == 'cuda':
         end.record()
@@ -159,55 +161,74 @@ def train_one_loop(model, data_loader, optim, loss_fn, device):
     else:
         end = time.perf_counter_ns()
         elapsed_ms = (end - start)/(1000**2)
-    #prof.export_chrome_trace("single_batch_training_loop.json")
+    #prof.export_chrome_trace("cifaramp_cuda_single_batch_training_loop.json")
     
     return tlosses, elapsed_ms
 
-def training_loop(model, data_loader, epochs, epochs_trained, optim, loss_fn, device, store_checkpt):
+def training_loop(model, data_loader, epochs, epochs_trained, optim, scaler, loss_fn, device, store_checkpt):
     if epochs_trained is None:
         epochs_trained = 0
     losses = []
     for epoch in range(epochs):
-        tlosses, elapsed_ms = train_one_loop(model, data_loader, optim, loss_fn, device)
+        tlosses, elapsed_ms = train_one_loop(model, data_loader, optim, scaler, loss_fn, device)
         loss = (sum(tlosses)/len(tlosses))
         losses.append(loss)
         
         print(f"Epoch: {(epochs_trained+epoch+1):3}/{epochs_trained+epochs:2} and loss:{loss:.5f} in {elapsed_ms} ms time")
         if store_checkpt is not None and store_checkpt == True:
-            store_checkpoint(model, optim, epochs_trained+epoch+1, checkpt_path)
-            
+            store_checkpoint(model, optim, scaler, epochs_trained+epoch+1, checkpt_path)
+
     return losses
 
-def store_checkpoint(model, optim, epochs, file):
+def store_checkpoint(model, optim, scaler, epochs, file):
     check_point = {
         'model': model.state_dict(),
         'optim': optim.state_dict(),
+        'scaler': scaler.state_dict(),
         'epochs_done' : epochs
     }
     torch.save(check_point, file)
     
-def load_checkpoint(file, device, model, optim):
+def load_checkpoint(file, device, model, optim, scaler):
     check_point = torch.load(file, map_location=device, weights_only=True)
     model_dict = check_point['model']
     optim_dict = check_point['optim']
+    scaler_dict = check_point['scaler']
     epochs_done = check_point['epochs_done']
     model.load_state_dict(model_dict)
     
     if optim is not None:
         optim.load_state_dict(optim_dict)
+        
+    if scaler is not None:
+        scaler.load_state_dict(scaler_dict)
     
     print(f"Checkpoint loaded. Total epochs done till now: {epochs_done}")
-    return model_dict, optim_dict, epochs_done
+    return model_dict, optim_dict, scaler_dict, epochs_done
+
+def set_seed(seed):
+    torch.manual_seed(seed=seed)
+    random.seed(seed)
+    
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+
 
 FRESH_TRAINING = True
-checkpt_path = "./cifarfp32_1.pth"
+checkpt_path = "./cifarfp32_2.pth"
 
 device = 'cpu'
 if torch.cuda.is_available():
     device = 'cuda'
 
+set_seed(42)
 model = cifar_model().to(device)
 optim = torch.optim.Adam(params=model.parameters(), lr=0.001)
+scaler = GradScaler(device, enabled=True)
 loss_fn = nn.CrossEntropyLoss()
 epochs_trained = None
 model.train()
@@ -216,7 +237,7 @@ if not FRESH_TRAINING:
     model_dict, optim_dict, epochs_done = load_checkpoint(checkpt_path, device, model, optim)
     epochs_trained = epochs_done
 
-epochs_to_run_now = 15
+epochs_to_run_now = 1
 batch_size = 1024
 train_loader = DataLoader(dataset=train, batch_size=batch_size, shuffle=True)
 
@@ -225,13 +246,13 @@ activities = [ProfilerActivity.CPU]
 if torch.cuda.is_available():
     activities += [ProfilerActivity.CUDA]
 #with profile(activities=activities, profile_memory=True, record_shapes=True) as prof:
-training_loop(model, train_loader, epochs_to_run_now, epochs_trained, optim, loss_fn, device, True)
+training_loop(model, train_loader, epochs_to_run_now, epochs_trained, optim, scaler, loss_fn, device, True)
 #prof.export_chrome_trace("cuda_cifar_fp32_trace.json")
 
 ### Test accuracy logic ###
 
 model = cifar_model().to(device)
-load_checkpoint(checkpt_path, device, model, None)
+load_checkpoint(checkpt_path, device, model, None, None)
 
 test_loader = DataLoader(dataset=test, batch_size=batch_size, shuffle=False)
 test_n = test.data.shape[0]

@@ -471,3 +471,81 @@ Note: The initial state of the CPU & GPU Models are different, which may affect 
 - The CPU run reached higher accuracy (70%) than the GPU run (58%, reproduced twice), despite identical hyperparameters and epoch count. Since the model, optimizer, and data pipeline are unchanged across devices, this gap is more likely explained by run-to-run randomness (shuffling, augmentation, weight init) than by the device itself — this is exactly the "accidental `torch.no_grad()`" / "dataset split" style checklist from Part C worth re-checking if the gap persists after a few more seeded runs, rather than assuming GPU execution itself caused the drop.
 - A single GPU batch (700 ms) includes one-time CUDA context/kernel warm-up, so it isn't a reliable per-batch estimate for the full 15-epoch run — matches the Session 5/7 point about excluding warm-up steps from steady-state timing.
 
+## Session 9
+
+### AMP run, worked through [5_cifar_amp.py](../Month%202/5_cifar_amp.py)
+
+Same model, data pipeline, optimizer (`Adam(lr=0.001)`), `batch_size=1024`, and checkpointing scheme as the Session 8 FP32 baseline. The only change is the precision path: forward + loss run inside `autocast(device_type='cuda', dtype=torch.float16, enabled=True)`, and `GradScaler` scales the loss before `backward()` and unscales before `optim.step()`:
+
+```python
+with autocast(device_type=device, dtype=torch.float16, enabled=True):
+    logits = model(x)
+    batch_loss = loss_fn(logits, y)
+
+scaler.scale(batch_loss).backward()
+scaler.step(optim)
+scaler.update()
+optim.zero_grad(set_to_none=True)
+```
+
+Confirmed under autocast: `logits.dtype` is `torch.float16` — the forward/loss computation runs in FP16 while the model's stored parameters and the optimizer state remain FP32, matching the Session 6 distinction between operation dtype and parameter dtype.
+
+### Benchmark results
+
+| Metric | FP32 (Session 8) | AMP (Session 9) |
+|---|---:|---:|
+| Single-batch time | 700 ms (includes warm-up) | 620–920 ms |
+| Epoch time | 31 s (15-epoch run total, see Session 8 note) | 31 s |
+| Test accuracy | 58% | 68% |
+
+Note: the FP32 "31 s" figure in Session 8 was logged as the scope "all batches (15 epochs)", while this AMP run's 31 s is logged per epoch. Scope isn't confirmed to match between the two numbers, so the epoch-time row shouldn't be read as "AMP and FP32 took the same time" without re-running both under an identical, explicitly per-epoch measurement — flagging this the same way the accuracy gap was flagged in Session 8 rather than asserting a 1.0x speedup.
+
+### Part D — Paired-trace questions and answers
+
+1. **Where does one training step begin and end?**
+
+   One step begins when a batch is pulled from the `DataLoader` (`for batch_no, (x, y) in enumerate(data_loader)`) and ends after `optim.zero_grad(set_to_none=True)` completes for that batch — i.e. host-to-device transfer → forward/loss (inside autocast) → `scaler.scale(loss).backward()` → `scaler.step(optim)` → `scaler.update()` → `zero_grad`.
+
+2. **How much time appears in host-to-device transfer?**
+
+   About 3 ms total for moving one batch's `x` and `y` to the GPU (`x.to(device)`, `y.to(device)`).
+
+3. **How much time appears in forward and loss?**
+
+   Forward pass: ~3.14 ms. Loss computation (`loss_fn`) itself: ~147.2 microseconds — small, as expected for `CrossEntropyLoss` on a `[1024, 10]` logits tensor. However, calling `.item()` on the loss (to append it to `tlosses` for logging) took ~18 ms — this forces a CPU/GPU sync that stalls the async pipeline, which is far more expensive than the loss computation it's reading. This is a concrete example of accidentally introducing a sync point inside the timed region, something Session 7's "unsynchronized Python timer" caution generalizes to any blocking `.item()`/`.cpu()` call inside a hot loop.
+
+4. **How much time appears in backward?**
+
+   ~3.49 ms for `scaler.scale(batch_loss).backward()`.
+
+5. **How much time appears in the optimizer?**
+
+   ~3.027 ms for `scaler.step(optim)` + `scaler.update()`.
+
+6. **Which stage changed most under AMP?**
+
+   I could not load the linked Perplexity thread to pull its specific answer, so this is reasoned from the trace evidence collected here instead: the clearest change is inside the forward convolution kernels themselves — cuDNN dispatches a different kernel for FP32 vs FP16 (see Q7), and convolutions are exactly the op type expected to benefit most from Tensor Cores under autocast. Host-to-device transfer (~3 ms), backward (~3.49 ms), and the optimizer step (~3.027 ms) are all in a similar few-millisecond band in both runs, which is consistent with the curriculum's explanation that parameter/optimizer-state dtype stays FP32 and transfer size is unchanged — so the forward/conv stage is the one most plausibly carrying the AMP benefit, not backward or the optimizer.
+
+7. **Are visible CPU or input gaps present?**
+
+   Yes — visible CPU-side gaps are present in the trace (e.g. around the `.item()` sync point noted in Q3), consistent with the GPU finishing its queued kernels and then waiting on host-side Python work before the next batch's kernels can be launched.
+
+8. **Did CUDA kernel durations or names change?**
+
+   Yes. The dominant convolution kernel differs by precision:
+   - FP32: `_5x_cudnn_ampere_scudnn_128x64_relu_xregs_large_nn_v1`
+   - AMP/FP16: `_5x_cudnn_ampere_fp16_scudnn_fp16_128x64_relu_medium_nn_v1`
+
+   cuDNN selects a separate, FP16-specialized kernel (note the `fp16` name segment and the `medium` vs `large` tile/register configuration) rather than running the same kernel at a different dtype — direct evidence that autocast is changing which kernel cuDNN picks, not just reinterpreting the same kernel's bits.
+
+9. **Is the profiler observation consistent with the clean benchmark?**
+
+   Yes — the per-region trace numbers (host-to-device, forward, backward, optimizer all in the low single-digit milliseconds, plus the `.item()` sync cost) are consistent with, and help explain, the single-batch wall-clock range of 620–920 ms once DataLoader fetch/augmentation and any remaining warm-up effects are accounted for in the clean benchmark.
+
+### Observations
+
+- The output logits under autocast are `torch.float16`, confirming autocast is actually taking effect for the forward pass, while the checkpointed model/optimizer state stays FP32.
+- AMP reached 68% test accuracy vs. FP32's 58% from Session 8 — but per the Session 8 note, the two runs didn't share identical seeded initial weights, so this accuracy gap is more likely run-to-run variance than a precision effect, and shouldn't be read as "AMP trains to higher accuracy."
+- The biggest avoidable cost found in this trace isn't precision-related at all: `batch_loss.item()` (~18 ms) dwarfs the actual loss computation (~147.2 µs) because it forces a CUDA sync every batch — worth removing from the hot loop (e.g. accumulate on-GPU and `.item()` once per epoch) before trusting any further timing comparisons.
+- The clearest AMP-driven change is the cuDNN kernel swap for convolution (Q6/Q8), which is the expected mechanism for the speedup: it is not that every kernel got proportionally faster, but that a specific, lower-precision-eligible kernel class (conv/BatchNorm) got replaced, while transfer, backward, and optimizer stages stayed roughly the same order of magnitude.
+

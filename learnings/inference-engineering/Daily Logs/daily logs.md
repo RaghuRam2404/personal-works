@@ -163,3 +163,11 @@ I should wake up a bit sooner around 5:30 or something. From session 8, I finish
 Timespent: 1.5 hours
 
 Finished session 8, for session 9 everything is same but we are implementing mixed precision training with fp16. I need to modify the training loop accordingly and check the performance and accuracy by Monday. Handle properly about the inititaing the model with same weights for reproducing the results and restoring the state_dict of gradscaler for resuming training.
+
+## 2026-10-12
+
+Timespent: 1 hour
+
+Finished coding of session 9 and took output traces and compared it. Still some questions are pending. Start with checking https://www.perplexity.ai/search/0ffadfae-c23a-4b92-81ec-e4e5c001f56c tomorrow. check the kernel differences. Recheck the session 9 notes for the questions.
+
+I guess I can finish both session 9 and 10 tomorrow.

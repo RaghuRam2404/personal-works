@@ -1,6 +1,8 @@
 
 ## Instagram carousel works
-- [ ] Create brand design guideline
+- [x] Create brand design guideline. Meaning - what we stand for, vision & mission
+- [ ] how to get paid etc with community strategy. Seems it's a hard one to figure out. I still don't know what am I going to do. Figure it out asap next week
+- [ ] Create brand design guideline and assets
 - [ ] Create content pillars and problem statements in those pillars
 - [ ] Content Funnel plan (ie) what kind of content in 1st, 2nd month etc
 - [ ] Content suggestion wrt content pillars and funnel stages
