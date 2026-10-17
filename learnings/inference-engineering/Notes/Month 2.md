@@ -500,7 +500,7 @@ Confirmed under autocast: `logits.dtype` is `torch.float16` — the forward/loss
 
 Note: the FP32 "31 s" figure in Session 8 was logged as the scope "all batches (15 epochs)", while this AMP run's 31 s is logged per epoch. Scope isn't confirmed to match between the two numbers, so the epoch-time row shouldn't be read as "AMP and FP32 took the same time" without re-running both under an identical, explicitly per-epoch measurement — flagging this the same way the accuracy gap was flagged in Session 8 rather than asserting a 1.0x speedup.
 
-### Part D — Paired-trace questions and answers
+### Paired-trace questions and answers
 
 1. **Where does one training step begin and end?**
 
@@ -524,7 +524,29 @@ Note: the FP32 "31 s" figure in Session 8 was logged as the scope "all batches (
 
 6. **Which stage changed most under AMP?**
 
-   I could not load the linked Perplexity thread to pull its specific answer, so this is reasoned from the trace evidence collected here instead: the clearest change is inside the forward convolution kernels themselves — cuDNN dispatches a different kernel for FP32 vs FP16 (see Q7), and convolutions are exactly the op type expected to benefit most from Tensor Cores under autocast. Host-to-device transfer (~3 ms), backward (~3.49 ms), and the optimizer step (~3.027 ms) are all in a similar few-millisecond band in both runs, which is consistent with the curriculum's explanation that parameter/optimizer-state dtype stays FP32 and transfer size is unchanged — so the forward/conv stage is the one most plausibly carrying the AMP benefit, not backward or the optimizer.
+   Measured with [6_fp32_vs_amp.py](../Month%202/6_fp32_vs_amp.py), input batch `10000x3x32x32` (note: larger batch than the `1024`-batch trace used in Q1–5, so absolute ms values aren't directly comparable across the two tables — only the FP32-vs-AMP delta per stage is): Below is all the CPU submitting work to the GPU for each stage.
+    
+   | Stage | FP32 | AMP | Notes |
+   |---|---:|---:|---|
+   | `forward_pass` | 5.682 ms | 5.635 ms | ~same |
+   | `calculate_loss` | 0.388 ms | 0.379 ms | ~same |
+   | `backward` | 3.583 ms | 4.039 ms | slightly slower under AMP (GradScaler-based `backward`) |
+   | `update_gradients` | 2.709 ms | 585.063 ms | dominated by a `.item()` call costing 581.520 ms — a forced CUDA sync, not a real AMP cost |
+   | `zero_grad` | 0.085 ms | 0.101 ms | ~same |
+
+
+    | (CUDA) Stage | FP32 | FP16 |
+    |---|---:|---:|
+    | `forward_pass` time | 372 ms | 215 ms |
+
+   Dominant convolution kernel:
+
+   | Precision | Kernel | Time |
+   |---|---|---:|
+   | FP32 | `_5x_cudnn_ampere_scudnn_128x64_relu_xregs_large_nn_v1` | 11.330 ms |
+   | AMP/FP16 | `_5x_cudnn_ampere_fp16_scudnn_fp16_128x64_relu_medium_nn_v1` | 5.702 ms |
+
+   Once the `.item()` sync in `update_gradients` is discounted (same pitfall as the `batch_loss.item()` cost in Q3), the stage that genuinely changes under AMP is the convolution kernel itself: cuDNN swaps to an FP16-specialized kernel and roughly halves its time (11.330 ms → 5.702 ms), while `forward_pass`/`calculate_loss`/`zero_grad` stay effectively unchanged and `backward` is marginally slower due to `GradScaler` bookkeeping.
 
 7. **Are visible CPU or input gaps present?**
 
@@ -533,8 +555,8 @@ Note: the FP32 "31 s" figure in Session 8 was logged as the scope "all batches (
 8. **Did CUDA kernel durations or names change?**
 
    Yes. The dominant convolution kernel differs by precision:
-   - FP32: `_5x_cudnn_ampere_scudnn_128x64_relu_xregs_large_nn_v1`
-   - AMP/FP16: `_5x_cudnn_ampere_fp16_scudnn_fp16_128x64_relu_medium_nn_v1`
+   - FP32: `_5x_cudnn_ampere_scudnn_128x32_relu_small_nn_v1` or `_5x_cudnn_ampere_scudnn_128x64_relu_xregs_large_nn_v1`
+   - AMP/FP16: `void implicit_convolve_sgemm<__half, __half, int, 1024, 5, 5, 3, 3, 3, 1, false, false, true>(int, int, int, __half const*, int, __half*, __half const*, kernel_conv_params, unsigned long long, int, float, float, int, __half const*, __half const*, bool, bool, int, int)` or `_5x_cudnn_ampere_fp16_scudnn_fp16_128x64_relu_medium_nn_v1`
 
    cuDNN selects a separate, FP16-specialized kernel (note the `fp16` name segment and the `medium` vs `large` tile/register configuration) rather than running the same kernel at a different dtype — direct evidence that autocast is changing which kernel cuDNN picks, not just reinterpreting the same kernel's bits.
 
@@ -549,3 +571,210 @@ Note: the FP32 "31 s" figure in Session 8 was logged as the scope "all batches (
 - The biggest avoidable cost found in this trace isn't precision-related at all: `batch_loss.item()` (~18 ms) dwarfs the actual loss computation (~147.2 µs) because it forces a CUDA sync every batch — worth removing from the hot loop (e.g. accumulate on-GPU and `.item()` once per epoch) before trusting any further timing comparisons.
 - The clearest AMP-driven change is the cuDNN kernel swap for convolution (Q6/Q8), which is the expected mechanism for the speedup: it is not that every kernel got proportionally faster, but that a specific, lower-precision-eligible kernel class (conv/BatchNorm) got replaced, while transfer, backward, and optimizer stages stayed roughly the same order of magnitude.
 
+
+## Session 10
+
+### Final report — FP32 vs. mixed-precision CIFAR-10 training
+
+#### 1. Environment
+
+| Field | Value |
+|---|---|
+| GPU | NVIDIA L4 (compute capability (8, 9)) |
+| PyTorch | 2.11.0+cu128 |
+| CUDA build | 12.8 |
+| cuDNN | 91900 |
+| BF16 natively supported | Yes — `torch.cuda.is_bf16_supported(including_emulation=False)` returns `True` |
+| Actual AMP dtype used | `torch.float16` |
+| `GradScaler` used | Yes, for the FP16 path (`torch.amp.GradScaler(device, enabled=True)`) |
+
+The Session 8/9 FP32-vs-AMP pair uses FP16 + `GradScaler`, not BF16, even though the GPU natively supports BF16. A separate precision-mode experiment ([output/cuda_fp16.txt](../Month%202/output/cuda_fp16.txt), and the CUDA BF16 run saved under the misleadingly named [output/mps_bf16.txt](../Month%202/output/mps_bf16.txt)) confirms BF16 runs on this GPU with no `GradScaler` and a near-identical accuracy curve to FP32/FP16, but that run uses a different, smaller LeNet-style model and was not profiled, so it is not used for the benchmark numbers below.
+
+#### 2. Model and data pipeline
+
+- Model: 4-conv CNN defined in [4_cifar_fp32_baseline.py](../Month%202/4_cifar_fp32_baseline.py) / [5_cifar_amp.py](../Month%202/5_cifar_amp.py) — `(Conv2d 3→64, BN, ReLU)` → `(Conv2d 64→64, BN, ReLU, MaxPool)` → `(Conv2d 64→128, BN, ReLU)` → `(Conv2d 128→128, BN, ReLU, MaxPool)` → `AdaptiveAvgPool2d(1,1)` → `Linear(128, 10)`.
+- Parameter count: **262,218** trainable parameters (`sum(p.numel() for p in model.parameters())`, confirmed in both scripts).
+- Data: `torchvision.datasets.CIFAR10`. Train transform: `ToImage → RandomHorizontalFlip → RandomCrop(32, padding=4) → ToDtype(float32, scale=True) → Normalize(0.5, 0.5, 0.5)`. Test uses the same deterministic tail without random crop/flip.
+
+#### 3. Shared experiment configuration
+
+| Field | Value |
+|---|---|
+| Optimizer | Adam |
+| Learning rate | 0.001 (constant) |
+| Scheduler | None |
+| Batch size | 1024 |
+| Loss function | `CrossEntropyLoss` |
+| Timing method | `torch.cuda.Event` start/end pair + `torch.cuda.synchronize()` |
+
+#### 4. FP32 result
+
+| Field | Value |
+|---|---|
+| Epochs | 15 |
+| Final test accuracy | 58% |
+| Single-batch step time | ~700 ms (includes one-time CUDA/cuDNN warm-up) |
+| 15-epoch wall time | 31 s (≈ 2.07 s/epoch average, including the warm-up epoch) |
+
+Accuracy stayed below the 70% target hit by the earlier CPU run (70%, 87 s) with identical hyperparameters — flagged in Session 8 as more likely run-to-run variance (shuffling, augmentation, weight init) than a device effect.
+
+#### 5. Mixed-precision result
+
+| Field | Value |
+|---|---|
+| Epochs | 1 (see Limitations) |
+| Final test accuracy | 68% |
+| Single-batch step time | 620–920 ms |
+| Logged "epoch time" | 31 s (scope not confirmed comparable to the FP32 figure — see Section 6) |
+
+#### 6. Benchmark comparison
+
+| Metric | FP32 | AMP (FP16) |
+|---|---:|---:|
+| Step time | ~700 ms | 620–920 ms |
+| Test accuracy | 58% | 68% |
+| Dominant conv kernel time (isolated 10k-image batch, [6_fp32_vs_amp.py](../Month%202/6_fp32_vs_amp.py)) | 11.330 ms (`..._scudnn_128x64_relu_xregs_large_nn_v1`) | 5.702 ms (`..._fp16_scudnn_fp16_128x64_relu_medium_nn_v1`) |
+
+| Stage | FP32 | FP16 |
+|---|---:|---:|
+| `forward_pass` time | 372 ms | 215 ms |
+
+Two speedup numbers come out of this data, and they disagree, which is itself the headline finding:
+
+- **Step-time ratio (wall clock, real DataLoader batches):** 700 / 620–920 ≈ **0.76x–1.13x** — essentially no reliable end-to-end win, within run-to-run noise.
+- **Kernel-level ratio (isolated conv kernel, synthetic batch):** 11.330 / 5.702 ≈ **1.99x** — close to the theoretical 2x for the one op that is actually FP16-accelerated.
+
+The 15-epoch wall-time rows are not used for the headline ratio: the FP32 "31 s" figure covers all 15 epochs, while the AMP run only executed 1 epoch, so the two "31 s" numbers in the raw logs are coincidental, not a like-for-like per-epoch comparison (flagged already in Session 9 notes).
+
+#### 7. Profiler observations
+
+From the paired-trace work in Session 9 ([cifarfp32_cuda_single_batch_training_loop.json](../Month%202/cifarfp32_cuda_single_batch_training_loop.json), [cifaramp_cuda_single_batch_training_loop.json](../Month%202/cifaramp_cuda_single_batch_training_loop.json), [cuda_simple_fp32_trace.json](../Month%202/cuda_simple_fp32_trace.json), [cuda_simple_amp_trace.json](../Month%202/cuda_simple_amp_trace.json)):
+
+- Host-to-device transfer: ~3 ms/batch, unchanged between FP32 and AMP.
+- Forward pass: ~5.68 ms (FP32) vs. ~5.64 ms (AMP) — effectively unchanged at the region level despite the conv kernel itself being ~2x faster, because the region also includes BatchNorm/ReLU/pooling ops and layout-conversion kernels (`nchwToNhwcKernel`/`nhwcToNchwKernel`) that run regardless of precision.
+- Backward: ~3.58 ms (FP32) vs. ~4.04 ms (AMP) — slightly *slower* under AMP due to `GradScaler` bookkeeping.
+- Optimizer step: ~2.71 ms (FP32) vs. ~3.54 ms (AMP, after removing a ~581 ms `.item()`-induced CUDA sync artifact that is not a real AMP cost).
+- `zero_grad`: ~0.09–0.10 ms, unchanged.
+- cuDNN selects a *different, FP16-specialized kernel* for the convolution under autocast (`implicit_convolve_sgemm<__half,...>` / `_5x_cudnn_ampere_fp16_scudnn_fp16_...`) rather than reinterpreting the same kernel's bits — direct evidence that autocast changes kernel selection, not just storage format.
+- A large avoidable CPU/GPU sync point exists in the hot loop (`batch_loss.item()`, ~18 ms per batch) that dwarfs the actual loss computation (~147 µs); this is a pipeline inefficiency, not a precision effect, and it would mask any real AMP speedup if left in a clean benchmark.
+
+#### 8. Why the speedup is not 2x
+
+Summing the per-stage numbers from Section 7 (excluding the `.item()` sync artifact) gives roughly 12.45 ms/step for FP32 and 13.70 ms/step for AMP on the synthetic 10,000-image profiled step — i.e. the one operation that halves in time (the convolution kernel, 11.33 ms → 5.70 ms) is only part of a step whose other parts stay the same size or grow slightly. This matches the curriculum's checklist point by point:
+
+- **Autocast does not convert every operation to FP16.** Only the conv/BatchNorm path inside `autocast` swaps kernels (Section 7); `BatchNorm`'s own reduction/normalization and the loss computation run in types chosen by PyTorch's op-level allow/deny list, not uniformly in FP16.
+- **Numerically sensitive ops stay in FP32.** `CrossEntropyLoss`'s softmax/log-sum-exp stays FP32-stable regardless of autocast, consistent with `calculate_loss` showing no measurable change (0.388 ms → 0.379 ms).
+- **Parameters and optimizer state stay FP32.** Checkpoints saved by `store_checkpoint` contain FP32 `model.state_dict()`/`optim.state_dict()` even for the AMP run — only the forward/loss activations are FP16 (`logits.dtype == torch.float16`), so Adam's moment updates in `update_gradients` do not benefit from the lower-precision kernel and instead got slightly slower under AMP (2.71 ms → 3.54 ms) because of `GradScaler`'s unscale/step bookkeeping.
+- **Data loading and CPU transforms don't speed up.** `RandomCrop`/`RandomHorizontalFlip`/`Normalize` run on the CPU in Python/`torchvision.transforms.v2` and are unaffected by the GPU's autocast context — not separately measured here, but they are a fixed, precision-independent floor under every batch.
+- **Host-to-device transfer doesn't halve.** Measured transfer stayed ~3 ms either way (Session 9) because the images are read, cropped, and transferred as FP32 tensors before the model is ever reached; FP16 only exists inside the forward/loss region.
+- **Kernel-launch overhead remains.** The layout-conversion kernels (`nchwToNhwcKernel`, `nhwcToNchwKernel`) appear in both FP32 and FP16 traces (Section 7 trace file inspection) — these launches aren't eliminated by autocast, they're just launched with half-size tensors.
+- **The optimizer gets little benefit from Tensor Cores.** Adam's elementwise moment/update math is not a matmul/conv op, so it isn't autocast-eligible and isn't Tensor-Core-accelerated — observed directly as a slower, not faster, optimizer stage under AMP.
+- **This CNN may not generate enough matrix work to saturate Tensor Cores.** With `batch_size=1024` and channel widths of 64/128, the conv workload is modest next to a GPU recipe tuned for much larger matmuls; the ~2x the convolution *does* achieve suggests the op itself is Tensor-Core-eligible, but the surrounding small ops (BatchNorm, pooling, zero_grad) never reach a scale where precision matters.
+- **Halving representation size doesn't halve every byte moved in the full step.** Only the forward/loss tensors are FP16; inputs, parameters, gradients, and optimizer state (momentum/variance buffers) stay FP32, so total step memory traffic shrinks by far less than 2x.
+- **End-to-end speedup is limited by the accelerated fraction of the step.** Using Amdahl's-law reasoning on the Section 7 numbers: the conv kernel is roughly 11.33/12.45 ≈ 91% of the *measured forward compute* here but a much smaller fraction of the full step once transfer, backward, optimizer, and `.item()`-style sync points are included — which is exactly why the step-time ratio (0.76x–1.13x) comes out far below the kernel-level ratio (1.99x).
+
+#### 9. Limitations
+
+- The AMP run only executed 1 epoch, not the full 15 used for the FP32 baseline, so the "epoch time" row in the raw logs is not a controlled comparison; only the single-batch step-time range and the isolated-kernel profiler numbers are treated as reliable here.
+- Neither run reached the 70% accuracy target reached by the earlier CPU baseline; FP32 (58%) and AMP (68%) are also not confirmed to share identical seeded initial weights, so the accuracy gap between them is more likely run-to-run variance than a precision effect.
+- GPU utilization was not measured with `nvidia-smi` or any other tool for either run, so that required field is not available and is reported here as not measured rather than guessed.
+- The 2x-ratio comparison in Section 7 came from a single synthetic, unprofiled-pipeline batch (`6_fp32_vs_amp.py`, random 10,000×3×32×32 tensors, no DataLoader/augmentation), so it isolates stage costs well but is not itself a clean end-to-end benchmark.
+- BF16 was never run through the same profiled FP32/AMP trace pair — the only BF16 evidence comes from a separate, smaller LeNet-style model/script, so this report cannot compare BF16 against FP16 on the same 4-conv CNN.
+- The `batch_loss.item()` sync cost (~18 ms/batch) was identified but not removed before the benchmark numbers above were collected, so the reported AMP step times still include some of that avoidable overhead.
+
+### Oral Report
+
+1. Why is a GPU not simply a faster CPU?
+
+A GPU is not simply a faster CPU because they prioritize different kinds of performance. A CPU is designed to execute individual instruction streams quickly, including work with dependencies and complex control flow. A GPU is designed for high throughput by executing many threads concurrently. This makes a GPU well suited to large amounts of independent work, but adding more execution lanes cannot remove a sequential dependency chain.
+
+2. What does the CPU do when a CUDA kernel is launched?
+
+When a CUDA kernel is launched, the CPU runs the host-side code needed to submit the kernel and its arguments to a CUDA stream. The launch is normally asynchronous: the CPU can continue executing and submitting more work without waiting for the GPU to finish. Operations within the same stream execute in order. Synchronization or some operations like `item()` which need the info to be transfered to the CPU, forces the CPU to wait when completion is required.
+
+3. What is an SM?
+
+An SM, or Streaming Multiprocessor, is a hardware unit within an NVIDIA GPU containing multiple execution units, warp schedulers, registers, and shared memory. Thread blocks are assigned to SMs, and each block’s threads are organized into warps. Multiple blocks can reside on one SM when resources permit, and the schedulers issue instructions from ready warps.
+
+4. What is a warp?
+
+A warp is a group of 32 threads that an SM schedules for execution. When an instruction is issued for a warp, the participating threads execute that instruction using their own data and private registers. Threads in the warp belong to the same block, but have different thread indices.
+
+| Memory        | Who can access it?                                                    |
+| ------------- | --------------------------------------------------------------------- |
+| Registers     | The owning thread                                                     |
+| Shared memory | Threads within the same thread block                                  |
+| Global memory | Threads across different blocks and SMs, given an appropriate address |
+
+5. Why is shared memory useful when global memory already exists?
+
+Shared memory provides fast, programmer-managed, on-chip storage that threads within a block can share. It is useful for reusing data and exchanging intermediate results, reducing repeated global-memory accesses. That can improve throughput when memory access is limiting performance.
+
+6. What is the difference between compute-bound and memory-bound work?
+
+Compute-bound work is limited primarily by how quickly the processor can execute calculations. Memory-bound work is limited primarily by accessing or moving data. For a memory-bandwidth-bound kernel, increasing arithmetic capacity alone offers little benefit; increasing memory bandwidth or reducing memory traffic can help. Arithmetic intensity—operations per byte moved—helps us reason about which limit is more likely.
+
+7. What is launch-bound work?
+
+Launch-bound work is limited by the overhead or rate of launching kernels rather than by their arithmetic or memory throughput. It commonly occurs with many tiny kernels whose execution is too short to hide the launch overhead. I would look for short kernels and GPU idle gaps aligned with CPU-side submission activity, rather than simply adding launch-call durations to GPU time.
+
+8. Why can GPU utilization be high while execution remains inefficient?
+
+GPU utilization can be high because kernels remain active, but that does not show how effectively they use the hardware. They might perform redundant work or use execution resources poorly. However, low arithmetic throughput alone is not proof of inefficiency: a memory-bound kernel may already be efficient if it approaches its relevant memory-bandwidth limit.
+
+9. What does autocast decide?
+
+Autocast chooses execution dtypes for eligible operations using predefined, device-specific policies. It runs suitable operations, such as matrix multiplication and convolution, in lower precision for performance, while retaining FP32 for operations whose numerical behavior benefits from it. It does not permanently convert the model’s FP32 parameters, and it does not dynamically test whether each input is safe in FP16.
+
+Eg: 
+
+```text
+total = a large value
+add a very small value to total #need fp32 here for precision
+repeat many times
+```
+
+10. Why does FP16 commonly need gradient scaling?
+
+FP16 has a limited representable range, so small gradients can underflow to zero during backward. Gradient scaling multiplies the loss before backward, which scales the gradients and helps preserve those small values. The gradients are then unscaled before the optimizer updates the parameters.
+pytorch
+
+11. Why does BF16 normally have less underflow risk than FP16?
+
+```
+FP32 range:
+  max           : 01111111011111111111111111111111  ->  3.402823e+38
+  min (lowest)  : 11111111011111111111111111111111  ->  -3.402823e+38
+  min normal    : 00000000100000000000000000000000  ->  1.175494e-38
+  min subnormal : 00000000000000000000000000000001  ->  1.401298e-45
+
+FP16 range:
+  max           : 0111101111111111  ->  6.550400e+04
+  min (lowest)  : 1111101111111111  ->  -6.550400e+04
+  min normal    : 0000010000000000  ->  6.103516e-05
+  min subnormal : 0000000000000001  ->  5.960464e-08
+
+BF16 range:
+  max           : 0111111101111111  ->  3.389531e+38
+  min (lowest)  : 1111111101111111  ->  -3.389531e+38
+  min normal    : 0000000010000000  ->  1.175494e-38
+  min subnormal : 0000000000000001  ->  9.183550e-41
+```
+
+BF16 has 8 exponent bits, compared with FP16’s 5, so it can represent much smaller nonzero magnitudes and normally has less underflow risk. FP16 has more fraction bits—10 versus BF16’s 7—so it offers finer precision within its normal range, but a narrower range overall.
+
+12. Why must CUDA timing account for asynchronous execution?
+
+CUDA launches are asynchronous, so a CPU timer can finish measuring before GPU execution completes. For wall-clock timing, synchronize before starting to exclude earlier queued work and before stopping to include completion of the measured work. Alternatively, use CUDA events and wait for the ending event before reading their elapsed time.
+
+13. Why is clean benchmark timing separated from profiler timing?
+
+Clean timing is separated from profiling because collecting execution events, shapes, and stack traces adds overhead and may change runtime behavior. I use unprofiled, warmed-up, correctly synchronized measurements to establish performance, then profiler traces to explain bottlenecks. I verify any improvement with another clean benchmark.
+
+14. How would a DataLoader bottleneck appear in a trace?
+
+A DataLoader bottleneck would appear as a long batch-retrieval region on the CPU overlapping a GPU idle gap. The next batch’s transfer and computation cannot proceed until retrieval completes. A long DataLoader region alone is not sufficient evidence, because loading may overlap useful GPU work.
+
+15. Why was your measured AMP speedup not 2x?
+
+AMP did not give a 2× end-to-end speedup because it did not halve the duration of every part of my training step. I observed faster convolutions under FP16, but other work remained, including operations executed in FP32. AMP can also add dtype-conversion and gradient-scaling work. Overall speedup depends on how much of the original runtime was accelerated, how much those operations improved, and any additional overhead—not simply on FP16 having half as many bits as FP32.

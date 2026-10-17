@@ -171,3 +171,41 @@ Timespent: 1 hour
 Finished coding of session 9 and took output traces and compared it. Still some questions are pending. Start with checking https://www.perplexity.ai/search/0ffadfae-c23a-4b92-81ec-e4e5c001f56c tomorrow. check the kernel differences. Recheck the session 9 notes for the questions.
 
 I guess I can finish both session 9 and 10 tomorrow.
+
+## 2026-10-13
+
+Timespent: 10 mins
+
+Wokeup at 6AM, but kids got me occupied. So didn't do much. ALso, I was distracted with other work (which I shouldn't have started). Tomorrow start with https://www.perplexity.ai/search/0ffadfae-c23a-4b92-81ec-e4e5c001f56c and finish session 9 and hop to session 10.
+
+
+## 2026-10-14
+
+Timespent: 1 hour
+
+Done with session 9, properly took the profiling traces for fp32 and amp and compared and written answers to the questions.
+
+Finish session 10 tomorrow and see what is month 3 about.
+
+## 2026-10-15
+
+Timespent: 1 hour
+
+In session 10, out of 15 questions, 10 are done https://www.perplexity.ai/search/2c42c5b9-8d7a-4893-a70e-2ea85da36fc1 . 
+
+- [x] Learn fp32 vs fp16 vs bf16 https://www.perplexity.ai/search/4b7966dc-74c2-4a02-b055-5a09739d1164?preview=1
+- [x] I need to finish balance 5 tomorrow
+- [x] Write top to bottom lecture notes
+- [ ] See month3's work and wrap up the mind.
+
+## 2026-10-16
+
+Timespent: 1 hour but distracted with local area early morning music.
+
+But I got the work done somehow. For Month3, finish session 0 to session 4 in 1 shot, as I have already finished micrograd before. So, read that code, understand it, internalize it again. Inform the same in notes properly. Then see the problem statement in session 5
+
+## 2026-10-17
+
+Timespent: 2-3 hours scattered
+
+Finished till session 4 and coded micrograd and did a sample training loop with loss being minimized for each epoch.
