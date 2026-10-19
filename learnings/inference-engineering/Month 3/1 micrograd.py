@@ -99,13 +99,13 @@ class Value:
         return self.__add__(other * -1)
     
     def __radd__(self, other):
-        return self.__add__(other)
+        return other.__add__(self)
     
     def __rmul__(self, other):
-        return self.__mul__(other)
+        return other.__mul__(self)
     
     def __rsub__(self, other):
-        return self.__sub__(other)
+        return other.__sub__(self)
     
     def __truediv__(self, other):
         other = self._clean(other)

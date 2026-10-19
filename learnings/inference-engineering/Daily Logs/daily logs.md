@@ -196,7 +196,7 @@ In session 10, out of 15 questions, 10 are done https://www.perplexity.ai/search
 - [x] Learn fp32 vs fp16 vs bf16 https://www.perplexity.ai/search/4b7966dc-74c2-4a02-b055-5a09739d1164?preview=1
 - [x] I need to finish balance 5 tomorrow
 - [x] Write top to bottom lecture notes
-- [ ] See month3's work and wrap up the mind.
+- [x] See month3's work and wrap up the mind.
 
 ## 2026-10-16
 
@@ -209,3 +209,20 @@ But I got the work done somehow. For Month3, finish session 0 to session 4 in 1 
 Timespent: 2-3 hours scattered
 
 Finished till session 4 and coded micrograd and did a sample training loop with loss being minimized for each epoch.
+
+## 2026-10-18
+
+Timespent: 4 hours scattered
+
+Coded bigram model with plain python and single neuron and tested it. Main thing for me to remember is that we used the NN based model to compute the probability distribution over the next character given the current character, which we found directly in the count based model. Another gotcha is how float16 changed 4410 to 4408.
+
+Tomorrow is holiday. So I can spend more time on session 8, which is building the makemore but with multi-layered perceptrons. Yeah.. Start with watching https://youtu.be/TCH_1BHY58I first to get good glimpse and for faster coding.
+
+## 2026-10-19
+
+Timespent: 3 hours scattered
+
+Recalled MLP from Andrej's ipynb and coded it without seeing his implementation (except for 2 things). All good. We can wrap the month 3's work now and move on to the next part of the curriculum. From 17-19, I had 3 days holiday, so I was able to spend a good amount of time to get the month3 works done. Feeling satisfied with the progress. I need to write curriculum for month4 and get started from tomorrow.
+
+- [ ] create month4 curriculum
+- [ ] start the batch normalization and understand it deeply
