@@ -1,80 +1,46 @@
-# Month 2 Curriculum: GPUs, Mixed Precision, and Profiling
+# Month 2 — GPUs, Mixed Precision, and Profiling
 
-## Month objective
+## Goal
 
-Month 2 changes the question from **“Is the model mathematically correct?”** to **“What does the machine actually do when the model runs, where does time go, and why?”** By the end, a training step should no longer look like one Python call: it should look like CPU input work, host-to-device transfer, CUDA kernel launches, execution on SMs, reads and writes through a memory hierarchy, synchronization, and optimizer work.
+Month 2 changes the question from **“Is the model mathematically correct?”** to **“What is the computer doing when the model runs, where does the time go, and why?”**
 
-The final outcome is one controlled CIFAR-10 experiment comparing FP32 with mixed precision, supported by benchmark measurements and profiler traces—not merely an accuracy notebook. The goal is not to become a CUDA kernel expert this month; it is to acquire the hardware and measurement model needed for every later inference-engineering phase.
+The final outcome is a controlled CIFAR-10 experiment comparing FP32 with mixed-precision training. You will collect profiler traces, compare performance, and explain why mixed precision does not automatically produce a 2x end-to-end speedup.
 
-## Starting position
+Month 2 is **not** a CUDA-kernel mastery month. Triton programming, custom CUDA extensions, tiled matrix multiplication, roofline calculations, occupancy tuning, and detailed Nsight Compute analysis are deferred to the later GPU-programming phase.
 
-The available learning log shows that the PyTorch basics, CIFAR-10 training loop, model save/load, basic multi-GPU concepts, and einops basics have been completed. It also shows that Month 1's five-case, 20-seed autograd parity harness was still unfinished at the last entry.[^1]
+## Required outcome
 
-Complete the following gate before Session 3 of this plan:
+By the end of the month, you must be able to:
 
-- Finish all five Month 1 parity cases: linear, two-layer MLP, ReLU/softmax MLP, manual L2 regularization, and toy RNN.
-- Run all cases across 20 seeds with `max_abs_diff < 1e-6`.
-- Explain what `.backward()` accumulates into `.grad`, why gradients must be cleared, and where `.detach()` cuts the graph.
-
-The CIFAR-10 loop already written in Month 1 should become the starting point for Project A2. Do not copy a polished trainer: refactor the existing loop so that each new system feature is understood as a change to known code.
-
-## Learning outcomes
-
-At the end of Month 2, you should be able to:
-
-- Draw the path from a PyTorch operation to an ATen operation, CUDA launch, kernel, SM, warp, and memory access.
-- Explain grids, thread blocks, warps, SMs, registers, shared memory/SRAM, cache, and global device memory.
-- Estimate the FLOPs and transferred bytes of a simple operation and use arithmetic intensity to predict whether compute or memory is the likely limiter.
-- Distinguish GPU utilization, SM occupancy, memory-bandwidth utilization, and actual useful throughput.
-- Explain FP32, FP16, BF16, autocasting, accumulation precision, underflow, overflow, and gradient scaling.
-- Add AMP correctly without manually converting the model or input tensors to half precision.
-- Benchmark CUDA code without accidentally timing only asynchronous kernel dispatch.
-- Capture and interpret a PyTorch Profiler trace with CPU and CUDA activity, input shapes, memory, and named regions.
-- Separate data loading, host-to-device transfer, forward/loss, backward, and optimizer time.
-- Explain from first principles why halving an operand's bytes cannot guarantee a 2x end-to-end speedup.
-
-## Important hardware correction
-
-The source curriculum says “T4 or better” and specifically asks for BF16. These requirements do not fully agree. NVIDIA's T4 specification advertises FP32, FP16, INT8, and INT4 execution, while native CUDA BF16 types require compute capability 8.0 or newer. Therefore:[^2][^3]
-
-- **Strict BF16 project:** use an Ampere-or-newer GPU on which `torch.cuda.is_bf16_supported(including_emulation=False)` returns `True`; PyTorch provides this API specifically to test BF16 support.[^4]
-- **Free T4 fallback:** run FP32 versus FP16 autocast with `GradScaler`, clearly label the deviation, and repeat only the final benchmark/profile on a native-BF16 machine if one becomes available.
-- **Do not silently call a T4 FP16 run “BF16.”** Hardware identity and dtype are experimental metadata.
-
-Run this preflight before doing any measurements:
-
-```python
-import platform
-import torch
-
-print("Python:", platform.python_version())
-print("PyTorch:", torch.__version__)
-print("CUDA build:", torch.version.cuda)
-print("CUDA available:", torch.cuda.is_available())
-
-if torch.cuda.is_available():
-    print("GPU:", torch.cuda.get_device_name(0))
-    print("Capability:", torch.cuda.get_device_capability(0))
-    print("BF16 native:", torch.cuda.is_bf16_supported(including_emulation=False))
-    print("cuDNN:", torch.backends.cudnn.version())
-```
-
-Save the output in the final report. Never compare runs performed on different GPU types as if precision were the only changed variable.
+- Explain the basic path from a PyTorch operation to GPU kernel execution.
+- Explain kernels, SMs, warps, registers, shared memory, and global GPU memory.
+- Distinguish basic compute-, memory-, launch-, and input-bound behavior.
+- Explain FP32, FP16, BF16, autocast, underflow, overflow, and gradient scaling.
+- Add AMP correctly to a PyTorch training loop.
+- Measure CUDA execution without relying on an unsynchronized Python timer.
+- Capture and open a PyTorch Profiler trace with `record_shapes=True`.
+- Identify data loading, transfer, forward, backward, and optimizer work in a trace.
+- Compare FP32 with mixed precision on CIFAR-10.
+- Explain why the measured speedup is not 2x.
 
 ## Work structure
 
-Follow the sessions in order. A session is 60–120 focused minutes; training jobs can continue after the study portion. The plan is approximately 15 hours per week for four weeks, but session numbering makes it usable even if office work causes an uneven calendar.
+Sessions 0–3 are retained from the original plan. Sessions 4–10 replace the previous over-scoped Sessions 4–26.
 
-| Stage | Sessions | Main result |
+| Stage | Sessions | Result |
 |---|---:|---|
-| Closure and setup | 0–2 | Month 1 closed; reproducible GPU environment |
-| GPU tooling | 3–6 | PyTorch-to-kernel execution map |
-| GPU architecture | 7–11 | Compute/memory and roofline mental model |
-| Mixed precision | 12–16 | Correct FP32 and AMP training paths |
-| Profiling | 17–20 | Labeled traces and bottleneck diagnosis |
-| Project A2 | 21–26 | Controlled experiment, report, oral defense |
+| Month 1 closure and setup | 0–2 | Correctness harness and reproducible trainer |
+| GPU tooling introduction | 3–4 | Basic execution and profiling-tool mental model |
+| GPU architecture | 5 | Basic hardware and memory model |
+| Mixed precision | 6 | AMP integrated into the trainer |
+| PyTorch Profiler | 7 | One working trace and an instrumented trainer |
+| Project A2 | 8–10 | FP32/AMP results, paired traces, and report |
 
-## Stage 0: Close Month 1
+At your current pace, Sessions 4–10 should require approximately 21–28 focused hours. Model training can run unattended and does not count as focused study time.
+
+---
+
+## Stage 0 — Close Month 1
 
 ### Session 0 — Parity harness
 
@@ -131,9 +97,9 @@ month2/
   README.md
 ```
 
-## Stage 1: GPU tooling
+## Stage 1 — GPU tooling
 
-GPU MODE Lecture 1 is explicitly the lecture on profiling and integrating CUDA kernels into PyTorch, with its notebook/slides located in `lecture_001`. Its examples move among ordinary PyTorch, Triton, inline C++/CUDA extensions, and NVIDIA profiling tools; `load_inline` handles source generation, Python binding, compilation, and loading of an extension.[^5][^6]
+GPU MODE Lecture 1 introduces several routes from PyTorch to GPU execution and several profiling tools. The goal this month is to understand what each route or tool is for—not to master all of them.
 
 ### Session 3 — Watch Lecture 1 once
 
@@ -148,191 +114,337 @@ Watch without coding. Capture answers to only these questions:
 
 Do not pause to understand every line of CUDA. The first pass is a map of the territory.
 
-### Session 4 — Re-run the square examples
+### Session 4 — Consolidate Lecture 1
 
-Work through the Lecture 1 repository examples in this order:
+#### Objective
+
+Build a clear mental model of how a PyTorch GPU operation is launched and what each profiling or kernel tool is used for.
+
+You are **not** required to write a Triton kernel, compile a custom CUDA extension, or operate Nsight Compute in this session.
+
+#### Learn
+
+Create this table in your own notes and explain every row in your own words:
+
+| Tool or mechanism | What you must understand |
+|---|---|
+| PyTorch tensor operation | A high-level operation that may dispatch one or more CPU or GPU kernels |
+| CUDA kernel | A function that executes parallel work on the GPU |
+| `torch.utils.cpp_extension.load_inline` | A way to compile and load custom C++/CUDA code into PyTorch |
+| Triton | A higher-level language and compiler for writing GPU kernels |
+| PyTorch Profiler | Connects PyTorch operators with CPU activity and CUDA execution |
+| Nsight Systems | Displays the wider CPU/GPU timeline, including launches, copies, kernels, and idle gaps |
+| Nsight Compute | Examines an individual kernel using detailed hardware metrics |
+
+#### Practical work
+
+Run only these Lecture 1 examples if your environment permits:
 
 1. Plain PyTorch square.
 2. PyTorch Profiler square.
-3. Triton square.
-4. `torch.utils.cpp_extension.load_inline` square.
-5. Nsight Systems/Compute command examples if the runtime permits them.
 
-For each implementation, record:
+For the Triton and `load_inline` examples:
 
-- Input shape and dtype.
-- Correctness check against `x.square()`.
-- First-run time versus warmed-up time.
-- Number/names of visible kernels.
-- What compilation or launch overhead occurred.
+- Read the code.
+- Identify where the input tensor enters.
+- Identify where the GPU implementation is defined.
+- Identify how the result returns to PyTorch.
+- Do not spend time fixing compiler, CUDA-toolkit, or environment problems.
 
-**Assignment M2.1:** Make the square implementation fail in three ways—CPU tensor passed to CUDA extension, non-contiguous tensor, and unsupported dtype. For each failure, write where validation should happen and whether the error belongs to Python, the C++ binding, or the CUDA kernel boundary.
+#### Assignment M2.1
 
-### Session 5 — Tool hierarchy
+Answer these questions without notes:
 
-Create a one-page “profiling zoom lens”:
+1. When `y = x.square()` runs on a CUDA tensor, what work happens on the CPU and what happens on the GPU?
+2. What is a CUDA kernel launch?
+3. Why can many small GPU operations be slower than one fused operation?
+4. When would you use PyTorch Profiler?
+5. When would you move from PyTorch Profiler to Nsight Systems?
+6. When would you move from PyTorch Profiler to Nsight Compute?
+7. What problem do Triton and `load_inline` each solve?
 
-| Tool | Scope | Primary question |
+#### Deliverable
+
+Create a short `lecture1-notes.md` containing:
+
+- The tool table.
+- A CPU-to-GPU execution sketch.
+- Your answers to the seven questions.
+- One profiler screenshot or the top-operations table from the square example.
+
+#### Exit criteria
+
+- You can explain the purpose of every tool in the table.
+- You can describe the basic path from a PyTorch call to GPU execution.
+- You understand that writing and tuning custom kernels is deferred until the later GPU-programming phase.
+
+---
+
+## Stage 2 — GPU architecture
+
+### Session 5 — Lecture 4 and the GPU mental model
+
+#### Goal
+
+Build enough of a GPU mental model to distinguish four possible limits: computation, memory movement, kernel-launch overhead, and input preparation.[^1]
+
+The assigned material is GPU MODE Lecture 4, **"Intro to Compute and Memory Architecture,"** taught by Thomas Viehmann; the official repository provides its notebook and slides in `lecture_004`.[^2]
+
+#### Timebox
+
+Plan for **about 2 hours**. Do not try to master CUDA kernel writing today; the target is to explain where work runs, how it is grouped, and why a workload can be slow.
+
+| Time | Task | Required output |
 |---|---|---|
-| Python timer | End-to-end | How long did the caller wait? |
-| CUDA events | Device interval | How long did queued GPU work take? |
-| PyTorch Profiler | Framework operators + kernels | Which model regions/operators consume time and memory? |
-| Nsight Systems | Whole-system timeline | Where are CPU, CUDA API, copies, kernels, and idle gaps? |
-| Nsight Compute | One/few kernels | Why is this kernel slow at the hardware-counter level? |
+| 0–15 min | Build the execution hierarchy from memory | One hand-drawn or Markdown diagram |
+| 15–75 min | Watch GPU MODE Lecture 4 | Short timestamped notes |
+| 75–100 min | Inspect one available GPU | Device facts and a memory calculation |
+| 100–120 min | Classify bottlenecks and answer the checkpoint | Completed notes file |
 
-The PyTorch Profiler records CPU and CUDA activities, can attach input shapes and memory information, and supports custom labels through `record_function`. Nsight Compute is a later zoom level; Month 2 requires familiarity with its purpose, not mastery.[^7]
+#### Pre-watch
 
-### Session 6 — Asynchronous execution lab
-
-Time one CUDA operation incorrectly with `time.perf_counter()`, then time it correctly after warm-up using either CUDA events or explicit synchronization. CUDA work is asynchronous with respect to the host, so an unsynchronized CPU timer may measure enqueue time rather than execution; NVIDIA recommends CUDA events and warm-up for device timing.[^8]
-
-**Deliverable:** a table comparing naive CPU timing, synchronized wall time, and CUDA-event time. Explain why they differ.
-
-**First-principles check:** If Python immediately returns after launching a kernel, which processor is doing work, and what event forces the CPU to wait?
-
-## Stage 2: GPU architecture
-
-CUDA's execution model treats the GPU as a collection of streaming multiprocessors. A thread block executes on one SM, threads in a block are grouped into warps of 32, and each SM has local registers and shared memory. These are the minimum facts needed to reason about Lecture 4 rather than memorizing terminology.[^9]
-
-### Session 7 — Pre-read before Lecture 4
-
-Learn this hierarchy and redraw it from memory:
+Write this hierarchy **without copying it first**:
 
 ```text
-CPU program
-  -> launches kernel
-GPU grid
-  -> many thread blocks
-thread block
-  -> assigned to one SM
-  -> divided into warps
-warp
-  -> 32 lanes/threads executing SIMT instructions
-thread
-  -> registers and per-thread state
+Python/PyTorch program on CPU
+  -> launches a GPU kernel
+GPU
+  -> contains streaming multiprocessors (SMs)
+SM
+  -> receives thread blocks and schedules warps
+Thread block
+  -> cooperating threads; stays on one SM
+Warp
+  -> 32 NVIDIA threads scheduled as a group
+Thread
+  -> executes the kernel on its own data
 ```
 
-Answer:
+The curriculum explicitly introduces the path from CPU program to GPU, then GPU to SMs, SMs to thread blocks and warps, and defines an NVIDIA warp as 32 threads. NVIDIA's programming guide confirms that blocks are divided into 32-thread warps using the SIMT execution model.[^3][^1]
 
-- Why can threads in one block cooperate cheaply?
-- Why can two arbitrary blocks not assume simultaneous execution?
-- Why should common block sizes generally be multiples of 32?
-- What happens when lanes in one warp take different branches?
+Before starting the lecture, answer these from first principles:
 
-### Session 8 — Watch Lecture 4
+1. If Python calls `torch.add`, which processor runs Python and which processor performs the tensor arithmetic when the tensors are on CUDA?
+2. Why does a GPU need thousands of lightweight threads instead of one extremely powerful thread?
+3. If a block has 256 threads, how many warps does it contain?
+4. Why must a thread block fit on one SM rather than being split across SMs?
 
-Watch the lecture without implementing. Focus on the causal chain:
+Do not look up polished answers yet. Mark each answer as **confident**, **uncertain**, or **guess**.
+
+#### Watch Lecture 4
+
+Open the official Lecture 4 notebook, slides, and recording from the GPU MODE materials. Watch for concepts rather than copying implementation details; the lecture covers compute and memory architecture and demonstrates fusion, launch latency, naive matrix multiplication, tiled matrix multiplication, shared memory, synchronization, coalescing, and occupancy.[^4][^5][^2]
+
+Pause and write one or two sentences at each of these points:
+
+- **CPU versus GPU:** CPU optimizes latency for a few complex tasks; GPU optimizes throughput across many parallel tasks.
+- **Kernel launch:** The CPU submits work; the launch itself has non-zero overhead, even if the kernel does almost nothing.
+- **SM, block, warp, thread:** Explain each term and the containment/assignment relationship.
+- **Memory hierarchy:** At minimum distinguish registers, shared memory/cache, and global GPU memory.
+- **Fusion:** Explain why replacing several elementwise kernels with one kernel can reduce both launch overhead and repeated memory traffic.
+- **Tiling:** Explain why loading a tile once into shared memory can allow many arithmetic operations to reuse it.
+- **Occupancy:** Treat it as the amount of potentially runnable work resident on an SM, not as a guarantee of speed.
+
+Do **not** spend the session debugging or rewriting the CUDA extension. Running the notebook is optional; understanding what each experiment demonstrates is mandatory.
+
+#### GPU inspection
+
+Run this in the same environment used for Month 2:
+
+```bash
+nvidia-smi
+```
+
+Then run:
+
+```python
+import torch
+
+assert torch.cuda.is_available()
+p = torch.cuda.get_device_properties(0)
+
+print("GPU:", p.name)
+print("SM count:", p.multi_processor_count)
+print("Total VRAM GiB:", p.total_memory / 1024**3)
+print("Max threads/block:", p.max_threads_per_block)
+print("Warp size:", p.warp_size)
+```
+
+Record the output. Then calculate:
 
 ```text
-operation shape
-  -> amount of work and data movement
-  -> kernel launch/grid
-  -> blocks scheduled on SMs
-  -> warps execute
-  -> registers/shared memory/global memory are accessed
-  -> one resource becomes the throughput limiter
+warps per 256-thread block = ceil(256 / warp_size)
 ```
 
-Capture the lecture's examples around approximate GELU fusion, launch latency, tiled matrix multiplication, and occupancy. The notebook asks why an unfused GELU is slow, measures empty-kernel launch latency, and explores tiled matmul and resource-limited occupancy.[^10]
+On an NVIDIA GPU with a warp size of 32, the result should be 8. NVIDIA documents that block sizes are converted into warps by grouping threads in sets of 32.[^3]
 
-### Session 9 — Memory hierarchy worksheet
+If no CUDA GPU is available, use the displayed RTX 3090 example from the lecture notes instead and label the values as **lecture hardware, not my hardware**.[^4]
 
-Build a conceptual comparison; do not memorize architecture-specific nanosecond values.
+#### Bottleneck exercise
 
-| Tier | Scope | Relative capacity | Relative speed | Main use |
-|---|---|---|---|---|
-| Registers | One thread | Tiny | Fastest | Scalars and local intermediates |
-| Shared memory/SRAM | One block on an SM | Small | Very fast | Explicit data reuse and cooperation |
-| L1/L2 cache | SM/device | Medium | Intermediate | Reuse captured by hardware caching |
-| Global device memory | Whole GPU | Large | Slowest on-device tier | Parameters, activations, inputs, outputs |
-| Host memory | CPU side | Very large | Across PCIe/interconnect | Dataset and application state |
+For each scenario, choose the **first bottleneck hypothesis** and justify it in one sentence. This is a hypothesis, not a profiler-confirmed conclusion.
 
-For each of these operations, estimate input/output bytes and useful arithmetic operations:
+| Scenario | First hypothesis to test | Reasoning target |
+|---|---|---|
+| Add two very large tensors | Memory movement | Very little arithmetic is performed per value loaded and stored |
+| Launch hundreds of tiny elementwise operations | Kernel-launch overhead | Fixed launch cost can dominate tiny kernels |
+| Perform one large dense matrix multiplication | Computation, or memory depending on shape/reuse | Each loaded value can participate in many operations |
+| GPU waits while the next batch is decoded on CPU | Input preparation | The accelerator has no ready work |
+| Replace several elementwise GELU operations with one fused kernel | Lower launch and memory overhead | Intermediate values need not repeatedly travel through global memory |
 
-- `y = x + 1`
-- `y = gelu(x)` written as several separate tensor operations
-- Fused `y = gelu(x)`
-- Matrix multiplication `C = A @ B`
-- 2D convolution
+The lecture's approximate-GELU and empty-kernel experiments are designed to expose fusion benefits and launch latency, while its naive and tiled matrix-multiplication examples introduce data reuse through shared memory.[^5][^4]
 
-The purpose is to discover reuse. Fusion can reduce intermediate writes/reads and launch overhead; tiling can load a value from global memory once and reuse it many times from shared memory.
+#### Deliverable
 
-### Session 10 — Roofline reasoning
+Create `session5-gpu-mental-model.md` with exactly these sections:
 
-Learn these definitions:
+```markdown
+# Session 5 — GPU Mental Model
 
-\[
-\text{Arithmetic intensity} = \frac{\text{useful FLOPs}}{\text{bytes moved from limiting memory tier}}
-\]
+## My GPU
+- Name:
+- SM count:
+- VRAM:
+- Warp size:
+- Max threads per block:
 
-\[
-\text{Attainable performance} \leq \min(\text{peak compute},\; \text{memory bandwidth} \times \text{arithmetic intensity})
-\]
+## Execution hierarchy
+[my diagram]
 
-Use them qualitatively:
+## Terms in my words
+- Kernel:
+- SM:
+- Thread block:
+- Warp:
+- Thread:
+- Register:
+- Shared memory:
+- Global memory:
 
-- Low arithmetic intensity suggests memory bandwidth can dominate.
-- High arithmetic intensity provides a chance to become compute-bound.
-- Small workloads can instead be launch- or CPU-bound because they do not expose enough parallel work.
-- A high GPU-Util number alone does not prove good efficiency.
+## Four bottlenecks
+| Bottleneck | What is limiting progress? | Example | Profiler clue |
+|---|---|---|---|
+| Compute | | | |
+| Memory movement | | | |
+| Kernel launch | | | |
+| Input preparation | | | |
 
-`nvidia-smi` defines GPU utilization as the percentage of a sampling period in which one or more kernels executed; it does not say how many SMs were productively used. A single continuously running but inefficient kernel can therefore report high utilization.[^11]
+## Lecture observations
+- Empty kernel:
+- GELU fusion:
+- Naive matmul:
+- Tiled matmul:
 
-**Assignment M2.2:** Predict the likely bottleneck for vector add, large matmul, tiny matmul, unfused elementwise chain, and DataLoader-starved CNN. Then design one measurement that could falsify each prediction.
+## Checkpoint answers
+1. ...
+```
 
-### Session 11 — Lecture 4 coding pass
+#### Checkpoint
 
-Return to the Lecture 4 notebook and run the GELU, empty-kernel, and tiled-matmul sections. For each:
+Finish by answering these without notes:
 
-- Verify correctness before measuring speed.
-- Warm up before collecting timing.
-- Change problem size or tile size.
-- Explain the result using launch overhead, data reuse, occupancy, or bandwidth.
+1. Starting from `torch.add(a, b)`, describe the path from the CPU call to GPU execution.
+2. What is an SM?
+3. What is the difference between a block and a warp?
+4. How many warps are in a 256-thread block on NVIDIA hardware?
+5. Why can an elementwise operation be memory-bound even though the GPU has many arithmetic units?
+6. Why can several tiny kernels be slower than one fused kernel?
+7. Why can a GPU show low utilization even when its kernel is fast?
+8. In tiled matrix multiplication, what data is reused and where is it temporarily stored?
 
-**Exit check:** Why can a fused kernel be faster even when it performs approximately the same mathematical operations?
+You are done only when answers 1–7 can be explained aloud in plain language and the answer to question 4 can be derived rather than recalled. Question 8 may remain partially uncertain at this point, but the explanation should identify shared-memory reuse. The session's architectural goal is reasoning about computation, data movement, launch overhead, and input preparation—not writing an optimized CUDA kernel.[^1]
 
-## Stage 3: Mixed precision
+#### Answer check
 
-PyTorch AMP assigns operation-specific dtypes inside an autocast region: operations such as convolutions and linear layers can use FP16/BF16, while numerically sensitive reductions may remain FP32. Autocast should cover the forward pass and loss, not the optimizer or a manually half-cast model; backward is run outside the autocast context.[^12][^13]
+Use this only after attempting the checkpoint:
 
-### Session 12 — Floating-point foundations
+1. Python runs on the CPU; PyTorch dispatches a CUDA operation; the CPU enqueues a kernel; the GPU schedules its blocks onto SMs; each SM divides blocks into warps and issues their instructions.
+2. An SM is a GPU execution cluster containing scheduling, arithmetic, register, and shared-memory resources.
+3. A block is a programmer-defined cooperating group assigned to one SM; a warp is the hardware scheduling group formed from threads in that block.
+4. `ceil(256 / 32) = 8` warps.
+5. Each element may require only a small amount of arithmetic but still has to be read and written, so data transfer can finish more slowly than the arithmetic capacity can be used.
+6. Fusion removes some launches and avoids writing and rereading intermediate tensors.
+7. The GPU can finish quickly and then wait for CPU preprocessing, data transfer, synchronization, or the next request.
+8. Tiles from the input matrices are loaded into shared memory and reused for multiple multiply-accumulate operations before the next tiles are loaded.
 
-For FP32, FP16, and BF16, learn:
+A warp is the NVIDIA scheduling/execution grouping of 32 threads, and divergent paths within a warp can require masking inactive threads.[^6][^3]
 
-- Sign, exponent, and fraction/significand roles.
-- Dynamic range versus precision.
-- Overflow: magnitude is too large to represent.
-- Underflow: a small nonzero value rounds to zero or a subnormal.
-- Why BF16 retains a range similar to FP32 but has fewer fraction bits.
-- Why FP16 has more fraction precision than BF16 but much less exponent range.
-- Why accumulation may use FP32 even when multiplication operands use a lower precision.
+---
 
-**Assignment M2.3a:** Without code, predict which is more at risk for gradient underflow—FP16 or BF16—and which provides more fine-grained precision near 1. Then verify with `torch.finfo` and small tensor experiments.
+## Stage 3 — Mixed precision
 
-### Session 13 — AMP recipe exactly as written
+### Session 6 — AMP foundations and trainer integration
 
-Run PyTorch's official AMP recipe in FP32 and mixed precision. It demonstrates synchronized timing, peak allocated memory, autocast, and `GradScaler`; the recipe notes that small or CPU-bound models may show little benefit because mixed precision helps most when GPU work is large enough to saturate the hardware.[^12]
+#### Objective
+
+Understand mixed precision and add a correct FP32/AMP switch to your existing CIFAR-10 trainer.
+
+#### Part A — Floating-point concepts
+
+Learn these concepts before running the AMP recipe:
+
+| Concept | Required understanding |
+|---|---|
+| FP32 | Standard 32-bit floating-point format commonly used for training |
+| FP16 | 16-bit format with less range than BF16; small gradients are more vulnerable to underflow |
+| BF16 | 16-bit format with an exponent range similar to FP32 but fewer precision bits |
+| Dynamic range | Span between the smallest and largest representable magnitudes |
+| Precision | How finely nearby values can be distinguished |
+| Overflow | A value is too large for the format and may become infinity |
+| Underflow | A small nonzero value becomes zero or loses useful information |
+| Mixed precision | Different operations use different floating-point formats according to performance and numerical needs |
+| Autocast | PyTorch chooses an appropriate dtype for eligible operations inside a context |
+| Accumulation precision | Products may use a lower precision while sums accumulate in a wider format |
+| Gradient scaling | Multiplies the loss before FP16 backward to protect small gradients, then unscales before updating parameters |
+
+#### Part B — Hardware check
+
+Run:
+
+```python
+import torch
+
+print("GPU:", torch.cuda.get_device_name(0))
+print("Capability:", torch.cuda.get_device_capability(0))
+print(
+    "Native BF16:",
+    torch.cuda.is_bf16_supported(including_emulation=False),
+)
+```
+
+Use this rule:
+
+- If native BF16 is supported, use `torch.bfloat16` for the strict curriculum experiment.
+- If the GPU is a T4 or otherwise lacks native BF16 support, use `torch.float16` with `GradScaler`.
+- Label the fallback experiment **FP32 versus FP16**, not FP32 versus BF16.
+- Use the same physical GPU for both compared runs.
+
+#### Part C — Complete the AMP recipe
+
+Work through PyTorch's official Automatic Mixed Precision recipe once. https://docs.pytorch.org/tutorials/recipes/recipes/amp_recipe.html
 
 Record:
 
-- Runtime.
-- Peak allocated tensor memory.
-- Output dtype of a linear/conv operation.
-- Loss dtype.
-- Whether a scaler is enabled.
-- GPU model and participating dimensions.
+- GPU model.
+- FP32 runtime from the recipe.
+- AMP runtime from the recipe.
+- Peak allocated memory if shown.
+- AMP dtype.
+- Whether `GradScaler` is enabled.
+- Dtype observed for at least one eligible operation inside autocast.
+- Dtype of the model's stored parameters.
 
-Then deliberately break it:
+Focus on:
 
-- Put `.backward()` inside autocast.
-- Manually call `.half()` or `.bfloat16()` on the full model.
-- Use FP16 without a scaler and construct values small enough to underflow.
-- Read/clip scaled gradients before `scaler.unscale_(optimizer)`.
-- Call `.item()` every training step and observe synchronization overhead.
+- Autocast wrapping the forward pass and loss.
+- Backward running outside the autocast context.
+- `GradScaler` for FP16.
+- The difference between model parameter dtype and operation/output dtype.
+- Why small or CPU-bound workloads may see little speedup.
 
-### Session 14 — Autocast mental model
+#### Part D — Integrate AMP
 
-Implement one training step with a precision switch:
+Add a precision switch to the existing trainer:
 
 ```python
 amp_dtype = (
@@ -340,10 +452,13 @@ amp_dtype = (
     if torch.cuda.is_bf16_supported(including_emulation=False)
     else torch.float16
 )
+
+use_amp = config.precision == "amp"
 use_scaler = use_amp and amp_dtype == torch.float16
 scaler = torch.amp.GradScaler("cuda", enabled=use_scaler)
 
 optimizer.zero_grad(set_to_none=True)
+
 with torch.autocast(
     device_type="cuda",
     dtype=amp_dtype,
@@ -361,81 +476,117 @@ else:
     optimizer.step()
 ```
 
-For FP16, gradient scaling raises small gradient magnitudes before backward, unscales before the update, and can skip an update when infinities or NaNs are detected. BF16 ordinarily does not need loss scaling because its exponent range is far larger than FP16's; still monitor non-finite losses and gradients.[^14][^15]
+Do not call `.half()` or `.bfloat16()` on the entire model when using autocast.
 
-**First-principles check:** Gradient scaling changes the numbers used during backward. Why does it not intentionally change the effective parameter update?
+#### Assignment M2.3
 
-### Session 15 — Precision microbenchmarks
+Run several batches in FP32 and AMP modes. Verify:
 
-For a representative convolution and matrix multiplication, sweep:
+- Both modes complete forward and backward passes.
+- The loss remains finite.
+- Parameters receive gradients.
+- The optimizer updates parameters.
+- The parameter dtype remains what you expect.
+- The AMP dtype is recorded.
+- `GradScaler` is enabled only when needed.
 
-- FP32, FP16 autocast, and BF16 autocast when supported.
-- Batch sizes such as 32, 64, 128, and the largest safe size.
-- At least one Tensor-Core-unfriendly versus friendlier dimension where relevant.
+Answer without notes:
 
-Measure median device time after warm-up and peak allocated memory. Do not draw conclusions from one iteration. The T4, for example, has hardware acceleration for mixed FP16/FP32 work; BF16 conclusions require a native-BF16 GPU.[^2]
+1. What does autocast decide?
+2. What does autocast not decide?
+3. Why should backward happen outside the autocast context?
+4. Why does FP16 commonly need gradient scaling?
+5. Why does BF16 normally need less protection against underflow?
+6. Why does gradient scaling not intentionally change the final parameter update?
 
-### Session 16 — Explain non-2x speedup
+#### Deliverable
 
-Write the explanation before running Project A2:
+- Updated trainer supporting `precision="fp32"` and `precision="amp"`.
+- `amp-notes.md` containing the recorded values and answers.
+- A short smoke-test log showing finite losses for both modes.
 
-- Lower precision does not halve every byte: labels, some activations/operations, master parameters, gradients, and optimizer state may remain in other formats.
-- Autocast deliberately keeps selected operations in FP32 for numerical behavior.[^12]
-- Data loading, Python, CPU transforms, host-to-device copies, kernel launch overhead, loss bookkeeping, and parts of the optimizer do not automatically become twice as fast.
-- A small CIFAR-10 CNN may not create enough work to saturate Tensor Cores; PyTorch's AMP recipe explicitly warns that CPU-bound or small workloads can see minor speedup.[^12]
-- If the baseline is memory-bound, fewer bytes may help; if it is launch-, input-, or non-Tensor-Core-op-bound, the same reduction may have little effect.
-- End-to-end speedup obeys the fraction of time actually accelerated, not the peak throughput ratio of one hardware unit.
+#### Exit criteria
 
-## Stage 4: PyTorch profiling
+- The same trainer runs in FP32 and AMP modes.
+- You can explain autocast and gradient scaling from first principles.
+- You have correctly selected BF16 or the documented FP16 fallback based on hardware support.
 
-The official profiler recipe covers operator timing, memory, Chrome/Perfetto trace export, stack traces, and scheduled profiling for long-running jobs. A schedule is essential here: profiling an entire 15-epoch training run creates unnecessary overhead and a huge trace.[^7]
+---
 
-### Session 17 — Profiler recipe
+## Stage 4 — PyTorch profiling
 
-Run the official recipe top to bottom. Be able to distinguish:
+### Session 7 — Profiler recipe and trainer instrumentation
+
+#### Objective
+
+Learn the minimum PyTorch Profiler workflow needed to capture and narrate Project A2.
+
+#### Part A — Complete the profiler recipe
+
+Work through the [official PyTorch Profiler recipe](https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html). Focus on:
 
 - CPU time versus CUDA time.
 - Self time versus total time.
-- Operator (`aten::conv2d`) versus device kernel.
-- Number of calls versus average time.
-- Allocated memory versus reserved memory.
-- Input-shape grouping.
-- Framework stack trace versus execution timeline.
+- PyTorch operator versus CUDA kernel.
+- Number of calls and average time.
+- `ProfilerActivity.CPU` and `ProfilerActivity.CUDA`.
+- `record_shapes=True`.
+- `record_function`.
+- Exporting a Chrome/Perfetto JSON trace.
+- Profiling a short steady-state window instead of an entire training run.
 
-The profiler's `record_shapes=True` allows grouping the same operator by input shape, and `profile_memory=True` tracks tensor allocation/deallocation. Stack capture is useful but adds overhead, so enable it only in a diagnostic trace.[^7]
+Keep the [PyTorch Profiler API reference](https://docs.pytorch.org/docs/stable/profiler.html) available for looking up parameters and methods.
 
-### Session 18 — Instrument the trainer
+You may skip deep stack-trace and memory-allocation analysis unless needed to diagnose a problem.
 
-Create named regions around the actual stages:
+#### Part B — Instrument the trainer
+
+Refer to the named-region examples in the [profiler recipe](https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html).
+
+Add named regions:
 
 ```python
-with record_function("data_wait"):
+from torch.profiler import record_function
+
+
+with record_function("data_loading"):
     images, targets = next(data_iter)
+
 
 with record_function("host_to_device"):
     images = images.to(device, non_blocking=True)
     targets = targets.to(device, non_blocking=True)
 
+
 with record_function("zero_grad"):
     optimizer.zero_grad(set_to_none=True)
 
+
 with record_function("forward_and_loss"):
-    with torch.autocast("cuda", dtype=amp_dtype, enabled=use_amp):
+    with torch.autocast(
+        device_type="cuda",
+        dtype=amp_dtype,
+        enabled=use_amp,
+    ):
         logits = model(images)
         loss = criterion(logits, targets)
 
+
 with record_function("backward"):
     backward_step(loss)
+
 
 with record_function("optimizer_step"):
     optimizer_step()
 ```
 
-Fetching must be explicitly timed with an iterator if you want `data_wait` to appear as a region. In an ordinary `for images, targets in loader` loop, the fetch happens before control enters the loop body.
+Use an explicit iterator if you want DataLoader waiting to appear inside `data_loading`. In a normal `for images, targets in loader` loop, fetching occurs before the loop body.
 
-### Session 19 — Scheduled trace
+#### Part C — Capture a smoke-test trace
 
-Capture only a small steady-state window:
+Read the scheduled-profiling example in the [profiler recipe](https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html). Use the [API reference](https://docs.pytorch.org/docs/stable/profiler.html) to look up `schedule`, `on_trace_ready`, `export_chrome_trace`, and `profiler.step()`.
+
+Profile only a short window:
 
 ```python
 activities = [
@@ -443,329 +594,573 @@ activities = [
     torch.profiler.ProfilerActivity.CUDA,
 ]
 
+
 with torch.profiler.profile(
     activities=activities,
-    schedule=torch.profiler.schedule(wait=2, warmup=2, active=5, repeat=1),
+    schedule=torch.profiler.schedule(
+        wait=1,
+        warmup=1,
+        active=3,
+        repeat=1,
+    ),
     on_trace_ready=lambda p: p.export_chrome_trace(
-        f"outputs/traces/{precision}_step{p.step_num}.json"
+        "outputs/traces/smoke_test.json"
     ),
     record_shapes=True,
-    profile_memory=True,
     with_stack=False,
-) as prof:
-    for step in range(9):
+) as profiler:
+    for _ in range(5):
         run_one_training_step(...)
-        prof.step()
+        profiler.step()
 ```
 
-PyTorch's schedule separates wait, warm-up, and active steps so initial profiling overhead does not dominate the captured interval. Open the resulting JSON in Perfetto or `chrome://tracing`; current PyTorch documentation recommends Perfetto/Chrome traces and marks the older TensorBoard profiler integration as deprecated.[^16][^7]
+Open the exported trace in [Perfetto](https://ui.perfetto.dev/) or `chrome://tracing`.
 
-### Session 20 — Read the trace
+Supporting resources:
 
-For both precision modes, answer:
+- [Perfetto UI guide](https://perfetto.dev/docs/visualization/perfetto-ui): Loading and navigating a trace.
+- [Perfetto external-format guide](https://perfetto.dev/docs/getting-started/other-formats): Chrome JSON trace support and flow events.
 
-- Where does one training step begin and end?
-- Is there an idle gap before forward?
-- Are host-to-device copies visible?
-- Which CUDA kernels dominate forward?
-- Which kernels dominate backward?
-- Does the optimizer create many small kernels?
-- Which operator has the highest self CUDA time?
-- Which input shape corresponds to that operator?
-- Are kernels separated by CPU launch gaps?
-- Did mixed precision change kernel names, durations, or memory traffic?
+#### Assignment M2.4
 
-**Assignment M2.4:** Write a five-sentence diagnosis before trying any optimization. Every sentence must connect an observation in the trace to a hypothesis; avoid generic advice such as “increase utilization.”
+Locate these regions in the smoke-test trace:
 
-## Project A2: Controlled trainer
+- Data loading.
+- Host-to-device transfer.
+- Forward and loss.
+- Backward.
+- Optimizer step.
+- CUDA kernels beneath at least one PyTorch operator.
 
-### Step 21 — Build the model
+Answer:
 
-Use a small CNN with exactly four convolution layers and no pretrained weights. A suitable starting structure is:
+1. What is the difference between CPU time and CUDA time?
+2. What is the difference between self time and total time?
+3. Why should the final benchmark run without the profiler enabled?
+4. Why should only a few steady-state steps be traced?
+5. What does `record_shapes=True` add?
+
+Use the [profiler recipe](https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html) to interpret the timing tables, and read the profiling-overhead warning in the [API reference](https://docs.pytorch.org/docs/stable/profiler.html).
+
+#### Deliverable
+
+- Instrumented trainer.
+- `smoke_test.json` that opens successfully.
+- `profiler-notes.md` containing answers and at least five trace observations.
+
+#### Exit criteria
+
+- The trace opens correctly.
+- All five custom training regions are visible.
+- You can connect a PyTorch operator to CUDA activity beneath it.
+- You can explain why profiler timing is not the clean benchmark result.
+
+---
+
+## Stage 5 — Project A2
+
+### Session 8 — Build and train the FP32 baseline
+
+#### Objective
+
+Reach at least 70% CIFAR-10 test accuracy within 15 epochs using a small four-convolution CNN without pretrained weights.
+
+#### Part A — Model
+
+Use a straightforward architecture. Do not spend time designing a novel CNN.
 
 ```text
 Input: 3 x 32 x 32
-Conv 3->64, 3x3, padding=1 -> BatchNorm -> ReLU
-Conv 64->64, 3x3, padding=1 -> BatchNorm -> ReLU -> MaxPool
-Conv 64->128, 3x3, padding=1 -> BatchNorm -> ReLU
-Conv 128->128, 3x3, padding=1 -> BatchNorm -> ReLU -> MaxPool
-Adaptive average pool -> Linear 128->10
+Conv 3 -> 64, 3x3, padding=1
+BatchNorm -> ReLU
+Conv 64 -> 64, 3x3, padding=1
+BatchNorm -> ReLU -> MaxPool
+Conv 64 -> 128, 3x3, padding=1
+BatchNorm -> ReLU
+Conv 128 -> 128, 3x3, padding=1
+BatchNorm -> ReLU -> MaxPool
+Adaptive average pooling
+Linear 128 -> 10
 ```
 
-Before training, print each stage's tensor shape and calculate the parameter count. Explain why convolution reuses each filter across spatial locations and why adaptive average pooling reduces dependence on a manually calculated flatten size.
+Before training:
 
-### Step 22 — Establish accuracy
+- Print the tensor shape after every major stage.
+- Count the trainable parameters.
+- Confirm the output shape is `[batch_size, 10]`.
+- Save the initial model state before the first optimizer update.
 
-Use training augmentation, normalization, and a held-out test transform without random augmentation. Start with one conventional optimizer/scheduler pair—for example, SGD with momentum and weight decay plus cosine decay, or AdamW plus cosine decay—and tune only until FP32 reaches at least 70% test accuracy within 15 epochs.
+#### Part B — Data
 
-Rules:
+Use:
 
-- Test data never influences gradient updates.
-- Do not add pretrained weights.
-- Do not increase beyond 15 epochs.
-- Record every hyperparameter.
-- Once the FP32 configuration crosses the bar, freeze it for the precision comparison.
+- Random crop with padding for training.
+- Random horizontal flip for training.
+- Tensor conversion and CIFAR-10 normalization.
+- Deterministic test preprocessing without random augmentation.
 
-### Step 23 — Freeze the experiment
+Do not use the test set to select updates during an epoch.
 
-Create one initial model state and use it for both trials. Keep constant:
+#### Part C — Training
+
+- Precision: FP32.
+- Maximum epochs: 15.
+- Target: at least 70% test accuracy.
+- No pretrained weights.
+- Record all hyperparameters.
+- Save the final checkpoint.
+- Record test accuracy and epoch time after every epoch.
+
+Use one conventional optimizer and scheduler configuration. Do not run a broad hyperparameter search.
+
+If the model is below 70%, check in this order:
+
+1. Input normalization.
+2. Training augmentation.
+3. `model.train()` and `model.eval()` placement.
+4. Learning rate.
+5. Optimizer and scheduler.
+6. Accidental `torch.no_grad()` usage.
+7. Accuracy calculation.
+8. Dataset split and labels.
+
+#### Part D — Benchmark FP32
+
+After warm-up, measure a steady-state section of the training loop without the profiler.
+
+Collect:
+
+- Median or mean step time.
+- Epoch time.
+- Images per second if convenient.
+- GPU utilization using one documented method.
+- Final test accuracy.
+- GPU model and batch size.
+
+CUDA execution is asynchronous. Use CUDA events or explicit synchronization around the timed section rather than an unsynchronized Python timer.
+
+Example with CUDA events:
+
+```python
+start = torch.cuda.Event(enable_timing=True)
+end = torch.cuda.Event(enable_timing=True)
+
+start.record()
+run_training_steps(...)
+end.record()
+torch.cuda.synchronize()
+
+elapsed_ms = start.elapsed_time(end)
+```
+
+#### Assignment M2.5
+
+Create the FP32 result record:
+
+| Field | Value |
+|---|---|
+| GPU | Measured |
+| Batch size | Measured |
+| Epochs | Measured |
+| Final test accuracy | Measured |
+| Mean/median step time | Measured |
+| Mean epoch time | Measured |
+| Images/sec | Measured or optional |
+| GPU utilization | Measured |
+
+#### Deliverable
+
+- Initial model state.
+- Final FP32 checkpoint.
+- FP32 training log.
+- FP32 benchmark result.
+- Evidence of at least 70% test accuracy within 15 epochs.
+
+#### Exit criteria
+
+- Accuracy is at least 70%.
+- The benchmark excludes profiler overhead.
+- CUDA timing accounts for asynchronous execution.
+- The initial model state is preserved for the AMP run.
+
+---
+
+### Session 9 — Mixed-precision run and paired traces
+
+#### Objective
+
+Run the same experiment using AMP, measure the difference, and capture comparable FP32 and AMP profiler traces.
+
+#### Part A — Controlled AMP run
+
+Restore the same initial model state used by the FP32 run.
+
+Keep these constant:
 
 - GPU and software environment.
+- Model architecture.
 - Initial model weights.
-- Dataset split and transformations.
-- Seed and batch order as far as practical.
+- Dataset and transforms.
 - Batch size.
-- Optimizer, scheduler, learning rate, and epoch count.
+- Optimizer.
+- Learning-rate schedule.
+- Epoch count.
 - Logging frequency.
+- Seed and data ordering as far as practical.
 
-Change only the precision path. Run the clean training jobs **without the profiler enabled**; profiler overhead makes profiled runtime unsuitable as the headline speed comparison.
+Change only the precision path.
 
-### Step 24 — Benchmark cleanly
+#### Part B — Train and benchmark AMP
 
-For each precision mode, collect:
+Collect the same measurements as FP32:
 
-- Test accuracy after every epoch.
-- Mean epoch time.
-- Median steady-state training-step time after warm-up.
-- Images per second.
-- Peak `torch.cuda.max_memory_allocated()`.
-- Mean and median GPU-Util samples from the same collection method.
-- GPU name, dtype, batch size, and package versions.
+- Final test accuracy.
+- Mean or median step time.
+- Epoch time.
+- Images per second if convenient.
+- GPU utilization using the same method.
+- Actual AMP dtype.
 
-Use warm-up and CUDA synchronization/events for timing. The official AMP recipe synchronizes before and after a timed region and resets peak allocated memory before measuring.[^12]
-
-If collecting `nvidia-smi` utilization, state its precise meaning: percentage of sampled time with at least one kernel active—not percentage of theoretical GPU FLOPs achieved. Do not use it alone to claim efficiency.[^11]
-
-Compute:
+Calculate:
 
 \[
-\text{speedup} = \frac{\text{median FP32 step time}}{\text{median AMP step time}}
+\text{speedup} =
+\frac{\text{FP32 step time}}
+     {\text{AMP step time}}
 \]
 
-\[
-\text{memory reduction} = 1 - \frac{\text{AMP peak allocated memory}}{\text{FP32 peak allocated memory}}
-\]
+If AMP step time is larger, report a speedup below 1.0x rather than hiding the result.
 
-### Step 25 — Capture paired traces
+#### Part C — Capture paired profiler traces
 
-Capture one scheduled FP32 trace and one scheduled AMP trace with the same batch size and profiler settings. Export:
+Capture:
 
-- `fp32_trace.json`
-- `amp_trace.json`
-- `fp32_top_ops.txt`
-- `amp_top_ops.txt`
+- `outputs/traces/fp32_trace.json`
+- `outputs/traces/amp_trace.json`
 
-Each table should include the top operators by self CUDA time and, separately, by CPU time. The trace must visibly contain the custom data, transfer, forward, backward, and optimizer regions.
+Use the same:
 
-### Step 26 — Write and defend
+- GPU.
+- Model.
+- Batch size.
+- Number of warm-up and active steps.
+- Profiler options.
+- Custom region names.
 
-Use this report structure:
+Enable `record_shapes=True` for both traces.
+
+#### Part D — Inspect both traces
+
+Answer:
+
+1. Where does one training step begin and end?
+2. How much time appears in data loading?
+3. How much time appears in host-to-device transfer?
+4. How much time appears in forward and loss?
+5. How much time appears in backward?
+6. How much time appears in the optimizer?
+7. Which stage changed most under AMP?
+8. Are visible CPU or input gaps present?
+9. Did CUDA kernel durations or names change?
+10. Is the profiler observation consistent with the clean benchmark?
+
+Approximate trace-based comparisons are sufficient. Do not attempt a detailed Nsight Compute analysis.
+
+#### Assignment M2.6
+
+Create this paired result table:
+
+| Metric | FP32 | AMP |
+|---|---:|---:|
+| Final test accuracy | Measured | Measured |
+| Step time | Measured | Measured |
+| Epoch time | Measured | Measured |
+| Images/sec | Measured/optional | Measured/optional |
+| GPU utilization | Measured | Measured |
+| Actual dtype | FP32 | BF16 or FP16 |
+| Speedup | 1.00x | Calculated |
+
+#### Deliverable
+
+- AMP checkpoint and training log.
+- AMP benchmark result.
+- One FP32 trace.
+- One AMP trace.
+- Completed paired result table.
+- Written answers to the ten trace questions.
+
+#### Exit criteria
+
+- Both runs are comparable and use the same initial weights.
+- Both traces open successfully.
+- Both traces contain data loading, transfer, forward, backward, and optimizer regions.
+- The measured speedup is calculated and reported honestly.
+
+---
+
+### Session 10 — Final analysis and oral defense
+
+#### Objective
+
+Produce a concise report and demonstrate that you can connect the measurements to the underlying mechanisms.
+
+#### Part A — Write the report
+
+Keep the report to approximately one or two pages, excluding code and trace files.
+
+Use this structure:
 
 ```text
-1. Hardware/software environment
-2. Model and parameter count
-3. Data pipeline and augmentation
-4. Shared training configuration
-5. FP32 results
-6. AMP results
-7. Benchmark method
-8. Profiler method
-9. Trace observations
-10. Bottleneck diagnosis
-11. Why speedup is not 2x
-12. Limitations and next experiment
+1. Environment
+2. Model and data pipeline
+3. Shared experiment configuration
+4. FP32 result
+5. Mixed-precision result
+6. Benchmark comparison
+7. Profiler observations
+8. Why the speedup is not 2x
+9. Limitations
 ```
 
-Required result table:
+Include:
 
-| Metric | FP32 | AMP | Interpretation |
-|---|---:|---:|---|
-| Final test accuracy | Measured | Measured | Accuracy delta |
-| Median step time | Measured | Measured | Headline latency |
-| Images/sec | Measured | Measured | Throughput |
-| Speedup | 1.00x | Measured | FP32 time / AMP time |
-| Peak allocated memory | Measured | Measured | Tensor-memory effect |
-| Mean GPU-Util | Measured | Measured | Busy-time signal only |
-| Data wait share | Measured | Measured | Input bottleneck evidence |
-| Forward share | Measured | Measured | Precision-sensitive work |
-| Backward share | Measured | Measured | Precision-sensitive work |
-| Optimizer share | Measured | Measured | Often less accelerated |
+- GPU model.
+- PyTorch and CUDA versions.
+- Whether BF16 is natively supported.
+- Actual AMP dtype.
+- Whether `GradScaler` was used.
+- Model parameter count.
+- Batch size.
+- Optimizer, scheduler, and learning rate.
+- Epoch count.
+- Final accuracy.
+- Step time.
+- Epoch time.
+- GPU utilization.
+- Speedup ratio.
 
-Do not invent expected numbers. The point is to explain the measurements obtained on the actual hardware.
+#### Part B — Explain the non-2x result
+
+Your explanation should connect your measurements to these ideas:
+
+- Autocast does not convert every operation to BF16 or FP16.
+- Some numerically sensitive operations remain in FP32.
+- Model parameters and optimizer state may remain in FP32.
+- Data loading and CPU transforms do not become twice as fast.
+- Host-to-device transfer does not automatically become twice as fast.
+- Kernel-launch overhead remains.
+- The optimizer may receive little benefit from Tensor Cores.
+- A small CIFAR-10 CNN may not generate enough matrix work to saturate Tensor Cores.
+- Halving the representation size does not halve every byte moved during the complete training step.
+- End-to-end speedup is limited by the fraction of the step that AMP accelerates.
+
+Do not merely list these reasons. Point to evidence from your traces wherever possible.
+
+#### Part C — Trace narration
+
+Open either trace and narrate:
+
+1. The CPU preparing or retrieving a batch.
+2. The input transfer to the GPU.
+3. The forward pass.
+4. Loss computation.
+5. Backward execution.
+6. The optimizer step.
+7. At least one PyTorch operator and the CUDA kernels beneath it.
+8. The largest visible bottleneck or idle gap.
+
+#### Part D — Oral examination
+
+Answer without notes:
+
+1. Why is a GPU not simply a faster CPU?
+2. What does the CPU do when a CUDA kernel is launched?
+3. What is an SM?
+4. What is a warp?
+5. Why is shared memory useful when global memory already exists?
+6. What is the difference between compute-bound and memory-bound work?
+7. What is launch-bound work?
+8. Why can GPU utilization be high while execution remains inefficient?
+9. What does autocast decide?
+10. Why does FP16 commonly need gradient scaling?
+11. Why does BF16 normally have less underflow risk than FP16?
+12. Why must CUDA timing account for asynchronous execution?
+13. Why is clean benchmark timing separated from profiler timing?
+14. How would a DataLoader bottleneck appear in a trace?
+15. Why was your measured AMP speedup not 2x?
+
+#### Deliverable
+
+- `report.md`.
+- FP32 and AMP result table.
+- Two profiler traces.
+- Oral explanation completed without notes.
+
+#### Exit criteria
+
+- The report describes the actual experiment rather than expected results.
+- Every performance claim is tied to a measurement.
+- You can narrate the trace.
+- You can explain the non-2x result from first principles.
+
+---
 
 ## Acceptance checklist
 
-Project A2 is complete only when every required box is checked:
+Month 2 is complete when all of these are true:
 
-- [ ] Month 1 parity harness passes all five cases across 20 seeds.
-- [ ] Four-convolution CNN uses no pretrained weights.
-- [ ] Test accuracy is at least 70% within 15 epochs.
-- [ ] FP32 and AMP trials use the same frozen configuration and initial weights.
-- [ ] The actual AMP dtype is recorded.
-- [ ] A strict BF16 run uses a GPU reporting native BF16 support; otherwise the FP16 fallback is clearly declared.
-- [ ] Timing excludes initial warm-up and correctly handles asynchronous CUDA execution.
-- [ ] Clean benchmark timing is separated from profiler timing.
-- [ ] Peak allocated memory is reported for both modes.
-- [ ] GPU utilization is reported with its measurement method and definition.
-- [ ] One FP32 and one AMP Chrome/Perfetto trace open successfully.
-- [ ] Both traces contain labeled data, transfer, forward, backward, and optimizer regions.
-- [ ] A top-operator table is saved for each mode.
-- [ ] The measured speedup ratio is stated.
-- [ ] The non-2x result is explained through bottleneck fractions, unchanged work, mixed operation dtypes, workload size, and hardware support.
-- [ ] The trace can be narrated without notes.
+- [ ] Session 0 parity harness passes all five cases across 20 seeds.
+- [ ] The existing CIFAR-10 trainer has been refactored and checkpoint-tested.
+- [ ] The hardware and software environment has been recorded.
+- [ ] GPU MODE Lecture 1 has been watched.
+- [ ] You can explain PyTorch Profiler, Nsight Systems, Nsight Compute, Triton, and `load_inline` at a high level.
+- [ ] GPU MODE Lecture 4 has been watched.
+- [ ] You can explain kernels, SMs, warps, registers, shared memory, cache, and global memory.
+- [ ] You can distinguish basic compute-, memory-, launch-, and input-bound behavior.
+- [ ] The official AMP recipe has been completed.
+- [ ] The trainer supports FP32 and AMP modes.
+- [ ] The actual AMP dtype and BF16 hardware support have been recorded.
+- [ ] FP16 uses `GradScaler` when applicable.
+- [ ] The official profiler recipe has been completed.
+- [ ] The trainer contains named data, transfer, forward, backward, and optimizer regions.
+- [ ] A four-convolution CNN reaches at least 70% CIFAR-10 test accuracy within 15 epochs.
+- [ ] FP32 and AMP runs begin with the same initial model weights.
+- [ ] Clean benchmark timing excludes profiler overhead.
+- [ ] CUDA timing handles asynchronous execution correctly.
+- [ ] Step time and GPU utilization are recorded for both runs.
+- [ ] The FP32-to-AMP speedup ratio is calculated.
+- [ ] One FP32 and one AMP trace open successfully.
+- [ ] Both traces use `record_shapes=True`.
+- [ ] You can identify data loading, transfer, forward, backward, and optimizer work in the traces.
+- [ ] You can explain why the measured speedup is not 2x.
+- [ ] The final report is complete.
+
+---
 
 ## Glossary
 
-### Execution model
+### GPU execution
 
 | Term | Meaning |
 |---|---|
-| Host | CPU and its memory; launches GPU work. |
-| Device | GPU and its memory. |
-| Kernel | Function executed in parallel by GPU threads. |
-| Grid | All thread blocks launched for one kernel. |
-| Thread block | Group of threads assigned to one SM; its threads can synchronize and share on-chip shared memory. |
-| Thread | One logical execution instance of a kernel. |
-| Warp | Hardware scheduling group of 32 CUDA threads on NVIDIA GPUs[^9]. |
-| SIMT | Single-instruction, multiple-thread execution model; warp lanes run a common instruction stream but retain per-thread state. |
-| SM | Streaming multiprocessor; schedules warps and contains execution units, registers, and shared memory[^9]. |
-| Occupancy | Ratio of active resident warps to the architecture's maximum possible resident warps; useful for latency hiding but not identical to performance. |
-| Warp divergence | Lanes in a warp take different control-flow branches, forcing paths to be handled separately. |
-| Kernel launch overhead | CPU/runtime cost and GPU scheduling latency before useful kernel work; important for tiny operations. |
+| Host | The CPU and its memory; prepares work and launches GPU operations |
+| Device | The GPU and its memory |
+| CUDA kernel | Function that executes parallel work on the GPU |
+| Kernel launch | CPU/runtime request that queues a kernel for GPU execution |
+| Grid | All thread blocks launched for one kernel |
+| Thread block | Group of cooperating threads assigned to one SM |
+| Thread | One logical execution instance of a kernel |
+| Warp | Group of 32 NVIDIA GPU threads scheduled together |
+| SM | Streaming multiprocessor that schedules blocks and warps and contains execution resources |
+| SIMT | Execution model in which threads in a warp follow a shared instruction stream while retaining individual state |
+| Occupancy | Proportion of potential warp capacity populated by active warps; not equivalent to speed |
 
 ### Memory and performance
 
 | Term | Meaning |
 |---|---|
-| Register | Fast, per-thread on-chip storage. |
-| SRAM/shared memory | Fast on-chip memory shared by threads in a block and explicitly managed by the kernel. |
-| Cache | Hardware-managed storage that retains recently/repeatedly accessed data. |
-| Global/device memory | Large off-chip GPU memory holding tensors; high bandwidth but much slower than registers/shared memory. |
-| HBM | High-bandwidth memory used by many data-center GPUs; a form of global device memory. Do not call every GPU's global memory HBM—a T4, for example, uses GDDR memory. |
-| Memory bandwidth | Bytes transferable per unit time between a memory tier and compute units. |
-| Latency | Delay between requesting an operation/data and receiving its result. |
-| Throughput | Work completed per unit time, such as images/sec. |
-| FLOP | One floating-point arithmetic operation under the counting convention being used. |
-| FLOPS | Floating-point operations per second. |
-| Arithmetic intensity | Useful FLOPs divided by bytes moved through a selected memory tier. |
-| Compute-bound | Performance limited mainly by execution throughput. |
-| Memory-bound | Performance limited mainly by data movement bandwidth. |
-| Launch-bound | Work is too small, so launch/dispatch overhead dominates. |
-| CPU/input-bound | GPU waits because host code, transforms, storage, or transfer cannot supply work fast enough. |
-| Fusion | Combining multiple operations into fewer kernels to reduce launches and intermediate memory traffic. |
-| Tiling | Dividing data into reusable blocks that fit in faster memory. |
-| Coalescing | Organizing warp memory accesses so they can be served with few efficient memory transactions. |
-| Roofline model | Bound relating peak compute, memory bandwidth, and arithmetic intensity. |
-| GPU utilization | Busy-time metric: fraction of sampled time during which at least one kernel ran[^11]. |
-| SM efficiency/activity | Finer metric describing how extensively SMs are active; not the same as GPU utilization. |
+| Register | Fast, per-thread on-chip storage |
+| Shared memory/SRAM | Fast on-chip memory shared by threads in one block |
+| Cache | Hardware-managed storage for recently or repeatedly accessed data |
+| Global/device memory | Large off-chip GPU memory containing tensors, parameters, and activations |
+| HBM | High-bandwidth device memory used on some GPUs; not all GPU memory is HBM |
+| Memory bandwidth | Number of bytes that can move per unit time |
+| Latency | Delay before an operation or data request completes |
+| Throughput | Amount of work completed per unit time |
+| Compute-bound | Arithmetic execution is the main limiting resource |
+| Memory-bound | Data movement is the main limiting resource |
+| Launch-bound | Kernel-launch and dispatch costs dominate useful execution |
+| Input-bound | GPU waits for data preparation, storage, or host-to-device transfer |
+| Fusion | Combining operations to reduce launches and intermediate memory traffic |
+| Tiling | Dividing data into reusable blocks that fit in faster memory; detailed implementation is deferred |
+| GPU utilization | Fraction of sampled time during which GPU kernels were active; not a complete efficiency metric |
 
 ### Precision
 
 | Term | Meaning |
 |---|---|
-| FP32 | 32-bit floating-point format commonly used as the default training precision. |
-| FP16 | 16-bit IEEE half precision; smaller range than BF16 and therefore more vulnerable to gradient underflow. |
-| BF16 | 16-bit format with an FP32-like exponent range but fewer fraction bits; native CUDA BF16 requires newer hardware[^3]. |
-| Mixed precision | Use of multiple floating formats in one execution according to speed and numerical needs. |
-| Tensor Core | Specialized hardware for matrix-like mixed-precision operations. |
-| Autocast | PyTorch context that selects an operation-specific lower or full precision automatically[^13]. |
-| Accumulation precision | Format used to add intermediate products, which may be wider than operand precision. |
-| Dynamic range | Span between smallest and largest representable magnitudes. |
-| Precision | Fineness with which nearby values can be distinguished. |
-| Overflow | Result magnitude exceeds representable range, often producing infinity. |
-| Underflow | Tiny nonzero result becomes subnormal or zero. |
-| Gradient scaling | Multiplying loss before backward to prevent FP16 gradients from underflowing, then unscaling before the update[^15]. |
-| NaN/Inf | Non-finite values signalling invalid arithmetic or overflow. |
+| FP32 | 32-bit floating-point format commonly used as default training precision |
+| FP16 | 16-bit floating-point format with less exponent range than BF16 |
+| BF16 | 16-bit format with FP32-like exponent range and fewer precision bits |
+| Mixed precision | Use of multiple floating-point formats during one computation |
+| Tensor Core | Specialized GPU hardware for matrix-like low-precision operations |
+| Autocast | PyTorch mechanism that selects an operation-specific dtype inside a context |
+| Accumulation precision | Format used when summing intermediate products |
+| Dynamic range | Span between smallest and largest representable magnitudes |
+| Precision | Ability to distinguish nearby values |
+| Overflow | Value exceeds the format's representable range |
+| Underflow | Tiny value becomes zero or loses useful representation |
+| Gradient scaling | Temporarily scales the loss to protect FP16 gradients, then unscales before the optimizer update |
+| NaN/Inf | Non-finite values indicating invalid arithmetic or overflow |
 
 ### Profiling
 
 | Term | Meaning |
 |---|---|
-| Benchmark | Controlled measurement designed to compare performance. |
-| Profile | Detailed observation intended to locate where and why time or memory is consumed. |
-| Warm-up | Unmeasured iterations used to absorb initialization, compilation, cache, and clock-stabilization effects. |
-| Synchronization | Waiting until previously queued GPU work completes. |
-| CUDA event | Device-timestamped marker used for GPU timing. |
-| Trace | Time-ordered record of CPU operations, CUDA calls, copies, kernels, and custom ranges. |
-| `ProfilerActivity.CPU/CUDA` | Activities telling PyTorch Profiler which host/device events to record[^7]. |
-| `record_function` | Context manager that adds a custom named range to a trace[^7]. |
-| `record_shapes` | Profiler option recording operator input shapes[^7]. |
-| `profile_memory` | Profiler option tracking tensor allocation and release[^7]. |
-| Self time | Time directly spent in an event, excluding child events. |
-| Total time | Event time including nested/child operations. |
-| Profiler schedule | Wait/warm-up/active cycle used to sample long-running jobs without tracing everything[^7]. |
-| Nsight Systems | System-level timeline profiler for CPU, CUDA APIs, transfers, and kernels. |
-| Nsight Compute | Kernel-level profiler exposing hardware counters and bottleneck evidence. |
-| Perfetto | Browser trace viewer suitable for PyTorch-exported Chrome JSON traces[^16]. |
-
-## Learning materials
-
-Use the materials in this exact order:
-
-1. **GPU MODE Lecture 1 — Profiling and Integrating CUDA Kernels in PyTorch:** watch the lecture; clone `gpu-mode/lectures`; inspect `lecture_001`; run the PyTorch, Triton, `load_inline`, and profiler examples.[^6][^5]
-2. **GPU MODE Lecture 4 — Intro to Compute and Memory Architecture:** watch once for structure, complete the execution/memory worksheet, then return for the GELU fusion, launch latency, tiled matmul, and occupancy code.[^10]
-3. **NVIDIA CUDA Programming Guide, Programming Model:** read only the sections on SMs, thread blocks, warps, and memory scope as a reference when Lecture 4 is unclear.[^9]
-4. **PyTorch Automatic Mixed Precision recipe:** run every section, including timing, peak memory, autocast, scaler, gradient inspection, checkpointing, and troubleshooting.[^12]
-5. **PyTorch AMP reference/examples:** use this to verify current APIs and which operations or regions should run under autocast.[^13][^14]
-6. **PyTorch Profiler recipe:** complete timing, memory, trace export, stack traces, and scheduled profiling.[^7]
-7. **Perfetto or Chrome trace viewer:** use it to narrate the two final JSON traces; TensorBoard profiler integration is now deprecated in PyTorch's documentation.[^16]
-
-## Oral examination
-
-Before moving to Month 3, answer these aloud without notes:
-
-1. Why is a GPU not simply “a faster CPU”?
-2. Starting from `loss.backward()`, what CPU and GPU events occur before gradients are ready?
-3. Why do GPUs schedule threads in warps, and what resource owns a thread block?
-4. Why is shared memory useful if global memory already exists?
-5. How can tiling increase arithmetic intensity?
-6. How can an operation show 100% GPU utilization and still be inefficient?
-7. Why can an unfused elementwise expression be memory- and launch-bound?
-8. Why must CUDA timing account for asynchronous execution?
-9. What exactly does autocast decide, and what does it not decide?
-10. Why does FP16 often need gradient scaling?
-11. Why is BF16 not simply “a more accurate FP16”?
-12. Why should backward occur outside the autocast context?
-13. Why can AMP reduce peak activation memory without halving total training memory?
-14. Why is profiler timing not the same as clean benchmark timing?
-15. Looking at a trace, how would you distinguish input starvation from a slow convolution?
-16. Why is the measured FP32-to-AMP speedup not guaranteed to be 2x?
-
-Month 2 is complete when the answers connect measurements to mechanisms. Merely reaching 70% accuracy or producing a JSON trace is insufficient; the acceptance bar is the ability to explain why the trace looks the way it does.
+| Benchmark | Controlled measurement used to compare performance |
+| Profile | Detailed observation used to find where time or memory is spent |
+| Warm-up | Unmeasured iterations that absorb initialization and stabilization effects |
+| Synchronization | Waiting for queued GPU work to finish |
+| CUDA event | Device-timestamped marker used to measure GPU execution time |
+| Trace | Time-ordered record of CPU operations, CUDA calls, transfers, and kernels |
+| `record_function` | Adds a named region to a PyTorch Profiler trace |
+| `record_shapes` | Records input shapes associated with profiled operators |
+| CPU time | Host-side time associated with an event |
+| CUDA time | Time associated with GPU kernels or device activity |
+| Self time | Time directly spent in an event, excluding child events |
+| Total time | Time including nested or child events |
+| PyTorch Profiler | Framework-level profiler connecting operators to CPU and CUDA activity |
+| Nsight Systems | System-level CPU/GPU timeline profiler |
+| Nsight Compute | Kernel-level hardware-counter profiler |
+| Perfetto | Browser-based viewer for Chrome JSON traces |
 
 ---
 
-## References
+## Learning materials
 
-1. [daily logs.md](daily logs.md)
+Use these materials in order:
 
-2. [t4-tensor-core-datasheet-951643.pdf](https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/tesla-t4/t4-tensor-core-datasheet-951643.pdf)
+1. GPU MODE Lecture 1: **Profiling and Integrating CUDA Kernels in PyTorch**  
+   <https://github.com/gpu-mode/lectures/tree/main/lecture_001>
+2. GPU MODE Lecture 4: **Intro to Compute and Memory Architecture**  
+   <https://github.com/gpu-mode/lectures/tree/main/lecture_004>
+3. NVIDIA CUDA Programming Guide, programming model—reference only when Lecture 4 terminology is unclear  
+   <https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html>
+4. PyTorch Automatic Mixed Precision recipe  
+   <https://docs.pytorch.org/tutorials/recipes/recipes/amp_recipe.html>
+5. PyTorch AMP examples and reference  
+   <https://docs.pytorch.org/docs/stable/notes/amp_examples.html>  
+   <https://docs.pytorch.org/docs/stable/amp.html>
+6. PyTorch Profiler recipe  
+   <https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html>
+7. Perfetto trace viewer  
+   <https://ui.perfetto.dev/>
 
-3. [5.4. C/C++ Language Extensions — CUDA Programming Guide](https://docs.nvidia.com/cuda/cuda-programming-guide/05-appendices/cpp-language-extensions.html)
+---
 
-4. [torch.cuda.is_bf16_supported — PyTorch 2.14 documentation](https://docs.pytorch.org/docs/stable/generated/torch.cuda.is_bf16_supported.html) - Return a bool indicating if the current CUDA/ROCm device supports dtype bfloat16. Rate this Page.. S...
+## Deferred work
 
-5. [README.md - gpu-mode/lectures - GitHub](https://github.com/gpu-mode/lectures/blob/main/README.md) - Lecture 1: Profiling and Integrating CUDA kernels in PyTorch. Speaker: Mark Saroufim; Notebook and s...
+Do not delay Month 3 for these topics. They return in later GPU-programming and inference-engineering phases:
 
-6. [GPU MODE Lecture 1: How to profile CUDA kernels in PyTorch](https://christianjmills.com/posts/cuda-mode-notes/lecture-001/) - Lecture #1 provides a practical introduction to integrating and profiling custom CUDA kernels within...
+- Writing Triton kernels from scratch.
+- Writing C++/CUDA extensions using `load_inline`.
+- Deliberately breaking custom CUDA bindings.
+- Detailed Nsight Systems workflows.
+- Detailed Nsight Compute hardware-counter analysis.
+- Roofline calculations and exact arithmetic-intensity analysis.
+- Tiled matrix-multiplication implementation and tuning.
+- Occupancy calculation and tuning.
+- Shared-memory bank conflicts.
+- Memory coalescing optimization.
+- Precision microbenchmark sweeps across many matrix shapes.
+- Tensor-Core tile and dimension tuning.
 
-7. [PyTorch Profiler — PyTorch Tutorials 2.14.0+cu130 documentation](https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html) - This recipe explains how to use PyTorch profiler and measure the time and memory consumption of the ...
+---
 
-8. [Commonly Used Command-Line...](https://docs.nvidia.com/deeplearning/tensorrt/latest/performance/benchmarking.html)
+## Final first-principles explanation
 
-9. [1.2. Programming Model — CUDA Programming Guide](https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html)
+Before moving to Month 3, explain this chain without notes:
 
-10. [lectures/lecture_004/cuda-mode-session-4.ipynb at main · gpu-mode/lectures](https://github.com/gpu-mode/lectures/blob/main/lecture_004/cuda-mode-session-4.ipynb) - Material for gpu-mode lectures. Contribute to gpu-mode/lectures development by creating an account o...
+> The CPU launches GPU kernels. Those kernels execute blocks of threads on SMs, with threads scheduled in warps. The kernels read parameters and activations through the GPU memory hierarchy. Autocast allows suitable operations to use lower-precision values, reducing some memory traffic and enabling specialized hardware. PyTorch Profiler shows which parts of the training step benefit. Because only part of the total step is accelerated, end-to-end speedup is lower than the theoretical low-precision hardware ratio.
 
-11. [NVIDIA Documentation Hub](https://docs.nvidia.com/deploy/nvidia-smi/)
-
-12. [amp_recipe.py](https://docs.pytorch.org/tutorials/_downloads/cadb3a57e7a6d7c149b5ae377caf36a8/amp_recipe.py)
-
-13. [Automatic Mixed Precision package - torch.amp — PyTorch 2.8 ...](https://docs.pytorch.org/docs/stable/amp.html?highlight=gradscalertorch.cuda.amp.GradScaler)
-
-14. [Automatic Mixed Precision examples — PyTorch 2.14 documentation](https://docs.pytorch.org/docs/stable/notes/amp_examples.html) - Gradient scaling improves convergence for networks with float16 (by default on CUDA and XPU) gradien...
-
-15. [amp.md.txt](https://docs.pytorch.org/docs/2.9/_sources/amp.md.txt)
-
-16. [PyTorch Profiler With TensorBoard](https://docs.pytorch.org/tutorials/intermediate/tensorboard_profiler_tutorial.html?highlight=profile)
-
+If you can explain this chain, reach the accuracy target, show both traces, state the measured speedup, and explain the result, Month 2 has achieved its purpose.

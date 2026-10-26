@@ -104,7 +104,8 @@ for epoch in range(epochs):
 
     embed = C[xdata].view(-1, block_size*emb_size)
     l1 = embed @ W1 + b1
-    logits = l1 @ W2 + b2
+    h1 = l1.tanh()
+    logits = h1 @ W2 + b2
     
     loss = loss_fn(logits, ydata)
     losses.append(loss.item())
@@ -121,7 +122,7 @@ avg_losses = torch.tensor(losses).view(-1,group_count).sum(dim=1, keepdim=True)/
 plt.plot(avg_losses)
 plt.show()
 
-print(avg_losses[-1]) #2.1691
+print(avg_losses[-1]) #2.0340
 
 ############ VISUALIZING EMBEDDINGS
 
@@ -131,6 +132,24 @@ for i in range(C.shape[0]):
     plt.text(x = C[i,0].data, y = C[i,1].data, s=itos[i], ha="center", va="center", color='white')
 plt.grid('minor')
 plt.show()
+
+############ TRAIN DEV TEST LOSS
+
+def get_loss(data, target):
+    with torch.no_grad():
+        embed = C[data].view(-1, block_size*emb_size)
+        l1 = embed @ W1 + b1
+        h1 = l1.tanh()
+        logits = h1 @ W2 + b2
+        
+        loss = loss_fn(logits, target)
+    return loss
+
+train_loss = get_loss(xtrain, ytrain)
+dev_loss = get_loss(xdev, ydev)
+test_loss = get_loss(xtest, ytest)
+print(f"{train_loss=}, {dev_loss=} and {test_loss=}") 
+#train_loss=tensor(2.0133), dev_loss=tensor(2.4013) and test_loss=tensor(2.4281)
 
 ############ GENERATING THE NAMES
 
@@ -145,7 +164,7 @@ for i in range(out_n):
         while True:
 
             embed = C[blocks[-3:]].view(-1, block_size * emb_size)
-            logits = (embed @ W1 + b1) @ W2 + b2
+            logits = ((embed @ W1 + b1).tanh()) @ W2 + b2
             probs = F.softmax(logits, dim=1)
             idx = torch.multinomial(probs, num_samples=1, replacement=True, generator=g).item()
             if idx == 0:
@@ -156,16 +175,16 @@ for i in range(out_n):
         print("".join(out))
         
 """
-Output generated: 
-
-idundenve
-mmarbidu
-myna
-bis
-illaynn
-rosmah
-mikan
-mikahanden
-mmel
-byach
+Output generated:
+ 
+iyuselyn
+ismar
+idredyn
+sin
+milla
+mila
+joshwan
+ina
+iyah
+oda
 """

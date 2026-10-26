@@ -1,5 +1,5 @@
 
-# Month 1 
+# Month 1 (from 2026-08-24 to 2026-09-18) : 26 days
 
 Plan reference [file](../Curriculum/Month%201.md)
 
@@ -69,7 +69,7 @@ We can consider this month's session as closed.
 
 In next session, start the [Month2.md](../Curriculum/Month2.md)'s Stage 0. Session 0 is already done, Session 1 is to properly add functions in the CIFAR10 model and see what can be done about session 2 as it involves running code in GPU.
 
-# Month 2
+# Month 2 (from 2026-09-19 to 2026-10-16) : 28 days
 
 ## 2026-09-19
 
@@ -204,6 +204,8 @@ Timespent: 1 hour but distracted with local area early morning music.
 
 But I got the work done somehow. For Month3, finish session 0 to session 4 in 1 shot, as I have already finished micrograd before. So, read that code, understand it, internalize it again. Inform the same in notes properly. Then see the problem statement in session 5
 
+# Month 3 (from 2026-10-17 to 2026-10-19) : 3 days
+
 ## 2026-10-17
 
 Timespent: 2-3 hours scattered
@@ -222,7 +224,63 @@ Tomorrow is holiday. So I can spend more time on session 8, which is building th
 
 Timespent: 3 hours scattered
 
-Recalled MLP from Andrej's ipynb and coded it without seeing his implementation (except for 2 things). All good. We can wrap the month 3's work now and move on to the next part of the curriculum. From 17-19, I had 3 days holiday, so I was able to spend a good amount of time to get the month3 works done. Feeling satisfied with the progress. I need to write curriculum for month4 and get started from tomorrow.
+Recalled MLP from Andrej's ipynb and coded it without seeing his implementation (except for 2 things). All good. We can wrap the month 3's work now and move on to the next part of the curriculum. From 17-19, I had 3 days holiday, so I was able to spend a good amount of time to get the month3 works done. Feeling satisfied with the progress. I need to write curriculum for month4 and get started from tomorrow. Created in-depth curriculum for Month4.
 
-- [ ] create month4 curriculum
 - [ ] start the batch normalization and understand it deeply
+
+
+# Month 4 (from 2026-10-20) : In progress
+
+## 2026-10-20
+
+Timespent: 1.5 hours
+
+Instead of watching https://youtu.be/P6sfmUTpUmc , I implemented the batchnorm and it's results are not as I expected. tomorrow I need to watch the video. Day after that, I can sit and finish off with the initialization experiments and then proceed for better loss minimization with batchnorm.
+
+- [x] Watch https://youtu.be/P6sfmUTpUmc (1 hour 55 minutes)
+
+## 2026-10-21
+
+Timespent: 40mins
+
+Wokeup late because of night travel and delayed sleep. Today, I finished the video till the initialization experiments part. Tomorrow, I'll see the remaining part of the video and finish it.
+
+- [x] Watch https://youtu.be/P6sfmUTpUmc?t=2448
+
+## 2026-10-22
+
+Timespent: 1.5 hours
+
+Finished watching the video. This marks the finish of session 1 of month4. Tomorrow I need to finish session 2 - Initialization experiments	Measured logits/activation/gradient effects.
+
+## 2026-10-23
+
+Timespent: 1.5 hours
+
+Finished session 2 - Initialization experiments and documented in the notes4.md. Tomorrow session 3 with batch norm implementation and if possible write BatchNorm1D code. https://youtu.be/P6sfmUTpUmc?t=2428 (for reference)
+
+## 2026-10-24
+
+Timespent: 2-4 hours
+
+Built the batchnorm naively and in the same API format of PyTorch. Understood and implemented diff diagnostic tools to see the activation outputs, each layer's grad, param's grad distribution, grad/param update ratio.. Using AI, I have got list of diff scenarious to test the model with and note the observations accordingly. I have to do that tomorrow.
+
+## 2026-10-25
+
+Timespent: 2 hours
+
+Finished with the experiments and noted the same in the [Inferences decision tree.png](../Notes/Month%204/Inferences%20decision%20tree.png) image, [3 deep nn runs.md](../Month%204/3%20deep%20nn%20runs.md) file and in the [Notes4.md](../Notes/Notes%204.md) file as well.
+
+Mark it as end of session 3 and 4 of month 4. For session 5-7, watch backprop ninja video and do only the backprop and see the hand derivations carefully (no need to implement everything).
+
+- Tomorrow start with watching the video and start the backprop for some variables. I can't finish it fully
+- Finish setting up the basic code to test the manual backprop calculations.
+
+## 2026-10-26
+
+Timespent: 3 hours
+
+Finished with the manual backprop without watching the video (as I have already watched this months before). Though I took time, I was satisfied with my understanding. 
+
+Tomorrow, make it a full runnable one and train the model and observe the losses. If possible, watch the remaining sections of the video, only after manual backprop implementation, get losses and print predictions.
+

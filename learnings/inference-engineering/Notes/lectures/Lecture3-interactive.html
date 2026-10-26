@@ -1,0 +1,1305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lecture 3 Pit Wall</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,400;0,600;0,700;0,900;1,700;1,900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout concept: a race-weekend timing screen. Sticky timing strip (16 sectors) on top, each Part is a sector with a briefing, a lab and a pit-stop quiz. */
+:root{
+  --bg:#15151E;        /* asphalt */
+  --panel:#1E1E2A;     /* garage */
+  --panel2:#272735;
+  --line:#3A3A48;
+  --fg:#F4F4F6;
+  --mute:#9C9CAA;
+  --red:#E10600;       /* F1 red */
+  --green:#00D26A;     /* green flag */
+  --yellow:#FFD600;    /* yellow flag */
+  --purple:#B455FF;    /* purple sector */
+  --display:"Titillium Web","Arial Narrow",Arial,sans-serif;
+  --body:"Titillium Web",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 17px/1.6 var(--body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 80px}
+.wrap{max-width:980px;margin:0 auto}
+a{color:var(--fg)}
+code,.mono{font-family:var(--mono);font-size:.86em}
+code{background:var(--panel2);padding:.1em .4em;border-radius:3px}
+pre{font:400 13.5px/1.55 var(--mono);background:#101018;border:1px solid var(--line);border-left:3px solid var(--red);padding:12px 14px;overflow-x:auto;margin:12px 0}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
+
+/* timing strip */
+.strip{position:sticky;top:0;z-index:20;background:rgba(21,21,30,.96);backdrop-filter:blur(6px);margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:8px max(16px,env(safe-area-inset-left,0px)) 8px;border-bottom:2px solid var(--red)}
+.strip-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;max-width:980px;margin:0 auto 6px}
+.brand{font:900 italic 18px/1 var(--display);letter-spacing:.02em;text-transform:uppercase}
+.brand b{color:var(--red)}
+.pts{margin-left:auto;display:flex;gap:14px;align-items:baseline;font-variant-numeric:tabular-nums}
+.pts .n{font:900 24px/1 var(--display)}
+.pts .l{font:600 11px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.pts .rank{font:700 italic 14px var(--display);color:var(--yellow);text-transform:uppercase}
+.cells{display:grid;grid-template-columns:repeat(16,1fr);gap:3px;max-width:980px;margin:0 auto}
+.cells a{height:22px;background:var(--panel2);display:grid;place-items:center;font:700 11px var(--display);text-decoration:none;color:var(--mute);clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+.cells a.some{background:var(--yellow);color:#000}
+.cells a.done{background:var(--green);color:#000}
+.cells a.perfect{background:var(--purple);color:#000}
+@media (max-width:560px){.cells a{font-size:9px;height:18px}.brand{font-size:15px}.pts .n{font-size:20px}}
+
+/* hero */
+.hero{padding:44px 0 26px;border-bottom:1px solid var(--line)}
+.hero .kick{display:inline-block;background:var(--red);padding:3px 16px 3px 10px;font:700 12px var(--display);letter-spacing:.16em;text-transform:uppercase;clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%)}
+.hero h1{font:900 italic clamp(38px,8vw,84px)/.95 var(--display);text-transform:uppercase;margin:14px 0 14px;letter-spacing:-.01em}
+.hero h1 span{color:var(--red)}
+.hero p{max-width:62ch;color:#D4D4DC;margin:8px 0}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:20px}
+.rules div{background:var(--panel);padding:12px 14px;border-top:3px solid var(--line);font-size:15px}
+.rules b{display:block;font:700 12px var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--yellow);margin-bottom:2px}
+
+/* sectors */
+.sector-banner{margin:64px 0 0;padding:14px 0;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.sector-banner .s{background:var(--fg);color:#000;font:900 italic 14px var(--display);text-transform:uppercase;letter-spacing:.08em;padding:4px 18px 4px 10px;clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%)}
+.sector-banner .t{font:600 15px var(--display);color:var(--mute);letter-spacing:.04em}
+section.part{margin-top:34px;scroll-margin-top:96px}
+.part-head{display:flex;align-items:flex-end;gap:16px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:16px}
+.part-no{font:900 italic clamp(56px,11vw,104px)/.8 var(--display);color:transparent;-webkit-text-stroke:2px var(--red);flex:none}
+.part-head h2{font:900 italic clamp(22px,4vw,34px)/1.05 var(--display);text-transform:uppercase}
+.part-head small{display:block;font:600 12px var(--display);letter-spacing:.14em;color:var(--mute);text-transform:uppercase;margin-top:4px}
+details.brief{background:var(--panel);margin:0 0 16px;border-left:3px solid var(--line)}
+details.brief>summary{cursor:pointer;padding:10px 14px;font:700 13px var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--mute);list-style:none}
+details.brief>summary::-webkit-details-marker{display:none}
+details.brief>summary::before{content:"+ ";color:var(--red)}
+details.brief[open]>summary::before{content:"– "}
+details.brief .in{padding:2px 16px 14px}
+details.brief ul{margin:6px 0;padding-left:20px}
+details.brief li{margin:5px 0}
+.eq{font-family:var(--mono);background:#101018;padding:8px 12px;display:block;margin:10px 0;overflow-x:auto;white-space:nowrap;font-size:14px}
+
+.lab,.quiz{background:var(--panel);margin:16px 0;position:relative;padding:34px 16px 16px}
+.lab::before,.quiz::before{content:"LAB";position:absolute;left:0;top:0;background:var(--red);font:900 italic 12px/1 var(--display);letter-spacing:.14em;padding:6px 18px 6px 12px;clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%)}
+.quiz{background:#191924;border:1px solid var(--line)}
+.quiz::before{content:"PIT STOP";background:var(--yellow);color:#000}
+.lab h3{font:700 19px var(--display);margin-bottom:4px}
+.lab .hint,.hint{color:var(--mute);font-size:15px;margin:2px 0 12px}
+.row{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:10px 0}
+.row>*{min-width:0}
+label.sl{display:grid;gap:2px;font:600 13px var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--mute);min-width:140px;flex:1 1 140px}
+label.sl output{color:var(--fg);font:600 14px var(--mono);letter-spacing:0;text-transform:none}
+input[type=range]{width:100%;accent-color:var(--red)}
+input[type=text],input[type=number],textarea,select{background:#101018;border:1px solid var(--line);padding:7px 10px;border-radius:2px;min-width:0}
+textarea{width:100%;font:13px/1.5 var(--mono);resize:vertical}
+.btn{background:var(--red);color:#fff;border:0;padding:8px 18px 8px 14px;font:700 14px var(--display);letter-spacing:.08em;text-transform:uppercase;clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+.btn:hover{background:#ff2a22}
+.btn.ghost{background:var(--panel2);color:var(--fg)}
+.btn.ghost:hover{background:var(--line)}
+.btn:disabled{opacity:.4;cursor:default}
+.tablewrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th{font:700 11.5px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--mute);text-align:left;padding:6px 10px;border-bottom:2px solid var(--line);white-space:nowrap}
+td{padding:6px 10px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.m{font-family:var(--mono);font-size:13px}
+tr.cur td{background:rgba(225,6,0,.22)}
+tr.done td{color:var(--fg)}
+tr.wait td{color:var(--mute)}
+.ok{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--yellow)}
+.pill{display:inline-block;padding:1px 9px;font:700 11px var(--display);letter-spacing:.1em;text-transform:uppercase;background:var(--panel2)}
+.pill.g{background:var(--green);color:#000}.pill.r{background:var(--red)}.pill.y{background:var(--yellow);color:#000}
+.callout{border-left:3px solid var(--yellow);background:#22222c;padding:9px 14px;margin:12px 0;font-size:15.5px}
+.callout b{color:var(--yellow)}
+canvas{width:100%;display:block;background:#101018;border:1px solid var(--line)}
+.stat{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+.stat div{background:var(--panel2);padding:8px 14px;min-width:120px;flex:1 1 120px}
+.stat b{display:block;font:900 22px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.stat span{font:600 11px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{font:600 13px var(--mono);background:var(--panel2);padding:3px 9px;border-bottom:2px solid var(--line)}
+.chip.t{border-color:var(--red)}
+.chip.x{border-color:var(--yellow);color:var(--yellow)}
+
+/* heatmap */
+.hmwrap{overflow-x:auto;margin:8px 0}
+.hm{display:grid;grid-template-columns:22px repeat(27,minmax(17px,1fr));min-width:560px;gap:1px;font:600 11px var(--mono)}
+.hm .h{display:grid;place-items:center;color:var(--mute);height:18px;cursor:pointer}
+.hm .h.sel{color:#000;background:var(--yellow)}
+.hm .c{aspect-ratio:1;background:#101018;cursor:pointer}
+.hm .c.sel{outline:1px solid var(--yellow)}
+.bars{display:grid;gap:3px;margin:6px 0}
+.bar{display:grid;grid-template-columns:34px 1fr 64px;gap:8px;align-items:center;font:13px var(--mono)}
+.bar i{display:block;height:14px;background:var(--red);transform-origin:left}
+.bar i.g{background:var(--green)}
+.bar i.p{background:var(--purple)}
+
+/* quiz */
+.q{padding:14px 0;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:0;padding-top:0}
+.q .qt{font-weight:600;margin-bottom:8px}
+.q .opts{display:grid;gap:6px}
+.q .opt{text-align:left;background:var(--panel2);border:1px solid var(--line);padding:9px 12px;border-radius:2px}
+.q .opt:hover:not(:disabled){border-color:var(--fg)}
+.q .opt.right{background:rgba(0,210,106,.18);border-color:var(--green)}
+.q .opt.wrong{background:rgba(225,6,0,.18);border-color:var(--red);color:var(--mute);text-decoration:line-through}
+.q .why{margin-top:10px;font-size:15.5px;border-left:3px solid var(--green);padding:6px 12px;background:#1d2a25}
+.q .fb{min-height:1.4em;font-size:14.5px;margin-top:6px;color:var(--mute)}
+.q .score{float:right;font:900 italic 14px var(--display);color:var(--green)}
+.seq{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;min-height:34px}
+.seq .chip{border-color:var(--green)}
+
+/* flashcards */
+.card{background:var(--panel2);border:1px solid var(--line);padding:22px;min-height:190px;display:grid;gap:12px;align-content:start}
+.card .cq{font:700 21px/1.3 var(--display)}
+.card .ca{border-top:2px solid var(--red);padding-top:12px;color:#E4E4EA}
+.card small{font:700 11px var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+
+.mini-table td,.mini-table th{padding:4px 8px}
+.res-row{display:grid;grid-template-columns:150px 1fr 60px;gap:10px;align-items:center;margin:6px 0;cursor:pointer;font-size:15px}
+.res-row .b{height:22px;background:var(--panel2);position:relative}
+.res-row .b i{position:absolute;inset:0 auto 0 0;background:var(--red)}
+.res-row .b i.y{background:var(--yellow)}.res-row .b i.g{background:var(--green)}
+.res-row .b em{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--fg)}
+@media (max-width:520px){.res-row{grid-template-columns:96px 1fr 52px;font-size:13px}}
+.final .row-p{display:flex;align-items:center;gap:10px;margin:5px 0;font-size:15px}
+.final .row-p i{display:block;height:10px;background:var(--panel2);flex:1;position:relative}
+.final .row-p i b{position:absolute;inset:0 auto 0 0;background:var(--green)}
+.footer{margin-top:70px;color:var(--mute);font-size:14px;border-top:1px solid var(--line);padding-top:14px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="strip" id="top">
+  <div class="strip-top">
+    <div class="brand">Lecture 3 <b>/</b> Pit Wall</div>
+    <div class="pts"><span class="rank" id="rank">Backmarker</span><span><span class="n" id="ptsN">0</span> <span class="l">PTS</span></span></div>
+  </div>
+  <nav class="cells" id="cells" aria-label="Sectors"></nav>
+</header>
+
+<main class="wrap">
+
+<div class="hero">
+  <span class="kick">Month 3 · Sessions 1–10</span>
+  <h1>Autograd, bigrams<br>and the first <span>MLP</span></h1>
+  <p>This is the whole of Lecture 3 turned into things you can push. Every Part has a short briefing, a lab that runs the real maths in your browser, and a pit stop of questions. Predict first, then press the button.</p>
+  <div class="rules">
+    <div><b>Scoring</b>25 points for a correct first answer, 12 for the second try, 5 after that.</div>
+    <div><b>Timing strip</b>Grey is untouched, yellow is in progress, green is finished, purple is a clean sweep on first tries.</div>
+    <div><b>Labs</b>The names corpus here is a small sample of 200 names, so the numbers differ from the notes (32,033 names). The behaviour is the same.</div>
+    <div><b>Progress</b>Saved in this browser. Reset it at the bottom of the page.</div>
+  </div>
+</div>
+
+<!-- ============ SECTOR 1 ============ -->
+<div class="sector-banner"><span class="s">Sector 1</span><span class="t">Parts 1–5 · The machinery that computes gradients</span></div>
+
+<section class="part" id="p1">
+  <div class="part-head"><div class="part-no">01</div><div><h2>Derivatives as perturbation</h2><small>Nudge the input, watch the output</small></div></div>
+  <details class="brief" open><summary>Briefing</summary><div class="in">
+    <ul>
+      <li>A derivative answers one question: if I nudge this input by a tiny amount, how much does the output move?</li>
+      <li>Central difference: <code>(f(x+h) − f(x−h)) / 2h</code>. Its error terms cancel, so it beats the one-sided version.</li>
+      <li>Hand derivatives are sums over every place a variable appears. <code>a</code> sits in <code>(a+b)²</code> and in <code>a·c/d</code>, so its derivative has two terms. That is why gradients must <b>accumulate</b> later.</li>
+      <li>Numerical gradients cost two forward passes <b>per parameter</b>. Backprop gives all gradients in one forward and one backward pass. The numerical method survives only as a test.</li>
+    </ul>
+    <code class="eq">expr = ((a+b)**2) + (a*c)/d + d + b/2    # a=3, b=10, c=12, d=4  ->  187</code>
+  </div></details>
+  <div class="lab" id="lab-num"></div>
+  <div class="quiz" data-part="1"></div>
+</section>
+
+<section class="part" id="p2">
+  <div class="part-head"><div class="part-no">02</div><div><h2>The graph and the chain rule</h2><small>Local derivatives, glued together</small></div></div>
+  <details class="brief" open><summary>Briefing</summary><div class="in">
+    <ul>
+      <li>Every expression is a graph. Leaves are inputs or parameters. Intermediate nodes come from an operation on its inputs.</li>
+      <li>The graph is a <b>DAG</b>, not a tree. <code>a</code>, <code>b</code> and <code>d</code> in the tanh expression each have two outgoing edges.</li>
+      <li>Constants are nodes too. <code>b/2</code> creates an extra node <code>2**-1</code>.</li>
+      <li>You never differentiate the whole expression. Each node only knows its local derivative.</li>
+    </ul>
+    <code class="eq">final gradient = upstream gradient × local derivative</code>
+    <table class="mini-table"><tr><th>Op</th><th>Local derivative</th></tr>
+      <tr><td><code>a + b</code></td><td>1 and 1 (a router)</td></tr>
+      <tr><td><code>a * b</code></td><td>b for a, a for b (swaps)</td></tr>
+      <tr><td><code>a ** n</code></td><td>n · a^(n−1)</td></tr>
+      <tr><td><code>tanh(a)</code></td><td>1 − out²</td></tr></table>
+  </div></details>
+  <div class="lab" id="lab-tanh"></div>
+  <div class="quiz" data-part="2"></div>
+</section>
+
+<section class="part" id="p3">
+  <div class="part-head"><div class="part-no">03</div><div><h2>The Value class</h2><small>Forward operations with a closure attached</small></div></div>
+  <details class="brief" open><summary>Briefing</summary><div class="in">
+    <ul>
+      <li>A <code>Value</code> stores <code>value</code>, <code>children</code> (the graph edges), <code>_backward</code> (a closure with this one op's rule) and <code>grad</code>.</li>
+      <li>Each op does three things: compute the forward value, record the inputs, attach a closure.</li>
+      <li>The closure is defined inside the operator, so it captures <code>self</code>, <code>other</code> and <code>out</code> exactly as they were.</li>
+      <li>Subtraction is <code>a + b*-1</code>. Division is <code>a * b**-1</code>. They inherit correct gradients for free.</li>
+      <li>The exponent in <code>__pow__</code> is a constant. <code>other.grad</code> stays 0, which would be wrong for <code>2**x</code>.</li>
+    </ul>
+<pre>def __mul__(self, other):
+    other = self._clean(other)
+    out = Value(self.value * other.value, children=(self, other))
+    def backward():
+        self.grad  += other.value * out.grad
+        other.grad += self.value  * out.grad
+    out._backward = backward
+    return out</pre>
+  </div></details>
+  <div class="quiz" data-part="3"></div>
+</section>
+
+<section class="part" id="p4">
+  <div class="part-head"><div class="part-no">04</div><div><h2>Reverse-mode backward()</h2><small>Seed, order, accumulate</small></div></div>
+  <details class="brief" open><summary>Briefing</summary><div class="in">
+    <ul>
+      <li><b>Seed</b> the output with 1 because ∂L/∂L = 1. A seed of 0 makes every gradient 0.</li>
+      <li><b>Topological order, then reverse.</b> A node may push gradient to its inputs only after every consumer has pushed into it.</li>
+      <li><b>Accumulate with +=.</b> A value reaching the output through several routes gets the sum of the routes. <code>y = x + x</code> must give 2.</li>
+      <li><code>backward()</code> never clears <code>grad</code>. Call it twice and non-root gradients double. Clearing is the caller's job.</li>
+    </ul>
+  </div></details>
+  <div class="lab" id="lab-ag"></div>
+  <div class="quiz" data-part="4"></div>
+</section>
+
+<section class="part" id="p5">
+  <div class="part-head"><div class="part-no">05</div><div><h2>Neuron, Layer, MLP, one loop</h2><small>Forward, loss, zero, backward, update</small></div></div>
+  <details class="brief" open><summary>Briefing</summary><div class="in">
+    <ul>
+      <li><code>Neuron(nin)</code>: <code>nin</code> weights and one bias, output <code>tanh(w·x + b)</code>. <code>MLP([3,4,4,1])</code> has <code>(3·4+4)+(4·4+4)+(4·1+1) = 41</code> parameters.</li>
+      <li>Why a bias: without it, all-zero input forces zero output. Why a nonlinearity: two stacked linear layers are one linear layer.</li>
+      <li>The graph is <b>rebuilt every iteration</b>. Only parameter values persist.</li>
+      <li>The update <code>p.value += -lr * p.grad</code> edits a plain number outside the graph. The gradient points toward increasing loss, so you step against it.</li>
+    </ul>
+  </div></details>
+  <div class="lab" id="lab-params"></div>
+  <div class="lab" id="lab-train"></div>
+  <div class="quiz" data-part="5"></div>
+</section>
+
+<!-- ============ SECTOR 2 ============ -->
+<div class="sector-banner"><span class="s">Sector 2</span><span class="t">Parts 6–10 · The bigram language model, two ways</span></div>
+
+<section class="part" id="p6">
+  <div class="part-head"><div class="part-no">06</div><div><h2>From autograd to language</h2><small>Pairs, boundary tokens, vocabulary</small></div></div>
+  <details class="brief" open><summary>Briefing</summary><div class="in">
+    <ul>
+      <li>A language model estimates the next-token distribution. A bigram assumes only the previous token matters: <code>P(xₜ | x₁…xₜ₋₁) ≈ P(xₜ | xₜ₋₁)</code>.</li>
+      <li>Each name is wrapped as <code>. name .</code>. For <code>emma</code> that gives 5 pairs, <code>len(word) + 1</code>. Over 32,033 names that is 228,146 pairs.</li>
+      <li><code>.</code> is an input at the start and a target at the end, so the model learns when to stop.</li>
+      <li>Vocabulary <code>V = 27</code>: <code>.</code> → 0, <code>a</code> → 1 … <code>z</code> → 26. A token ID is just an integer with no meaning.</li>
+    </ul>
+  </div></details>
+  <div class="lab" id="lab-pairs"></div>
+  <div class="quiz" data-part="6"></div>
+</section>
+
+<section class="part" id="p7">
+  <div class="part-head"><div class="part-no">07</div><div><h2>The count-based bigram</h2><small>A 27×27 table of counts</small></div></div>
+  <details class="brief" open><summary>Briefing</summary><div class="in">
+    <ul>
+      <li>Row <code>i</code> is the previous character, column <code>j</code> the next. <code>N[i,j]</code> counts how often <code>j</code> followed <code>i</code>. The whole model is 729 numbers.</li>
+      <li>Normalize with <code>N / N.sum(dim=1, keepdim=True)</code>. Each row becomes a distribution. Without <code>keepdim=True</code> the shape <code>[27]</code> aligns with the last axis and divides the wrong totals, silently.</li>
+      <li><code>dim=0</code> gives <code>P(previous | next)</code>. Legit, but not what generation needs.</li>
+      <li>Sampling is autoregressive: sample from row <code>idx</code>, feed the result back in as the next row. The generator is stateful, so an extra <code>multinomial</code> call changes every later sample.</li>
+      <li>Counts stored in FP16 silently round. <code>4410</code> becomes <code>4408</code>.</li>
+    </ul>
+  </div></details>
+  <div class="lab" id="lab-bigram"></div>
+  <div class="lab" id="lab-fp16"></div>
+  <div class="quiz" data-part="7"></div>
+</section>
+
+<section class="part" id="p8">
+  <div class="part-head"><div class="part-no">08</div><div><h2>NLL and smoothing</h2><small>How surprised is the model by real data?</small></div></div>
+  <details class="brief" open><summary>Briefing</summary><div class="in">
+    <ul>
+      <li>Likelihood is the product of the probabilities the model gave to every observed pair. A product of 228,146 numbers below 1 underflows, so take the log (a sum), negate it, and average.</li>
+      <li><code class="eq">NLL = −(1/M) Σ log P(yₘ | xₘ)</code></li>
+      <li>The uniform model gives <code>log V = log 27 = 3.296</code>. Anything that cannot beat it has learned nothing. Count model with α=1 on the full data: <b>2.4544</b>.</li>
+      <li>α=0 leaves zero-probability cells and <code>log 0 = −inf</code>. Training NLL never evaluates the unseen pairs, so it cannot see this. Held-out data can.</li>
+      <li>Larger α pulls every row toward uniform. Huge α drives NLL toward 3.296.</li>
+    </ul>
+  </div></details>
+  <div class="lab" id="lab-nll"></div>
+  <div class="quiz" data-part="8"></div>
+</section>
+
+<section class="part" id="p9">
+  <div class="part-head"><div class="part-no">09</div><div><h2>The neural bigram</h2><small>Learn the table with gradient descent</small></div></div>
+  <details class="brief" open><summary>Briefing</summary><div class="in">
+    <ul>
+      <li><code>xenc = one_hot(xs)</code> <code>[M,27]</code>, <code>logits = xenc @ w</code>, <code>counts = logits.exp()</code>, <code>prob = counts / counts.sum(1, keepdim=True)</code>.</li>
+      <li><code>one_hot(x) @ W</code> is row <code>x</code> of <code>W</code>. A matrix multiply is a table lookup in disguise.</li>
+      <li>Logits are not probabilities. <code>exp</code> makes them positive (the "count"), the row-sum division normalizes them. Together that is softmax.</li>
+      <li><code>prob[arange(M), ys]</code> picks the probability given to the correct next character.</li>
+      <li>Real runs: 100 steps, <code>lr = 50</code> (the loss is a mean, so gradients are tiny), loss starts at <b>3.7686</b> and ends at <b>2.4901</b> (with the L2 term). The count model had 2.4544.</li>
+    </ul>
+  </div></details>
+  <div class="lab" id="lab-softmax"></div>
+  <div class="lab" id="lab-neural"></div>
+  <div class="quiz" data-part="9"></div>
+</section>
+
+<section class="part" id="p10">
+  <div class="part-head"><div class="part-no">10</div><div><h2>Why they are one model</h2><small>Smoothing and L2 share an instinct</small></div></div>
+  <details class="brief" open><summary>Briefing</summary><div class="in">
+    <ul>
+      <li>Softmax of a row is <code>exp(W[x,y]) / Σⱼ exp(W[x,j])</code>. Set <code>W[x,y] = log(N[x,y] + α)</code> and it equals the smoothed count formula exactly.</li>
+      <li>The two differ only in <b>how the parameters are found</b>: counted in one pass, or found by gradient descent.</li>
+      <li>Smoothing pulls rows toward uniform. An L2 penalty pulls <code>W</code> toward 0, which makes logits equal, which makes softmax uniform. Bigger λ ≈ bigger α.</li>
+      <li>Same seed on both samplers means the same random numbers hit nearly the same slices. Identical samples are weak evidence. Compare the losses.</li>
+      <li>Use <code>F.cross_entropy(logits, ys)</code> on <b>raw logits</b>. It fuses log-softmax with NLL via log-sum-exp. The hand path overflows at <code>exp(100)</code>.</li>
+    </ul>
+    <p class="hint">The labs for this Part are the two neural labs above. Use the "Set W = log P" and the λ controls.</p>
+  </div></details>
+  <div class="quiz" data-part="10"></div>
+</section>
+
+<!-- ============ SECTOR 3 ============ -->
+<div class="sector-banner"><span class="s">Sector 3</span><span class="t">Parts 11–14 · A fixed-context MLP with embeddings</span></div>
+
+<section class="part" id="p11">
+  <div class="part-head"><div class="part-no">11</div><div><h2>Windows and splits</h2><small>block_size = 3 previous characters</small></div></div>
+  <details class="brief" open><summary>Briefing</summary><div class="in">
+    <ul>
+      <li>A bigram cannot tell <code>ann</code> from <code>kin</code>. A window of the last 3 characters can.</li>
+      <li>A count table over 3 characters needs <code>27³ = 19,683</code> rows, mostly unseen. Learned embeddings let similar contexts share parameters.</li>
+      <li>The script pads with one <code>.</code> each side and loops <code>len(word) − block_size</code> times. So the first letters are never targets and the context <code>[. . .]</code> is never trained. Padding with <code>block_size</code> dots gives <code>len(name) + 1</code> examples.</li>
+      <li>Train updates weights, dev chooses hyperparameters, test is seen once. The script splits 80/10/10 over unshuffled examples. A shuffled word-level split is better.</li>
+    </ul>
+  </div></details>
+  <div class="lab" id="lab-win"></div>
+  <div class="quiz" data-part="11"></div>
+</section>
+
+<section class="part" id="p12">
+  <div class="part-head"><div class="part-no">12</div><div><h2>Embeddings and the shape path</h2><small>From IDs to logits</small></div></div>
+  <details class="brief" open><summary>Briefing</summary><div class="in">
+    <ul>
+      <li><code>C</code> is <code>[27,10]</code>. <code>C[xdata]</code> is <code>[B,3,10]</code>. It is the same row selection as <code>one_hot @ W</code>, without the one-hot.</li>
+      <li>Flatten with <code>.view(-1, 30)</code>. No parameters. Position is kept by where each embedding sits: 0–9 oldest, 20–29 newest.</li>
+      <li>A longer context grows only <code>W1</code>, whose first dimension is <code>T·emb_size</code>.</li>
+      <li>Gradients reach only the selected rows of <code>C</code>. A character used twice in a batch gets both contributions added.</li>
+      <li>Parameters: <code>270 + 6000 + 200 + 5400 + 27 = 11,897</code>.</li>
+    </ul>
+  </div></details>
+  <div class="lab" id="lab-shape"></div>
+  <div class="lab" id="lab-emb"></div>
+  <div class="quiz" data-part="12"></div>
+</section>
+
+<section class="part" id="p13">
+  <div class="part-head"><div class="part-no">13</div><div><h2>Training the MLP</h2><small>Mini-batches, schedules, held-out loss</small></div></div>
+  <details class="brief" open><summary>Briefing</summary><div class="in">
+    <ul>
+      <li>Same five steps, plus a mini-batch: 8 random examples per step. The gradient is a noisy estimate that points the right way on average.</li>
+      <li>Mini-batch loss is noisy. Group and average, or evaluate full splits under <code>torch.no_grad()</code>. <code>avg_losses[-1]</code> is a <b>training</b> signal over the last 1000 steps.</li>
+      <li>Without <code>tanh</code> between layers, <code>(xW1+b1)W2+b2</code> collapses to one linear map. With <code>randn</code> weights, pre-activations start large, so <code>tanh</code> starts saturated.</li>
+      <li><b>The schedule bug:</b> <code>lr = 0.1 if i &lt; 100000 else 0.01</code> tested a leftover <code>i</code>. No error, no decay.</li>
+      <li>Train 2.0133 · Dev 2.4013 · Test 2.4281. The gap mixes overfitting with an unshuffled split.</li>
+      <li>Softmax is for sampling. Training passes raw logits to the loss.</li>
+    </ul>
+  </div></details>
+  <div class="lab" id="lab-lr"></div>
+  <div class="lab" id="lab-batch"></div>
+  <div class="lab" id="lab-collapse"></div>
+  <div class="quiz" data-part="13"></div>
+</section>
+
+<section class="part" id="p14">
+  <div class="part-head"><div class="part-no">14</div><div><h2>Results</h2><small>What each change bought</small></div></div>
+  <details class="brief" open><summary>Briefing</summary><div class="in">
+    <ul>
+      <li>Version 1 (schedule bug, no tanh): <b>2.2841</b>. Version 2 (schedule fixed): <b>2.1691</b>. Version 3 (tanh added): <b>2.0340</b>.</li>
+      <li>An earlier run of version 3 printed 1.9462. <code>C</code> and <code>randint</code> are not seeded, so identical code gives different numbers.</li>
+      <li>Bigram NLLs (2.4544 and 2.4901) are training NLLs over different examples. They are not like-for-like with MLP dev and test.</li>
+    </ul>
+  </div></details>
+  <div class="lab" id="lab-results"></div>
+  <div class="quiz" data-part="14"></div>
+</section>
+
+<!-- ============ FINISH ============ -->
+<div class="sector-banner"><span class="s">Finish</span><span class="t">Parts 15–16 · Debrief</span></div>
+
+<section class="part" id="p15">
+  <div class="part-head"><div class="part-no">15</div><div><h2>Spot the bug</h2><small>Mistakes that appear when you write this code</small></div></div>
+  <details class="brief" open><summary>Briefing</summary><div class="in">
+    <ul>
+      <li>Autograd: reverse operators are not all symmetric, <code>-x</code> and <code>2/x</code> need their own methods, <code>tanh</code> via <code>exp(2x)</code> overflows, gradients never reset themselves.</li>
+      <li>Bigram: right axis plus <code>keepdim=True</code>, no FP16 counts, a stateful generator, compare losses on the same data.</li>
+      <li>MLP: pad with <code>block_size</code> boundary tokens, shuffle then split, full dev evaluation, nonlinearity between layers, schedule on the loop counter, seed every random source, raw logits to the loss.</li>
+    </ul>
+  </div></details>
+  <div class="quiz" data-part="15"></div>
+</section>
+
+<section class="part" id="p16">
+  <div class="part-head"><div class="part-no">16</div><div><h2>Self-check flashcards</h2><small>30 questions from the notes</small></div></div>
+  <div class="lab" id="lab-cards"></div>
+  <div class="lab final" id="lab-final"></div>
+</section>
+
+<div class="footer">Built from Notes/lectures/Lecture3.md. Labs use a 200-name sample, so loss values are not the notes' 32,033-name numbers.</div>
+</main>
+
+<script>
+/* ============ helpers ============ */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function H(html){const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstElementChild;}
+const fmt=(x,n=4)=>Number.isFinite(x)?x.toFixed(n):(x>0?'∞':x<0?'-∞':'NaN');
+function seeded(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+function randn(r){let u=0;while(!u)u=r();const v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+const COL={red:'#E10600',green:'#00D26A',yellow:'#FFD600',purple:'#B455FF',fg:'#F4F4F6',mute:'#9C9CAA',line:'#3A3A48'};
+const redraws=[];
+let rzT;window.addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>redraws.forEach(f=>f()),120);});
+
+function plot(c,h,series,o={}){
+  const dpr=window.devicePixelRatio||1,w=c.clientWidth||600;c.width=w*dpr;c.height=h*dpr;c.style.height=h+'px';
+  const x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,w,h);
+  const L=44,R=10,T=10,B=22,pw=w-L-R,ph=h-T-B;
+  const xmin=o.xmin??0,xmax=o.xmax??1,ymin=o.ymin,ymax=o.ymax;
+  const X=v=>L+(v-xmin)/(xmax-xmin||1)*pw,Y=v=>T+ph-(v-ymin)/(ymax-ymin||1)*ph;
+  x.font='11px "JetBrains Mono",monospace';x.fillStyle=COL.mute;x.strokeStyle=COL.line;x.lineWidth=1;
+  const yt=o.yticks||[ymin,(ymin+ymax)/2,ymax];
+  yt.forEach(v=>{const y=Y(v);x.beginPath();x.moveTo(L,y);x.lineTo(w-R,y);x.stroke();x.textAlign='right';x.fillText((+v.toFixed(2))+'',L-5,y+4);});
+  const xt=o.xticks||[xmin,xmax];
+  xt.forEach(v=>{x.textAlign='center';x.fillText(o.xfmt?o.xfmt(v):v+'',X(v),h-6);});
+  (o.hlines||[]).forEach(hl=>{const y=Y(hl.y);x.strokeStyle=hl.color;x.setLineDash([5,4]);x.beginPath();x.moveTo(L,y);x.lineTo(w-R,y);x.stroke();x.setLineDash([]);x.fillStyle=hl.color;x.textAlign='right';x.fillText(hl.label,w-R-2,y-4);});
+  series.forEach(s=>{
+    x.strokeStyle=s.color;x.fillStyle=s.color;x.lineWidth=s.lw||2;
+    const xs=s.xs||s.ys.map((_,i)=>xmin+(xmax-xmin)*i/Math.max(1,s.ys.length-1));
+    if(s.dots){s.ys.forEach((v,i)=>{x.globalAlpha=.55;x.beginPath();x.arc(X(xs[i]),Y(Math.min(ymax,Math.max(ymin,v))),2.2,0,7);x.fill();x.globalAlpha=1;});}
+    else{x.beginPath();s.ys.forEach((v,i)=>{const px=X(xs[i]),py=Y(Math.min(ymax,Math.max(ymin,v)));i?x.lineTo(px,py):x.moveTo(px,py);});x.stroke();}
+    (s.marks||[]).forEach(m=>{x.fillStyle=m.color||COL.yellow;x.beginPath();x.arc(X(m.x),Y(m.y),5,0,7);x.fill();});
+  });
+}
+
+/* ============ state ============ */
+let S={q:{},fc:{}};
+try{const r=JSON.parse(localStorage.getItem('l3f1')||'{}');S={q:r.q||{},fc:r.fc||{}};}catch(e){}
+function save(){try{localStorage.setItem('l3f1',JSON.stringify(S));}catch(e){}}
+
+/* ============ quiz bank ============ */
+const QUIZ={
+1:[
+ {t:'num',q:'With a=3, b=10, c=12, d=4, what is ∂expr/∂d? (Use the lab above if you want to check.)',a:-1.25,tol:.001,why:'d appears in a·c/d and as a plain +d. The derivative is −a·c/d² + 1 = −36/16 + 1 = −1.25 (Part 1).'},
+ {t:'mcq',q:'Why is the numerical derivative not used to train a model?',o:['It is less accurate than backprop','It needs two forward passes per parameter','It cannot handle tanh','It only works for linear functions'],a:1,why:'One million parameters would need two million forward passes per gradient. Backprop needs one forward and one backward pass. The numerical version stays as an independent test.'},
+ {t:'mcq',q:'You shrink h to 1e-16 in float64. The central difference for a=3 returns a garbage value (often 0). Why?',o:['The function is not differentiable there','3 + 1e-16 rounds back to 3, so both evaluations are identical','Python caps h at 1e-8','The hand derivative changes'],a:1,why:'Much smaller h and f(x+h) − f(x−h) loses all its significant digits to rounding. Much larger and the slope stops being local. Try the h slider.'},
+ {t:'mcq',q:'Which is more accurate for the same h?',o:['One-sided (f(x+h)−f(x))/h','Central (f(x+h)−f(x−h))/2h','They are always identical','Neither, both have O(1) error'],a:1,why:'The error terms of the two sides cancel in the central difference.'}
+],
+2:[
+ {t:'mcq',q:'In the tanh graph, node a feeds both (a+b) and (a*c). What does a.grad become?',o:['Only the last path contributes','The sum of the contributions from both paths','The product of both paths','The average of both paths'],a:1,why:'Multivariable chain rule: total effect is the sum over routes. That is why backward uses += (Part 2, Part 4.3).'},
+ {t:'num',q:'tanh output e = 0.6044. What is the local derivative 1 − e², to 3 decimals?',a:0.635,tol:.002,why:'1 − 0.6044² = 1 − 0.3653 = 0.6347. Every node on the main chain carries this same factor.'},
+ {t:'num',q:'out = a * b with a = 3, b = 5. The upstream gradient is 2. What does a receive?',a:10,tol:.001,why:'Multiplication swaps: a.grad += b.value × out.grad = 5 × 2 = 10. This is why the forward values must be kept.'},
+ {t:'mcq',q:'You push the tanh input to 4. What happens to the gradient flowing back through tanh?',o:['It grows','It is almost 0 (saturation)','It stays exactly 1','It becomes negative'],a:1,why:'1 − tanh²(4) ≈ 0.0013. Saturated tanh passes almost no gradient.'}
+],
+3:[
+ {t:'mcq',q:'How does the engine build a − b?',o:['A dedicated __sub__ backward rule','a + (b * -1), reusing add and mul','a * b**-1','It does not support subtraction'],a:1,why:'Built from primitives, so no new backward rule is needed and it is correct for free (Part 3.3).'},
+ {t:'mcq',q:'Why is _backward a closure defined inside each operator?',o:['Python requires it','It captures self, other and out as they were, so each node carries its own rule with no lookup table','It makes the forward pass faster','It lets grad be negative'],a:1,why:'No switch on operation type: the node already knows how to differentiate itself.'},
+ {t:'mcq',q:'__pow__ only updates self.grad. When would that be WRONG?',o:['x**2','x**-1','2**x (a variable exponent)','x**0.5'],a:2,why:'The exponent is treated as a constant, so other.grad stays 0. Correct for x**2, wrong for a variable exponent.'},
+ {t:'mcq',q:'Why does Neuron.__call__ need __radd__?',o:['sum() starts at the int 0, so 0 + Value must work','Addition is not commutative','It speeds up zip','It handles the bias'],a:0,why:'sum() starts at int 0, so the first addition is 0 + Value, which calls __radd__.'}
+],
+4:[
+ {t:'order',q:'Put the steps of backward() in order.',items:['Seed root.grad = 1','Build a topological order (inputs first)','Walk that list in reverse','Call each node\'s _backward()'],why:'Seed first. The DFS appends a node only after its inputs, giving forward order. Reversed, every consumer comes before the node it feeds.'},
+ {t:'num',q:'y = Value(2.0); z = y + y; z.backward(). What is y.grad?',a:2,tol:.001,why:'Two edges into the same node, each doing += 1.0 × z.grad. With = you would get 1. Flip the accumulate toggle in the lab to see it.'},
+ {t:'mcq',q:'You call loss.backward() twice without clearing. What happens to non-root gradients?',o:['Nothing, they reset','They double','They become 0','They raise an error'],a:1,why:'backward() reseeds the root only and adds into everything else. Clearing is the caller\'s job (zero_grad).'},
+ {t:'mcq',q:'Why is the final gradient seeded with 1.0?',o:['Because the loss is always 1','Because ∂L/∂L = 1 and every gradient is a product starting there','To avoid division by zero','To make += work'],a:1,why:'A seed of 0 would make every gradient 0.'},
+ {t:'mcq',q:'Why does reverse mode suit one scalar loss and a million parameters?',o:['It is exact and numeric is not','One backward pass gives the gradient with respect to every input at about the cost of one forward pass','It needs less memory than forward','It ignores the graph'],a:1,why:'Numerical needs two forward passes per parameter. Reverse mode gets everything at once.'}
+],
+5:[
+ {t:'num',q:'How many parameters does MLP([2,5,1]) have? (Try the calculator.)',a:21,tol:.001,why:'(2·5+5) + (5·1+1) = 15 + 6 = 21. Each neuron has nin + 1 parameters.'},
+ {t:'order',q:'Put the training loop in order. (zero_grad may also sit right after the loss, but never after backward.)',items:['zero_grad','forward pass','compute loss','backward','update parameters'],alts:[[1,2,0,3,4]],why:'Zero before backward, or old gradients pile on top of new ones.'},
+ {t:'mcq',q:'Why is the update p.value += -lr * p.grad done outside the graph?',o:['Python cannot differentiate +=','It edits a plain number. Inside the graph, the next backward would differentiate through the optimizer','Because lr is a constant','It is faster'],a:1,why:'The update creates no node and has no gradient.'},
+ {t:'mcq',q:'What do you get if you stack two linear layers with no nonlinearity?',o:['A deeper, more expressive model','One linear layer: W2(W1x) = (W2W1)x','A model that cannot train','A model with no bias'],a:1,why:'tanh between layers is what lets depth add expressive power. The collapse lab in Part 13 shows it numerically.'},
+ {t:'mcq',q:'In the lab, you untick zero_grad. What do you expect?',o:['Same training, slightly slower','Gradients accumulate across iterations, so steps grow and training gets erratic','Training is unaffected because the graph is rebuilt','Loss drops faster for free'],a:1,why:'The graph is rebuilt every iteration, but grad lives on the parameters and persists until you clear it.'}
+],
+6:[
+ {t:'num',q:'How many bigram pairs does "olivia" produce with the . boundary on both sides?',a:7,tol:.001,why:'len(word) + 1 = 6 + 1 = 7: (. o) (o l) (l i) (i v) (v i) (i a) (a .).'},
+ {t:'mcq',q:'Why is the same symbol "." used as both input and target?',o:['To save a row','So the model learns what starts a name and when to stop','Because Python needs a sentinel','It prevents zero counts'],a:1,why:'(. e) says what starts a name, (a .) says what ends one.'},
+ {t:'mcq',q:'What does a bigram model lose?',o:['The previous character','Everything before the previous character','The boundary tokens','Probabilities'],a:1,why:'It sees n and cannot tell ann from kin.'},
+ {t:'mcq',q:'sorted(chars)[1:] drops the "." and it is re-added at index 0. Why does sorted put it first?',o:['"." has ASCII 46, before "a" at 97','Python puts punctuation first by rule','It was inserted manually','Because it is the most frequent'],a:0,why:'That gives V = 27 with . → 0, a → 1, … z → 26.'}
+],
+7:[
+ {t:'num',q:'What is torch.tensor(4414.).half() stored as?',a:4416,tol:.001,why:'In 4096–8192 the spacing is 4. 4414 is exactly halfway between 4412 (1103×4, odd) and 4416 (1104×4, even). Ties go to even, so it rounds up. Use the FP16 lab to check.'},
+ {t:'mcq',q:'Up to which integer can FP16 store every integer exactly?',o:['255','2048','65504','16,777,216'],a:1,why:'10 fraction bits: spacing is 1 up to 2048, then 2, then 4, then 8. 65504 is the range, not the precision.'},
+ {t:'mcq',q:'You normalize with N.sum(dim=0) instead of dim=1. What do you actually get?',o:['A crash','P(previous | next), a distribution of a different kind','The same result','Probabilities that all equal 1/27'],a:1,why:'Columns are normalized. Check with P.sum(1), which should be all ones. Flip the axis in the lab.'},
+ {t:'mcq',q:'You drop keepdim=True. The sum has shape [27] and PyTorch aligns it with the last axis. What happens?',o:['An error is raised','Each column j is divided by row j\'s total, silently wrong','It still works','Rows divide correctly but slowly'],a:1,why:'Broadcasting does not complain. It divides the wrong totals.'},
+ {t:'mcq',q:'You add a quick multinomial test draw on the same generator before the sampling loop. What changes?',o:['Nothing','Every later name changes, because the generator is stateful','Only the first name','The distribution changes'],a:1,why:'Reproducibility means same seed and the same sequence of calls. Press "Burn one draw" in the lab.'}
+],
+8:[
+ {t:'num',q:'What is the uniform-model NLL for a vocabulary of V = 10? (natural log, 3 decimals)',a:2.303,tol:.002,why:'−log(1/V) = log V = ln 10 = 2.303. For V = 27 it is 3.296.'},
+ {t:'mcq',q:'Why does α = 0 not damage the training NLL, even with zero-count cells?',o:['log(0) is defined as 0','Training only evaluates pairs that exist, and each has count ≥ 1','The zeros cancel','PyTorch masks them'],a:1,why:'The zero cells are exactly the pairs the training set never evaluates. They hurt on new data. Type a test name in the lab at α = 0.'},
+ {t:'mcq',q:'You set α huge. What does NLL approach?',o:['0','log V = 3.296 (the uniform baseline)','−∞','2.45'],a:1,why:'Pseudo-counts swamp real counts, every row becomes 1/27.'},
+ {t:'mcq',q:'Why do we take the log of the likelihood?',o:['To make it bigger','A product of 228,146 numbers below 1 underflows to 0; the log turns it into a sum','Because probabilities are negative','To normalize rows'],a:1,why:'Then we negate (optimizers minimize) and divide by M so the number does not depend on dataset size.'},
+ {t:'mcq',q:'A model has a good average NLL. Which statement is true?',o:['Every sampled name will look right','Probabilities match the data, but samples can still be locally plausible and globally strange','It cannot be a bigram','The model has memory'],a:1,why:'A bigram has no memory beyond one character.'}
+],
+9:[
+ {t:'mcq',q:'Why does one_hot(x) @ W select a row?',o:['The one-hot has a single 1, so the product is 1·W[x,:] plus zeros','PyTorch special-cases it','W is diagonal','It sums the whole matrix'],a:0,why:'A matrix multiply here is a table lookup in disguise. Click characters in the softmax lab.'},
+ {t:'mcq',q:'The neural bigram starts at loss 3.7686, worse than the uniform 3.296. Why?',o:['A bug','Random weights with std 1 make the softmax confidently wrong, which is penalized more than knowing nothing','The L2 term','log 27 is wrong'],a:1,why:'Slide the init σ in the lab: at σ = 0 the loss is exactly log 27.'},
+ {t:'mcq',q:'Logits [2.0, 1.0, 0.1] go through softmax. Which is the largest probability?',o:['The first, about 0.66','The last','They are equal','Cannot tell'],a:0,why:'exp gives 7.39, 2.72, 1.11; sum 11.2; the first is 0.659.'},
+ {t:'mcq',q:'Why is lr = 50 reasonable here?',o:['It never is','The loss is a mean over 228,146 examples, so each gradient entry is tiny, and the model is one shallow layer','Because 50 is a magic constant','Because of the L2 term'],a:1,why:'A rate that works for one loss scale is not portable to another. A sum loss would need a far smaller one.'},
+ {t:'mcq',q:'You call F.cross_entropy(F.softmax(logits, 1), y). What is wrong?',o:['Nothing','It expects raw logits, so the loss is computed on a distribution normalized twice','It is too slow','It does not accept y'],a:1,why:'Pass raw logits. Apply softmax only when sampling.'}
+],
+10:[
+ {t:'mcq',q:'Which W makes softmax(one_hot(x) @ W) equal the smoothed count table?',o:['W = N','W[x,y] = log(N[x,y] + α)','W = exp(N)','W = N / sum'],a:1,why:'exp(W[x,y]) = N[x,y] + α, so the softmax equals the smoothed count formula.'},
+ {t:'mcq',q:'What does an L2 penalty on W push the model toward?',o:['Sharper distributions','Uniform probabilities, like smoothing','Zero loss','Bigger logits'],a:1,why:'Penalty pulls W toward 0, equal logits give a uniform softmax. Bigger λ corresponds to bigger α.'},
+ {t:'mcq',q:'Both bigram samplers use the same seed and give nearly identical names. What does that prove?',o:['The models are identical','Weak evidence only: the same random numbers land in the same slices when distributions are close. The losses are the real comparison','The seed is wrong','One model is cheating'],a:1,why:'Names diverge only when a random number falls into the thin gap between cumulative boundaries.'},
+ {t:'mcq',q:'What is the real difference between count model and neural bigram?',o:['Their capacity','How parameters are found: counted once versus gradient descent','Number of parameters','The vocabulary'],a:1,why:'Both have 729 parameters. Neither is smarter. Gradient descent matters because it scales to models with no closed form.'},
+ {t:'mcq',q:'Why does the hand-written exp / divide / log path overflow?',o:['It does not','exp(100) is already inf in float32; cross_entropy uses log-sum-exp','Division by zero','log of a negative number'],a:1,why:'F.cross_entropy fuses log-softmax with NLL.'}
+],
+11:[
+ {t:'num',q:'With block_size 3 and the script\'s single "." on each side, how many examples does "emma" give? (Use the lab.)',a:3,tol:.001,why:'Padded word has 6 characters, the loop runs 6 − 3 = 3 times: [. e m]→m, [e m m]→a, [m m a]→.'},
+ {t:'num',q:'With block_size dots padded at the start and one at the end, how many examples does "emma" give?',a:5,tol:.001,why:'len(name) + 1 = 5, and every letter is a target.'},
+ {t:'num',q:'How many rows would a count table over 3 characters need (V = 27)?',a:19683,tol:.5,why:'27³ = 19,683, mostly unseen. Embeddings let similar contexts share parameters.'},
+ {t:'mcq',q:'Which split do you use to choose hyperparameters, and which do you look at once?',o:['Train chooses, dev once','Dev chooses, test once at the end','Test chooses, dev once','All three freely'],a:1,why:'Choices made by looking at a split fit that split. Dev absorbs that bias. Test stays unbiased.'},
+ {t:'mcq',q:'The script slices xs[0:n1] without shuffling. What is the risk?',o:['None','Dev and test are the tail of names.txt, a different region from train','Training is slower','Duplicate windows'],a:1,why:'Split words first, after shuffling, then build windows.'}
+],
+12:[
+ {t:'num',q:'T=3, emb=2, H=100, V=27. How many parameters? (C + W1 + b1 + W2 + b2)',a:3481,tol:.5,why:'54 + 600 + 100 + 2700 + 27 = 3481.'},
+ {t:'mcq',q:'You change block_size from 3 to 6, emb 10, H 200. Which shape changes?',o:['Only W1 becomes [60,200]','All weight matrices','Only C','Only W2'],a:0,why:'W1 is [T·emb, H]. The hidden and output layers keep their shapes.'},
+ {t:'mcq',q:'Batch ids contain character "a" three times. What happens to row C["a"] in backward?',o:['Overwritten by the last','All three contributions are added','Only the first counts','It gets zero'],a:1,why:'Same accumulation rule as Part 4.3. Rows not in the batch get exactly zero.'},
+ {t:'mcq',q:'Is flattening C[xdata].view(-1, 30) a learned layer?',o:['Yes, with 30 weights','No, it only reinterprets the numbers and position is kept by where each embedding sits','Yes, it mixes positions','No, but it drops position'],a:1,why:'Numbers 0–9 come from the oldest character, 20–29 from the newest.'},
+ {t:'mcq',q:'What is the shape of C[xdata] when xdata is [8,3] and C is [27,10]?',o:['[8,30]','[8,3,10]','[27,10]','[3,10]'],a:1,why:'Each of the 24 ids is replaced by its 10-vector. Then .view flattens to [8,30].'}
+],
+13:[
+ {t:'mcq',q:'`lr = 0.1 if i < 100000 else 0.01` inside `for epoch in range(200000)`. What happens?',o:['Works fine','i is a leftover small variable, so the condition is always true and lr stays 0.1 with no error','Crashes with NameError','lr is always 0.01'],a:1,why:'Use the epoch counter, and print lr at a few steps after adding a schedule.'},
+ {t:'mcq',q:'What is avg_losses[-1]?',o:['The dev loss','The average training mini-batch loss over the last 1000 steps','The test loss','The full-train loss'],a:1,why:'A training signal. Dev and test come from get_loss over the whole split under no_grad.'},
+ {t:'mcq',q:'Train 2.0133, dev 2.4013. What can you conclude?',o:['Definitely overfitting','Some gap is expected, but unshuffled splits mean the gap mixes overfitting with a distribution difference','The model is broken','Dev must equal train'],a:1,why:'A shuffled word-level split would remove the second cause.'},
+ {t:'mcq',q:'Why is softmax used in generation but not in training?',o:['Sampling needs probabilities; the loss takes raw logits and applies log-softmax itself','Softmax is slow in training','They are the same','Training uses sigmoid'],a:0,why:'cross_entropy fuses log-softmax with NLL.'},
+ {t:'mcq',q:'Why does the batch-noise lab show a smaller spread at larger batch size?',o:['Larger batches reduce the loss','Averaging more examples shrinks the noise, roughly 1/√B','Random seed','Larger batches ignore outliers'],a:1,why:'Each step\'s gradient is a noisy estimate of the full gradient that points the right way on average.'},
+ {t:'mcq',q:'Why does a saturated tanh unit learn slowly?',o:['Its output is 0','1 − tanh² is near 0, so almost no gradient flows','It has no bias','It is linear'],a:1,why:'With randn weights the pre-activations start large, so many units start in the flat region (see the pre-activation sample lab in Part 2).'}
+],
+14:[
+ {t:'num',q:'By how much did fixing the schedule... no wait: how much did adding tanh lower the loss, version 2 → 3? (2.1691 → 2.0340)',a:0.135,tol:.002,why:'About 0.135. Fixing the schedule 1 → 2 gave about 0.115.'},
+ {t:'mcq',q:'Two runs of the identical version-3 code printed 1.9462 and 2.0340. Why?',o:['A bug','C and randint are unseeded, so each run has different init and mini-batches','tanh is random','Float error'],a:1,why:'The two runs differ by ~0.09, comparable to the effect of the schedule fix (0.115), so one run per version leaves exact sizes uncertain.'},
+ {t:'mcq',q:'Is bigram NLL 2.4544 directly comparable with MLP dev 2.4013?',o:['Yes, lower is better, MLP wins','No: different examples (training pairs vs held-out windows), and a different windowing','Yes, same data','Only if you add L2'],a:1,why:'The closest like-for-like figure is the MLP train loss 2.0133. A fair comparison needs all models on the same held-out split.'},
+ {t:'mcq',q:'Why did the first-letter distribution look odd (many names start with a vowel or y)?',o:['The data','The [. . .] start context is never trained under the single-dot windowing, yet generation starts from it (a likely reason, untested)','tanh bias','Seed'],a:1,why:'The notes flag this as likely, not verified.'}
+],
+15:[
+ {t:'mcq',q:'`def __rsub__(self, other): return self - other`. With x = Value(5), what does 2 - x give?',o:['-3','3','7','TypeError'],a:1,why:'It computes x - 2 = 3. A correct form is (-1 * self) + other, so 2 - x = -3.'},
+ {t:'mcq',q:'`loss = F.cross_entropy(F.softmax(logits, dim=1), ys)` — what is the bug?',o:['None','Softmax applied twice effectively; cross_entropy wants raw logits','dim should be 0','ys has wrong dtype'],a:1,why:'Apply softmax only when sampling.'},
+ {t:'mcq',q:'`P = N / N.sum(1)` (no keepdim). Which check catches the bug?',o:['P.shape','P.sum(1), which must be all ones','N.max()','torch.isnan(P)'],a:1,why:'Without keepdim the divide aligns the wrong axis silently. P.sum(1) exposes it.'},
+ {t:'mcq',q:'You compute nll = -log_likelihood / count for counts, later reuse the name nll for the neural loss. What is the risk?',o:['None','A name reused for different things hides bugs; print it right after computing','Python forbids it','Memory leak'],a:1,why:'Use distinct names like nll_counts.'},
+ {t:'mcq',q:'`math.exp(2*x)` inside tanh for x = 400. What happens?',o:['Returns 1.0','OverflowError; math.tanh is the stable form','Returns inf silently','Returns nan'],a:1,why:'OverflowError beyond about 355.'}
+]
+};
+QUIZ[14][0].q='How much did adding tanh lower the loss, version 2 → 3? (2.1691 → 2.0340)';
+const ALLQ=Object.entries(QUIZ).flatMap(([p,l])=>l.map((q,i)=>(q.id='p'+p+'q'+i,q.part=+p,q)));
+const FC_N=30;
+
+/* ============ scoring / header ============ */
+function partState(n){
+  if(n===16){const m=Object.keys(S.fc).length;return m===0?'':m>=FC_N?'done':'some';}
+  const qs=QUIZ[n];let done=0,perfect=0;
+  qs.forEach(q=>{const r=S.q[q.id];if(r&&r.done){done++;if(r.tries===0)perfect++;}});
+  if(!done)return '';if(done<qs.length)return 'some';return perfect===qs.length?'perfect':'done';
+}
+function totalPts(){return Object.values(S.q).reduce((a,r)=>a+(r.pts||0),0)+Object.keys(S.fc).length*3;}
+const MAXPTS=ALLQ.length*25+FC_N*3;
+function header(){
+  const cells=$('#cells');if(!cells.children.length){for(let i=1;i<=16;i++){const a=document.createElement('a');a.href='#p'+i;a.textContent=i;a.title='Part '+i;cells.appendChild(a);}}
+  [...cells.children].forEach((a,i)=>{a.className=partState(i+1);});
+  const p=totalPts(),pct=p/MAXPTS;$('#ptsN').textContent=p;
+  $('#rank').textContent=pct>=.9?'Pole position':pct>=.7?'Podium':pct>=.45?'Points finish':pct>=.15?'Midfield':'Backmarker';
+  if(typeof renderFinal==='function')renderFinal();
+}
+function award(q,tries){
+  const pts=tries===0?25:tries===1?12:5;
+  S.q[q.id]={done:1,tries,pts};save();header();return pts;
+}
+
+/* ============ quiz engine ============ */
+function buildQ(q,idx){
+  const wrap=H('<div class="q"><div class="qt"></div><div class="body"></div><div class="fb"></div></div>');
+  const qt=$('.qt',wrap),body=$('.body',wrap),fb=$('.fb',wrap);
+  qt.innerHTML='<span class="score"></span>'+(idx+1)+'. '+q.q.replace(/`([^`]+)`/g,'<code>$1</code>').replace(/</g,(m,o,s)=>m);
+  const saved=S.q[q.id];let tries=0;
+  const finish=(t,showAns)=>{
+    const r=S.q[q.id]||{};
+    $('.score',wrap).textContent='+'+r.pts+' pts';
+    const w=H('<div class="why"></div>');w.textContent=q.why;wrap.appendChild(w);
+  };
+  if(q.t==='mcq'){
+    const box=H('<div class="opts"></div>');body.appendChild(box);
+    q.o.forEach((o,i)=>{
+      const b=H('<button class="opt"></button>');b.textContent=o;box.appendChild(b);
+      b.onclick=()=>{
+        if(S.q[q.id]&&S.q[q.id].done&&!b._live)return;
+        if(S.q[q.id]&&S.q[q.id].done)return;
+        if(i===q.a){b.classList.add('right');$$('.opt',box).forEach(x=>x.disabled=true);award(q,tries);fb.textContent='';finish();}
+        else{b.classList.add('wrong');b.disabled=true;tries++;fb.textContent='Not that one. Try again.';}
+      };
+    });
+    if(saved&&saved.done){$$('.opt',box).forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add('right');});finish();}
+  }else if(q.t==='num'){
+    const r=H('<div class="row"><input type="number" step="any" style="width:150px" aria-label="Your answer"><button class="btn">Check</button></div>');body.appendChild(r);
+    const inp=$('input',r),btn=$('button',r);
+    const check=()=>{
+      if(S.q[q.id]&&S.q[q.id].done)return;
+      const v=parseFloat(inp.value);if(isNaN(v)){fb.textContent='Type a number first.';return;}
+      if(Math.abs(v-q.a)<=q.tol){award(q,tries);inp.disabled=btn.disabled=true;inp.style.borderColor=COL.green;fb.textContent='';finish();}
+      else{tries++;inp.style.borderColor=COL.red;
+        if(tries>=3){S.q[q.id]={done:1,tries,pts:0};save();header();inp.value=q.a;inp.disabled=btn.disabled=true;fb.textContent='Answer revealed, no points.';finish();}
+        else fb.textContent=(v>q.a?'Too high.':'Too low.')+' Try again ('+(3-tries)+' left).';}
+    };
+    btn.onclick=check;inp.onkeydown=e=>{if(e.key==='Enter')check();};
+    if(saved&&saved.done){inp.value=q.a;inp.disabled=btn.disabled=true;finish();}
+  }else if(q.t==='order'){
+    const n=q.items.length;let seq=[];
+    const perm=q.items.map((_,i)=>i).sort(()=>Math.random()-.5);
+    const sq=H('<div class="seq" aria-live="polite"></div>'),box=H('<div class="opts"></div>'),rb=H('<div class="row"><button class="btn ghost">Reset</button></div>');
+    body.append(sq,box,rb);
+    const valid=s=>[q.items.map((_,i)=>i),...(q.alts||[])].some(a=>a.every((v,i)=>v===s[i]));
+    function draw(){
+      sq.innerHTML='';seq.forEach((i,k)=>{const c=H('<span class="chip"></span>');c.textContent=(k+1)+'. '+q.items[i];sq.appendChild(c);});
+      $$('.opt',box).forEach(b=>b.disabled=seq.includes(+b.dataset.i)||(S.q[q.id]&&S.q[q.id].done));
+    }
+    perm.forEach(i=>{const b=H('<button class="opt"></button>');b.textContent=q.items[i];b.dataset.i=i;box.appendChild(b);
+      b.onclick=()=>{seq.push(i);draw();if(seq.length===n){if(valid(seq)){award(q,tries);fb.textContent='';finish();$$('.opt',box).forEach(x=>x.disabled=true);rb.hidden=true;}else{tries++;fb.textContent='Wrong order. Sequence cleared.';seq=[];draw();}}};
+    });
+    $('button',rb).onclick=()=>{seq=[];draw();};
+    if(saved&&saved.done){seq=q.items.map((_,i)=>i);draw();$$('.opt',box).forEach(x=>x.disabled=true);rb.hidden=true;finish();}
+    else draw();
+  }
+  return wrap;
+}
+$$('.quiz').forEach(el=>{
+  const n=+el.dataset.part;
+  el.appendChild(H('<div class="hint" style="margin-top:-6px">Questions for Part '+n+'. Answer from memory first.</div>'));
+  QUIZ[n].forEach((q,i)=>el.appendChild(buildQ(q,i)));
+});
+
+/* ============ shared corpus ============ */
+const NAMES_TXT='emma olivia ava isabella sophia charlotte mia amelia harper evelyn abigail emily elizabeth mila ella avery sofia camila aria scarlett victoria madison luna grace chloe penelope layla riley zoey nora lily eleanor hannah lillian addison aubrey ellie stella natalia zoe leah hazel violet aurora savannah audrey brooklyn bella claire skylar lucy paisley everly anna caroline nova genesis emilia kennedy samantha maya willow kinsley naomi aaliyah elena sarah ariana allison gabriella alice madelyn cora ruby eva serenity autumn adeline hailey gianna valentina isla eliana quinn nevaeh ivy sadie piper lydia alexa josephine emery julia delilah arianna vivian kaylee sophie brielle madeline liam noah oliver james elijah william henry lucas benjamin theodore jack levi alexander jackson mateo daniel michael mason sebastian ethan logan owen samuel jacob asher aiden john joseph wyatt david leo luke julian hudson grayson matthew ezra gabriel carter isaac jayden luca anthony dylan lincoln thomas maverick elias josiah charles christopher jaxon maxwell santiago nolan adrian cameron hunter ryan miles eli nathan landon angel robert easton colton jordan dominic austin ian cooper bennett sawyer kai declan roman jameson jason kevin brayden ayden weston emmett bryson ryder';
+const CH='.abcdefghijklmnopqrstuvwxyz';
+const stoi={};[...CH].forEach((c,i)=>stoi[c]=i);
+const CORP={names:[],xs:[],ys:[],N:new Float64Array(729),M:0};
+function setCorpus(txt){
+  CORP.names=txt.toLowerCase().split(/[\s,]+/).map(s=>s.replace(/[^a-z]/g,'')).filter(Boolean);
+  CORP.xs=[];CORP.ys=[];CORP.N=new Float64Array(729);
+  CORP.names.forEach(w=>{const t='.'+w+'.';for(let i=0;i<t.length-1;i++){const a=stoi[t[i]],b=stoi[t[i+1]];CORP.xs.push(a);CORP.ys.push(b);CORP.N[a*27+b]++;}});
+  CORP.M=CORP.xs.length;
+}
+setCorpus(NAMES_TXT);
+function probs(alpha,axis=1){
+  const P=new Float64Array(729),N=CORP.N;
+  if(axis===1){for(let i=0;i<27;i++){let s=0;for(let j=0;j<27;j++)s+=N[i*27+j]+alpha;for(let j=0;j<27;j++)P[i*27+j]=s>0?(N[i*27+j]+alpha)/s:0;}}
+  else{for(let j=0;j<27;j++){let s=0;for(let i=0;i<27;i++)s+=N[i*27+j]+alpha;for(let i=0;i<27;i++)P[i*27+j]=s>0?(N[i*27+j]+alpha)/s:0;}}
+  return P;
+}
+function nllOf(P){let s=0;for(let k=0;k<CORP.M;k++){const p=P[CORP.xs[k]*27+CORP.ys[k]];s+=-Math.log(p);}return s/CORP.M;}
+function nameNLL(P,name){const t='.'+name+'.';let s=0,n=0,worst=null;for(let i=0;i<t.length-1;i++){const p=P[stoi[t[i]]*27+stoi[t[i+1]]];s+=-Math.log(p);n++;if(p===0&&!worst)worst=t[i]+t[i+1];}return{nll:s/n,worst,n};}
+function sampleRow(P,row,r){let s=0;for(let j=0;j<27;j++)s+=P[row*27+j];if(s<=0)return 0;let u=r()*s,c=0;for(let j=0;j<27;j++){c+=P[row*27+j];if(u<c)return j;}return 26;}
+function genNames(P,r,k){const out=[];for(let n=0;n<k;n++){let idx=0,o='';for(let g=0;g<30;g++){idx=sampleRow(P,idx,r);if(idx===0)break;o+=CH[idx];}out.push(o||'(empty)');}return out;}
+
+/* ============ LAB 1: numerical derivative ============ */
+(function(){
+  const el=$('#lab-num');
+  el.innerHTML=`<h3>Central difference versus the hand derivative</h3>
+  <p class="hint">Move the inputs. Then slide h from 1e-1 down to 1e-16 and watch the numeric column. Predict where it breaks before you get there.</p>
+  <div class="row">
+    <label class="sl">a <output id="n-a"></output><input type="range" id="n-ar" min="-5" max="12" step="1" value="3"></label>
+    <label class="sl">b <output id="n-b"></output><input type="range" id="n-br" min="-5" max="15" step="1" value="10"></label>
+    <label class="sl">c <output id="n-c"></output><input type="range" id="n-cr" min="-5" max="20" step="1" value="12"></label>
+    <label class="sl">d <output id="n-d"></output><input type="range" id="n-dr" min="1" max="10" step="1" value="4"></label>
+    <label class="sl">h = 10^−k, k = <output id="n-h"></output><input type="range" id="n-hr" min="1" max="16" step="1" value="8"></label>
+  </div>
+  <div class="stat"><div><b id="n-f">187</b><span>expr value</span></div></div>
+  <div class="tablewrap"><table><thead><tr><th>Var</th><th>Hand derivative</th><th>Central diff</th><th>One-sided</th><th>|central error|</th></tr></thead><tbody id="n-tb"></tbody></table></div>
+  <div class="callout" id="n-note"></div>`;
+  const f=(a,b,c,d)=>((a+b)**2)+(a*c)/d+d+b/2;
+  function upd(){
+    const v={a:+$('#n-ar').value,b:+$('#n-br').value,c:+$('#n-cr').value,d:+$('#n-dr').value},k=+$('#n-hr').value,h=Math.pow(10,-k);
+    Object.keys(v).forEach(x=>$('#n-'+x).textContent=v[x]);$('#n-h').textContent=k;
+    $('#n-f').textContent=f(v.a,v.b,v.c,v.d).toFixed(3);
+    const an={a:2*(v.a+v.b)+v.c/v.d,b:2*(v.a+v.b)+.5,c:v.a/v.d,d:-v.a*v.c/(v.d*v.d)+1};
+    const g=(vr,s)=>{const p={...v};p[vr]+=h*s;return f(p.a,p.b,p.c,p.d);};
+    let rows='',worst=0;
+    for(const vr of ['a','b','c','d']){
+      const cd=(g(vr,1)-g(vr,-1))/(2*h),os=(g(vr,1)-f(v.a,v.b,v.c,v.d))/h,er=Math.abs(cd-an[vr]);worst=Math.max(worst,er);
+      const cl=er<1e-5?'ok':er<1e-2?'warn':'bad';
+      rows+=`<tr><td><b>${vr}</b></td><td class="m">${an[vr].toFixed(6)}</td><td class="m">${cd.toFixed(6)}</td><td class="m">${os.toFixed(6)}</td><td class="m ${cl}">${er.toExponential(2)}</td></tr>`;
+    }
+    $('#n-tb').innerHTML=rows;
+    $('#n-note').innerHTML=k>=15?'<b>h is too small.</b> v+h rounds back to v, so the subtraction returns 0 or noise. The derivative is lost to rounding.':k>=12?'<b>Getting noisy.</b> The subtraction f(x+h) − f(x−h) is eating significant digits.':k<=2?'<b>h is too big.</b> The slope is no longer local, and even the central difference drifts from the truth.':'Near the sweet spot for float64. Central error is tiny and the one-sided estimate is visibly worse.';
+  }
+  $$('input',el).forEach(i=>i.oninput=upd);upd();
+})();
+
+/* ============ LAB 2: tanh + saturation ============ */
+(function(){
+  const el=$('#lab-tanh');
+  el.innerHTML=`<h3>tanh and its local derivative 1 − out²</h3>
+  <p class="hint">The red line is tanh. The green line is the factor that multiplies every gradient passing through it.</p>
+  <label class="sl" style="max-width:420px">pre-activation x <output id="t-x"></output><input id="t-xr" type="range" min="-6" max="6" step="0.05" value="0.5"></label>
+  <div class="stat"><div><b id="t-o"></b><span>tanh(x)</span></div><div><b id="t-d"></b><span>1 − out² (gradient factor)</span></div><div><b id="t-p"></b><span>% of upstream gradient that passes</span></div></div>
+  <canvas id="t-c"></canvas>
+  <h3 style="margin-top:18px">How saturated does a freshly initialised MLP start?</h3>
+  <p class="hint">Part 13 initialises embeddings and W1 with <code>randn</code>. This simulates the 30-input pre-activations of 400 hidden units (my own simulation, not a number from the notes).</p>
+  <div class="row"><button class="btn" id="t-sim">Sample 400 pre-activations</button><label class="sl" style="max-width:260px">weight std <output id="t-sdo"></output><input id="t-sd" type="range" min="0.05" max="1" step="0.05" value="1"></label></div>
+  <div id="t-res" class="callout">Press the button.</div>`;
+  const c=$('#t-c');
+  function draw(){
+    const x=+$('#t-xr').value,o=Math.tanh(x),d=1-o*o;
+    $('#t-x').textContent=x.toFixed(2);$('#t-o').textContent=o.toFixed(4);$('#t-d').textContent=d.toFixed(4);$('#t-p').textContent=(d*100).toFixed(1)+'%';
+    const xs=[],a=[],b=[];for(let i=0;i<=120;i++){const v=-6+12*i/120;xs.push(v);a.push(Math.tanh(v));b.push(1-Math.tanh(v)**2);}
+    plot(c,230,[{xs,ys:a,color:COL.red},{xs,ys:b,color:COL.green},{xs:[x],ys:[o],color:COL.red,marks:[{x,y:o,color:COL.red},{x,y:d,color:COL.green}]}],{xmin:-6,xmax:6,ymin:-1.1,ymax:1.1,yticks:[-1,0,1],xticks:[-6,-3,0,3,6],hlines:[]});
+  }
+  $('#t-xr').oninput=draw;draw();redraws.push(draw);
+  function sim(){
+    const sd=+$('#t-sd').value;$('#t-sdo').textContent=sd.toFixed(2);const r=seeded(Math.floor(Math.random()*1e9));
+    let sat=0,vals=[],gs=0;
+    for(let k=0;k<400;k++){let s=0;for(let i=0;i<30;i++)s+=randn(r)*randn(r)*sd;vals.push(s);const d=1-Math.tanh(s)**2;gs+=d;if(Math.abs(s)>2)sat++;}
+    const std=Math.sqrt(vals.reduce((a,v)=>a+v*v,0)/400);
+    $('#t-res').innerHTML=`Pre-activation std ≈ <b>${std.toFixed(2)}</b>. <b>${(sat/4).toFixed(0)}%</b> of the units have |x| &gt; 2, where the gradient factor is below 0.07. Mean gradient factor: <b>${(gs/400).toFixed(3)}</b>. ${sd>=.9?'With std-1 weights the layer starts heavily saturated.':'Shrink the weights and the saturation fades.'}`;
+  }
+  $('#t-sim').onclick=sim;$('#t-sd').oninput=sim;
+})();
+
+/* ============ LAB 3: autograd stepper ============ */
+(function(){
+  const el=$('#lab-ag');
+  el.innerHTML=`<h3>Run backward() one node at a time</h3>
+  <p class="hint">This is the real graph of <code>tanh(((a+b)**2) + (a*c)/d + d + b/2)</code> with a real engine behind it. Before pressing, predict: after the full run, is <code>a.grad</code> 0.6982?  Then break it with the two toggles.</p>
+  <div class="row">
+    <label class="sl">a <output id="g-a"></output><input type="range" id="g-ar" min="0.05" max="1" step="0.05" value="0.3"></label>
+    <label class="sl">b <output id="g-b"></output><input type="range" id="g-br" min="0.05" max="1" step="0.05" value="0.1"></label>
+    <label class="sl">c <output id="g-c"></output><input type="range" id="g-cr" min="0.05" max="1" step="0.05" value="0.12"></label>
+    <label class="sl">d <output id="g-d"></output><input type="range" id="g-dr" min="0.2" max="1" step="0.05" value="0.4"></label>
+  </div>
+  <div class="row">
+    <label><input type="checkbox" id="g-acc" checked> accumulate with <code>+=</code> <span class="hint">(untick: use <code>=</code>)</span></label>
+    <label><input type="checkbox" id="g-rev" checked> reverse topological order <span class="hint">(untick: forward order)</span></label>
+  </div>
+  <div class="row"><button class="btn" id="g-next">Next node</button><button class="btn" id="g-all">Run backward()</button><button class="btn ghost" id="g-reset">Zero grads</button><span id="g-status" class="hint"></span></div>
+  <div class="tablewrap"><table><thead><tr><th>Node</th><th>Op</th><th>Inputs</th><th>Data</th><th>Grad</th><th>Numeric check</th><th>State</th></tr></thead><tbody id="g-tb"></tbody></table></div>
+  <div class="callout" id="g-note"></div>`;
+  class V{constructor(d,op,ch,name){this.d=d;this.g=0;this.ch=ch||[];this.op=op||'leaf';this.name=name||'';this._b=()=>{};}}
+  const MODE={acc:true,rev:true};
+  const addg=(n,v)=>{n.g=MODE.acc?n.g+v:v;};
+  const add=(a,b,n)=>{const o=new V(a.d+b.d,'+',[a,b],n);o._b=()=>{addg(a,o.g);addg(b,o.g);};return o;};
+  const mul=(a,b,n)=>{const o=new V(a.d*b.d,'*',[a,b],n);o._b=()=>{addg(a,b.d*o.g);addg(b,a.d*o.g);};return o;};
+  const pw=(a,k,n)=>{const o=new V(a.d**k.d,'**',[a,k],n);o._b=()=>addg(a,k.d*a.d**(k.d-1)*o.g);return o;};
+  const th=(a,n)=>{const t=Math.tanh(a.d),o=new V(t,'tanh',[a],n);o._b=()=>addg(a,(1-t*t)*o.g);return o;};
+  let root,order,k,nodes;
+  const F=(a,b,c,d)=>Math.tanh(((a+b)**2)+(a*c)/d+d+b/2);
+  function build(){
+    const a=new V(+$('#g-ar').value,'leaf',[],'a'),b=new V(+$('#g-br').value,'leaf',[],'b'),c=new V(+$('#g-cr').value,'leaf',[],'c'),d=new V(+$('#g-dr').value,'leaf',[],'d');
+    const two=new V(2,'const',[],'2'),m1=new V(-1,'const',[],'-1'),two2=new V(2,'const',[],'2'),m12=new V(-1,'const',[],'-1');
+    const s=add(a,b,'s'),p=pw(s,two,'p'),m=mul(a,c,'m'),r=pw(d,m1,'r'),q=mul(m,r,'q'),u1=add(p,q,'u1'),u2=add(u1,d,'u2'),hh=pw(two2,m12,'h'),u=mul(b,hh,'u'),u3=add(u2,u,'u3'),e=th(u3,'e');
+    root=e;const seen=new Set();nodes=[];(function topo(n){if(seen.has(n))return;seen.add(n);n.ch.forEach(topo);nodes.push(n);})(e);
+    ['a','b','c','d'].forEach((nm,i)=>[a,b,c,d][i].leaf=nm);
+    root.leafs={a,b,c,d};reset();
+  }
+  function reset(){nodes.forEach(n=>n.g=0);k=0;order=MODE.rev?[...nodes].reverse():[...nodes];render();}
+  function numeric(nm){const v={a:+$('#g-ar').value,b:+$('#g-br').value,c:+$('#g-cr').value,d:+$('#g-dr').value},h=1e-6,p={...v},m={...v};p[nm]+=h;m[nm]-=h;return(F(p.a,p.b,p.c,p.d)-F(m.a,m.b,m.c,m.d))/(2*h);}
+  function step(){if(k>=order.length)return;if(k===0)root.g=1;order[k]._b();k++;render();}
+  function render(){
+    ['a','b','c','d'].forEach(x=>$('#g-'+x).textContent=$('#g-'+x+'r').value);
+    const ids=new Map(nodes.map((n,i)=>[n,i]));
+    $('#g-tb').innerHTML=nodes.map(n=>{
+      const pos=order.indexOf(n),st=pos<k?'done':pos===k?'cur':'wait';
+      const nm=n.name||'·';const chk=n.leaf?(()=>{const t=numeric(n.leaf),ok=Math.abs(t-n.g)<1e-4;return `<span class="${ok?'ok':'bad'}">${t.toFixed(4)} ${ok?'✔':'✗'}</span>`;})():'';
+      return `<tr class="${st}"><td><b>${nm}</b></td><td>${n.op}</td><td class="m">${n.ch.map(c=>c.name||'·').join(', ')}</td><td class="m">${n.d.toFixed(4)}</td><td class="m">${n.g.toFixed(4)}</td><td class="m">${chk}</td><td>${st==='done'?'<span class="pill g">pushed</span>':st==='cur'?'<span class="pill r">next</span>':'<span class="pill">waiting</span>'}</td></tr>`;
+    }).join('');
+    $('#g-status').textContent='Processed '+k+' of '+order.length+' nodes';
+    const L=root.leafs,ok=['a','b','c','d'].every(x=>Math.abs(numeric(x)-L[x].g)<1e-4);
+    let msg='';
+    if(k<order.length)msg='Press <b>Next node</b> to run one <code>_backward()</code>, or <b>Run backward()</b> for all of them.';
+    else if(ok)msg='<b>All four leaf gradients match the numeric check.</b> Press Run backward() again without zeroing and watch them double (Part 4.5).';
+    else if(!MODE.acc)msg='<b>Wrong.</b> With <code>=</code>, a, b and d, which have two outgoing edges, keep only the last path.';
+    else if(!MODE.rev)msg='<b>Wrong.</b> In forward order <code>a._backward()</code> runs first while a.grad is still 0, and <code>e</code> runs too late for anyone to use it.';
+    else msg='<b>Grads differ from the numeric check.</b> You probably called backward twice without zeroing: every non-root gradient doubled.';
+    $('#g-note').innerHTML=msg;
+  }
+  $$('input[type=range]',el).forEach(i=>i.oninput=build);
+  $('#g-acc').onchange=e=>{MODE.acc=e.target.checked;reset();};
+  $('#g-rev').onchange=e=>{MODE.rev=e.target.checked;reset();};
+  $('#g-next').onclick=step;
+  $('#g-all').onclick=()=>{root.g=1;order=MODE.rev?[...nodes].reverse():[...nodes];nodes.forEach(n=>n._b?0:0);order.forEach(n=>n._b());k=order.length;render();};
+  $('#g-reset').onclick=reset;
+  build();
+})();
+
+/* ============ LAB 4: parameter calculator + training loop ============ */
+(function(){
+  const el=$('#lab-params');
+  el.innerHTML=`<h3>Parameter counter: MLP([...])</h3>
+  <p class="hint">Edit the layer sizes. Each neuron has <code>nin + 1</code> parameters.</p>
+  <div class="row"><input type="text" id="pc-in" value="3, 4, 4, 1" style="width:220px" aria-label="Layer sizes"><span id="pc-out" style="font-weight:700"></span></div>
+  <div class="tablewrap"><table><thead><tr><th>Layer</th><th>Neurons</th><th>Params per neuron</th><th>Subtotal</th></tr></thead><tbody id="pc-tb"></tbody></table></div>`;
+  function upd(){
+    const a=$('#pc-in').value.split(/[,\s]+/).map(Number).filter(n=>n>0&&Number.isFinite(n));
+    let tot=0,rows='';for(let i=0;i<a.length-1;i++){const s=(a[i]+1)*a[i+1];tot+=s;rows+=`<tr><td>${a[i]} → ${a[i+1]}</td><td>${a[i+1]}</td><td>${a[i]}+1 = ${a[i]+1}</td><td>${s}</td></tr>`;}
+    $('#pc-tb').innerHTML=rows;$('#pc-out').textContent=a.length>1?'Total: '+tot+' parameters':'Need at least two sizes';
+  }
+  $('#pc-in').oninput=upd;upd();
+
+  const t=$('#lab-train');
+  t.innerHTML=`<h3>One neuron, one loop. Break it with zero_grad.</h3>
+  <p class="hint">A single neuron <code>tanh(w·x + b)</code> fits four points (x = −2, −1, 1, 2 to y = −0.8, −0.4, 0.4, 0.8) with a summed squared loss. Predict what unticking <code>zero_grad</code> does, then try it.</p>
+  <div class="row">
+    <label class="sl">learning rate <output id="tr-lro"></output><input type="range" id="tr-lr" min="0.01" max="0.5" step="0.01" value="0.05"></label>
+    <label><input type="checkbox" id="tr-z" checked> call <code>zero_grad()</code> each iteration</label>
+  </div>
+  <div class="row"><button class="btn" id="tr-1">Step ×1</button><button class="btn" id="tr-25">Step ×25</button><button class="btn ghost" id="tr-r">Reset</button></div>
+  <div class="stat"><div><b id="tr-l">–</b><span>loss</span></div><div><b id="tr-w">–</b><span>w</span></div><div><b id="tr-b">–</b><span>b</span></div><div><b id="tr-gw">–</b><span>w.grad</span></div><div><b id="tr-it">0</b><span>iteration</span></div></div>
+  <canvas id="tr-c"></canvas>`;
+  const X=[-2,-1,1,2],Y=[-.8,-.4,.4,.8];let w,b,gw,gb,hist;
+  function rst(){w=-0.5;b=0.5;gw=0;gb=0;hist=[];lossNow();draw();}
+  function lossNow(){let l=0;X.forEach((x,i)=>{l+=(Math.tanh(w*x+b)-Y[i])**2;});return l;}
+  function stepOnce(){
+    if($('#tr-z').checked){gw=0;gb=0;}
+    const lr=+$('#tr-lr').value;
+    X.forEach((x,i)=>{const yp=Math.tanh(w*x+b),dz=2*(yp-Y[i])*(1-yp*yp);gw+=dz*x;gb+=dz;});
+    hist.push(lossNow());
+    w-=lr*gw;b-=lr*gb;
+  }
+  function draw(){
+    $('#tr-lro').textContent=(+$('#tr-lr').value).toFixed(2);
+    const l=lossNow();$('#tr-l').textContent=Number.isFinite(l)?l.toFixed(4):'∞';$('#tr-w').textContent=w.toFixed(3);$('#tr-b').textContent=b.toFixed(3);$('#tr-gw').textContent=gw.toFixed(3);$('#tr-it').textContent=hist.length;
+    const ys=hist.length?hist.slice(-120):[l];const mx=Math.max(1,...ys)*1.05;
+    plot($('#tr-c'),170,[{ys,color:COL.red}],{xmin:0,xmax:Math.max(1,ys.length-1),ymin:0,ymax:mx,xticks:[0,Math.max(1,ys.length-1)],xfmt:v=>'',hlines:[]});
+  }
+  $('#tr-1').onclick=()=>{stepOnce();draw();};
+  $('#tr-25').onclick=()=>{for(let i=0;i<25;i++)stepOnce();draw();};
+  $('#tr-r').onclick=rst;$('#tr-lr').oninput=draw;$('#tr-z').onchange=rst;
+  redraws.push(draw);rst();
+})();
+
+/* ============ LAB 5: pairs ============ */
+(function(){
+  const el=$('#lab-pairs');
+  el.innerHTML=`<h3>Pair maker</h3>
+  <p class="hint">Type any lowercase name. Predict the number of pairs before you read the counter.</p>
+  <div class="row"><input type="text" id="pr-in" value="emma" style="width:220px" aria-label="Name"><span id="pr-n" style="font-weight:700"></span></div>
+  <div class="chips" id="pr-chips"></div>
+  <div class="hint">Vocabulary (hover for IDs):</div><div class="chips" id="pr-voc"></div>`;
+  const upd=()=>{
+    const w=$('#pr-in').value.toLowerCase().replace(/[^a-z]/g,'').slice(0,24),t='.'+w+'.';
+    $('#pr-chips').innerHTML=[...t].slice(0,-1).map((c,i)=>`<span class="chip ${i===0?'x':''}">(${c} ${t[i+1]})</span>`).join('');
+    $('#pr-n').textContent=w.length?`len(word)+1 = ${w.length}+1 = ${w.length+1} pairs`:'Type a name';
+  };
+  $('#pr-in').oninput=upd;upd();
+  $('#pr-voc').innerHTML=[...CH].map((c,i)=>`<span class="chip" title="${c} → ${i}">${c}:${i}</span>`).join('');
+})();
+
+/* ============ LAB 6: bigram counts + NLL (Part 7/8) ============ */
+const BG={alpha:1,axis:1,sel:0,rng:null,seed:2147483647};
+function bgRng(){BG.rng=seeded(BG.seed);}bgRng();
+const ALPHAS=[0,0.1,0.5,1,2,5,10,50,200,2000];
+(function(){
+  const el=$('#lab-bigram');
+  el.innerHTML=`<h3>The count matrix, live</h3>
+  <p class="hint">Rows are the previous character, columns the next. Hover or tap a cell. Click a row letter to see its distribution. The corpus is editable.</p>
+  <details class="brief" style="margin:6px 0"><summary>Edit the corpus (space or comma separated names)</summary><div class="in"><textarea id="bg-txt" rows="4"></textarea></div></details>
+  <div class="row">
+    <label class="sl">smoothing α <output id="bg-ao"></output><input type="range" id="bg-a" min="0" max="${ALPHAS.length-1}" step="1" value="3"></label>
+    <label><input type="radio" name="bg-ax" value="1" checked> normalize <code>dim=1</code> (rows)</label>
+    <label><input type="radio" name="bg-ax" value="0"> normalize <code>dim=0</code> (columns)</label>
+  </div>
+  <div class="stat"><div><b id="bg-m"></b><span>pairs</span></div><div><b id="bg-nll"></b><span>training NLL</span></div><div><b>3.296</b><span>uniform log 27</span></div><div><b id="bg-rs"></b><span>row sums</span></div></div>
+  <div class="hmwrap"><div class="hm" id="bg-hm"></div></div>
+  <div class="callout" id="bg-info">Hover a cell.</div>
+  <div class="bars" id="bg-bars"></div>
+  <h3 style="margin-top:18px">Autoregressive sampling and the stateful generator</h3>
+  <div class="row"><label>seed <input type="number" id="bg-seed" value="2147483647" style="width:150px"></label><button class="btn" id="bg-gen">Generate 5 names</button><button class="btn ghost" id="bg-burn">Burn one draw</button><button class="btn ghost" id="bg-rst">Reset generator</button></div>
+  <div class="chips" id="bg-out"></div>
+  <p class="hint">Reset, generate, reset, generate: identical. Reset, burn one draw, generate: the names shift. Same seed is not enough, you need the same sequence of calls.</p>`;
+  $('#bg-txt').value=NAMES_TXT;
+  const hm=$('#bg-hm');
+  function render(){
+    const P=probs(BG.alpha,BG.axis),mx=Math.max(...P);
+    $('#bg-ao').textContent=BG.alpha;
+    $('#bg-m').textContent=CORP.M;$('#bg-nll').textContent=fmt(nllOf(P));
+    let mn=Infinity,mxr=-Infinity;for(let i=0;i<27;i++){let s=0;for(let j=0;j<27;j++)s+=P[i*27+j];mn=Math.min(mn,s);mxr=Math.max(mxr,s);}
+    const okr=Math.abs(mn-1)<1e-9&&Math.abs(mxr-1)<1e-9;
+    $('#bg-rs').innerHTML=okr?'<span class="ok">all 1 ✔</span>':`<span class="bad">${mn.toFixed(2)}–${mxr.toFixed(2)} ✗</span>`;
+    let h='<div></div>'+[...CH].map((c,j)=>`<div class="h" style="cursor:default">${c}</div>`).join('');
+    for(let i=0;i<27;i++){
+      h+=`<div class="h ${BG.sel===i?'sel':''}" data-r="${i}">${CH[i]}</div>`;
+      for(let j=0;j<27;j++){const p=P[i*27+j];h+=`<div class="c ${BG.sel===i?'sel':''}" data-i="${i}" data-j="${j}" style="background:rgba(225,6,0,${p?Math.min(1,.12+Math.sqrt(p/mx)*.88):0}); ${p===0?'background:#101018':''}"></div>`;}
+    }
+    hm.innerHTML=h;
+    const row=[];for(let j=0;j<27;j++)row.push([j,P[BG.sel*27+j]]);row.sort((a,b)=>b[1]-a[1]);
+    const top=row.slice(0,6),m2=top[0][1]||1;
+    $('#bg-bars').innerHTML=`<div class="hint">After "${CH[BG.sel]}", most likely next characters:</div>`+top.map(([j,p])=>`<div class="bar"><span>${CH[j]}</span><i style="width:${p/m2*100}%"></i><span>${(p*100).toFixed(1)}%</span></div>`).join('');
+  }
+  hm.addEventListener('click',e=>{const t=e.target;if(t.dataset.r!==undefined){BG.sel=+t.dataset.r;render();}else if(t.dataset.i!==undefined){BG.sel=+t.dataset.i;render();info(t);}});
+  hm.addEventListener('mouseover',e=>{const t=e.target;if(t.dataset.i!==undefined)info(t);});
+  function info(t){const i=+t.dataset.i,j=+t.dataset.j,P=probs(BG.alpha,BG.axis);$('#bg-info').innerHTML=`<b>N["${CH[i]}","${CH[j]}"]</b> = ${CORP.N[i*27+j]}  ·  P("${CH[j]}" after "${CH[i]}") = <b>${(P[i*27+j]*100).toFixed(2)}%</b>${CORP.N[i*27+j]===0&&BG.alpha===0?' <span class="bad">· zero count, log(0) = −inf</span>':''}`;}
+  $('#bg-a').oninput=e=>{BG.alpha=ALPHAS[+e.target.value];render();nllLab&&nllLab();};
+  $$('input[name=bg-ax]').forEach(r=>r.onchange=e=>{BG.axis=+e.target.value;render();nllLab&&nllLab();});
+  let tm;$('#bg-txt').oninput=e=>{clearTimeout(tm);tm=setTimeout(()=>{setCorpus(e.target.value);render();nllLab&&nllLab();document.dispatchEvent(new Event('corpus'));},250);};
+  $('#bg-seed').onchange=e=>{BG.seed=+e.target.value||1;bgRng();};
+  $('#bg-gen').onclick=()=>{$('#bg-out').innerHTML=genNames(probs(BG.alpha,BG.axis),BG.rng,5).map(n=>`<span class="chip t">${n}</span>`).join('');};
+  $('#bg-burn').onclick=()=>{BG.rng();$('#bg-out').innerHTML='<span class="chip x">one random number consumed</span>';};
+  $('#bg-rst').onclick=()=>{bgRng();$('#bg-out').innerHTML='<span class="chip x">generator reset</span>';};
+  render();
+})();
+
+/* ============ LAB 7: FP16 ============ */
+(function(){
+  const el=$('#lab-fp16');
+  el.innerHTML=`<h3>FP16 integer rounding</h3>
+  <p class="hint">Type an integer and predict what half precision stores. Ties go to the neighbour whose last stored bit is 0.</p>
+  <div class="row"><input type="number" id="fp-in" value="4410" style="width:150px" aria-label="Number"><button class="btn ghost" id="fp-a">2049</button><button class="btn ghost" id="fp-b">4410</button><button class="btn ghost" id="fp-c">4414</button><button class="btn ghost" id="fp-d">8195</button></div>
+  <div class="stat"><div><b id="fp-r">–</b><span>stored as FP16</span></div><div><b id="fp-s">–</b><span>spacing at this size</span></div><div><b id="fp-f">–</b><span>stored as FP32</span></div></div>
+  <div class="callout" id="fp-note"></div><pre id="fp-bits"></pre>`;
+  function half(x){
+    if(x===0)return{v:0,e:0,sp:Math.pow(2,-24)};const a=Math.abs(x),e=Math.max(-14,Math.floor(Math.log2(a))),sp=Math.pow(2,e-10),q=a/sp;
+    let r=Math.round(q);const tie=Math.abs(q-Math.floor(q)-.5)<1e-12;if(tie)r=2*Math.round(q/2);
+    return{v:Math.sign(x)*r*sp,e,sp,tie,lo:Math.floor(q)*sp,hi:Math.ceil(q)*sp,q};
+  }
+  function upd(){
+    const x=Math.round(+$('#fp-in').value||0);
+    if(Math.abs(x)>65504){$('#fp-r').textContent='inf';$('#fp-note').textContent='Above 65504 (the FP16 range). Overflow.';return;}
+    const h=half(x);$('#fp-r').textContent=h.v;$('#fp-s').textContent=h.sp;$('#fp-f').textContent=Math.fround(x);
+    $('#fp-note').innerHTML=h.v===x?`<b>Exact.</b> Every integer up to 2048 is exact, and many above it are too (multiples of the spacing).`:`<b>Changed by ${h.v-x>0?'+':''}${h.v-x}.</b> ${h.tie?`${x} is exactly halfway between ${h.lo} and ${h.hi}. In units of ${h.sp}: ${h.lo/h.sp} and ${h.hi/h.sp}. The even one wins, so it goes to <b>${h.v}</b>.`:`Nearest representable neighbour is ${h.v}.`}`;
+    const m=Math.abs(h.v),e2=m?Math.floor(Math.log2(m)):0,fr=m?Math.round((m/Math.pow(2,e2)-1)*1024):0;
+    $('#fp-bits').textContent=`value        = ${x}\nnormalize    = 1.xxxx × 2^${h.e}      e = ${h.e}\nspacing      = 2^(e-10) = 2^${h.e-10} = ${h.sp}\nstored bits  = ${x<0?1:0} | ${(e2+15).toString(2).padStart(5,'0')} | ${fr.toString(2).padStart(10,'0')}   (sign | exponent+15 | fraction)\ndecode       = 2^${e2} × (1 + ${fr}/1024) = ${h.v}`;
+  }
+  $('#fp-in').oninput=upd;[['a',2049],['b',4410],['c',4414],['d',8195]].forEach(([k,v])=>$('#fp-'+k).onclick=()=>{$('#fp-in').value=v;upd();});upd();
+})();
+
+/* ============ LAB 8: NLL / smoothing ============ */
+let nllLab;
+(function(){
+  const el=$('#lab-nll');
+  el.innerHTML=`<h3>NLL and the zero-probability trap</h3>
+  <p class="hint">Uses the α and axis chosen in the Part 7 lab above (scroll up to change them, or use these shortcuts). Type a name the corpus never saw and watch α = 0.</p>
+  <div class="row"><button class="btn ghost" data-a="0">α = 0</button><button class="btn ghost" data-a="3">α = 1</button><button class="btn ghost" data-a="9">α = 2000</button><span class="hint" id="nl-cur"></span></div>
+  <div class="stat"><div><b id="nl-tr"></b><span>training NLL (this corpus)</span></div><div><b id="nl-u">3.2958</b><span>uniform baseline</span></div></div>
+  <div class="row"><input type="text" id="nl-name" value="zqxk" style="width:200px" aria-label="Held-out name"><span id="nl-res"></span></div>
+  <div class="callout" id="nl-note"></div>
+  <div class="hint">Likelihood is a product, log-likelihood a sum. Pick a long name: the product underflows quickly.</div>
+  <div class="stat"><div><b id="nl-prod"></b><span>product of probabilities</span></div><div><b id="nl-sum"></b><span>sum of logs, negated and averaged</span></div></div>`;
+  nllLab=function(){
+    const P=probs(BG.alpha,BG.axis);$('#nl-cur').textContent='current α = '+BG.alpha+', axis = dim='+BG.axis;
+    $('#nl-tr').textContent=fmt(nllOf(P));
+    const nm=$('#nl-name').value.toLowerCase().replace(/[^a-z]/g,'');
+    if(!nm){$('#nl-res').textContent='';return;}
+    const r=nameNLL(P,nm);let prod=1;const t='.'+nm+'.';for(let i=0;i<t.length-1;i++)prod*=P[stoi[t[i]]*27+stoi[t[i+1]]];
+    $('#nl-res').innerHTML=`NLL of "${nm}" = <b class="${Number.isFinite(r.nll)?'':'bad'}">${fmt(r.nll)}</b>`;
+    $('#nl-prod').textContent=prod.toExponential(2);$('#nl-sum').textContent=fmt(r.nll);
+    $('#nl-note').innerHTML=!Number.isFinite(r.nll)?`<b>Probability 0.</b> The pair "${r.worst}" never occurred in training, so log(0) = −inf. The training NLL above is finite because it only evaluates pairs that exist.`:BG.alpha>=200?'With a huge α every row is nearly uniform, so NLL sits near log 27 = 3.296.':'Finite: every pair in this name has a nonzero probability.';
+  };
+  $$('[data-a]',el).forEach(b=>b.onclick=()=>{const i=+b.dataset.a;$('#bg-a').value=i;BG.alpha=ALPHAS[i];$('#bg-a').dispatchEvent(new Event('input'));});
+  $('#nl-name').oninput=nllLab;nllLab();
+})();
+
+/* ============ LAB 9: softmax ============ */
+(function(){
+  const el=$('#lab-softmax');
+  el.innerHTML=`<h3>Logits to probabilities</h3>
+  <p class="hint">Drag the logits. <code>exp</code> turns them into positive "counts", dividing by the sum makes the row total 1. Pick the correct next character and read the loss.</p>
+  <div id="sm-sl" class="row"></div>
+  <div class="tablewrap"><table><thead><tr><th>Char</th><th>logit</th><th>exp(logit)</th><th>probability</th><th></th></tr></thead><tbody id="sm-tb"></tbody></table></div>
+  <div class="row"><span class="hint">Correct next character:</span><select id="sm-y" aria-label="Correct class"></select><span id="sm-loss" style="font-weight:700"></span></div>
+  <div class="callout" id="sm-note"></div>
+  <h3 style="margin-top:18px">one_hot @ W is row selection</h3>
+  <p class="hint">Click a previous character. The one-hot vector picks exactly one row of a small W.</p>
+  <div class="chips" id="oh-pick"></div>
+  <pre id="oh-out"></pre>`;
+  const cs=['a','e','n','.'],lg=[2.0,1.0,0.1,-1.0];
+  const sl=$('#sm-sl');cs.forEach((c,i)=>sl.appendChild(H(`<label class="sl">${c==='.'?'. (stop)':c} <output id="sm-o${i}"></output><input type="range" min="-6" max="6" step="0.1" value="${lg[i]}" data-i="${i}"></label>`)));
+  cs.forEach((c,i)=>$('#sm-y').appendChild(new Option(c,i)));
+  function upd(){
+    $$('input[type=range]',sl).forEach(r=>lg[+r.dataset.i]=+r.value);lg.forEach((v,i)=>$('#sm-o'+i).textContent=v.toFixed(1));
+    const ex=lg.map(Math.exp),s=ex.reduce((a,b)=>a+b),p=ex.map(v=>v/s);const y=+$('#sm-y').value;
+    $('#sm-tb').innerHTML=cs.map((c,i)=>`<tr><td>${c}</td><td class="m">${lg[i].toFixed(1)}</td><td class="m">${ex[i].toFixed(3)}</td><td class="m">${(p[i]*100).toFixed(1)}%</td><td style="width:40%"><div class="bars"><div class="bar" style="grid-template-columns:1fr"><i class="${i===y?'g':''}" style="width:${p[i]*100}%"></i></div></div></td></tr>`).join('');
+    const loss=-Math.log(p[y]);$('#sm-loss').innerHTML='loss = −log P(correct) = <span class="'+(loss>1.386?'bad':'ok')+'">'+loss.toFixed(3)+'</span> &nbsp;(uniform over 4 would be 1.386)';
+    $('#sm-note').innerHTML=`Probabilities sum to ${(p.reduce((a,b)=>a+b)).toFixed(3)}. Add the same number to every logit and nothing changes: softmax only cares about differences. Make the correct logit much larger and the loss falls toward 0; make a wrong one huge and the loss explodes.`;
+  }
+  $$('input',sl).forEach(i=>i.oninput=upd);$('#sm-y').onchange=upd;upd();
+  const W=[[0.2,1.5,-0.4],[1.1,-0.3,0.6],[-0.8,0.9,2.0],[0.5,0.5,-1.2]],nm=['a','b','c','d'];
+  $('#oh-pick').innerHTML=nm.map((c,i)=>`<button class="btn ghost" data-i="${i}">${c}</button>`).join('');
+  function oh(i){
+    const x=[0,0,0,0];x[i]=1;const out=[0,1,2].map(j=>x.reduce((s,xv,r)=>s+xv*W[r][j],0));
+    $('#oh-out').textContent=`x_onehot = [${x.join(', ')}]\n\n W rows:\n${W.map((r,k)=>(k===i?'▶ ':'  ')+nm[k]+': ['+r.map(v=>v.toFixed(1).padStart(5)).join(', ')+']').join('\n')}\n\nx_onehot @ W = [${out.map(v=>v.toFixed(1)).join(', ')}]   ← equals row ${nm[i]} of W`;
+  }
+  $$('#oh-pick button').forEach(b=>b.onclick=()=>oh(+b.dataset.i));oh(0);
+})();
+
+/* ============ LAB 10: neural bigram training ============ */
+(function(){
+  const el=$('#lab-neural');
+  const LAMS=[0,0.01,0.1,1,10];
+  el.innerHTML=`<h3>Train the neural bigram on this corpus</h3>
+  <p class="hint">Full-batch gradient descent on a 27×27 W. Predict first: with init σ = 1, will the start loss be above or below 3.296? Then press <b>Step ×100</b> and compare with the count model. Heads up: on a 200-name corpus α = 1 is not small, so the neural model can beat the α = 1 count loss. The true floor for training loss is the α = 0 count model.</p>
+  <div class="row">
+    <label class="sl">learning rate <output id="nu-lro"></output><input type="range" id="nu-lr" min="1" max="100" step="1" value="50"></label>
+    <label class="sl">init σ <output id="nu-sdo"></output><input type="range" id="nu-sd" min="0" max="2" step="0.1" value="1"></label>
+    <label class="sl">L2 λ <output id="nu-lmo"></output><input type="range" id="nu-lm" min="0" max="4" step="1" value="1"></label>
+  </div>
+  <div class="row"><button class="btn" id="nu-1">Step ×1</button><button class="btn" id="nu-10">Step ×10</button><button class="btn" id="nu-100">Step ×100</button><button class="btn ghost" id="nu-r">Reset W</button><button class="btn ghost" id="nu-eq">Set W = log P (α = 1)</button></div>
+  <div class="stat">
+    <div><b id="nu-loss">–</b><span>loss incl. L2</span></div><div><b id="nu-pure">–</b><span>pure NLL</span></div><div><b id="nu-c1">–</b><span>count NLL α = 1</span></div><div><b id="nu-c0">–</b><span>count NLL α = 0 (floor)</span></div><div><b id="nu-gap">–</b><span>max |P − N| vs α = 1</span></div><div><b id="nu-it">0</b><span>steps</span></div>
+  </div>
+  <canvas id="nu-c"></canvas>
+  <div class="callout" id="nu-note"></div>`;
+  let W,hist,pure;
+  const rng=seeded(42);
+  function init(){const sd=+$('#nu-sd').value;W=new Float64Array(729);for(let i=0;i<729;i++)W[i]=randn(rng)*sd;hist=[];evalNow(true);}
+  function softmaxRow(i,out){let m=-Infinity;for(let j=0;j<27;j++)m=Math.max(m,W[i*27+j]);let s=0;for(let j=0;j<27;j++){out[j]=Math.exp(W[i*27+j]-m);s+=out[j];}for(let j=0;j<27;j++)out[j]/=s;}
+  function evalNow(record){
+    const lam=LAMS[+$('#nu-lm').value];const p=new Float64Array(27);let nll=0;const cache=[];for(let i=0;i<27;i++){softmaxRow(i,p);cache.push(Float64Array.from(p));}
+    for(let k=0;k<CORP.M;k++)nll-=Math.log(cache[CORP.xs[k]][CORP.ys[k]]);nll/=CORP.M;
+    let w2=0;for(let i=0;i<729;i++)w2+=W[i]*W[i];const loss=nll+lam*w2/729;pure=nll;
+    if(record)hist.push(loss);return{cache,nll,loss};
+  }
+  function step(){
+    const lam=LAMS[+$('#nu-lm').value],lr=+$('#nu-lr').value,{cache,loss}=evalNow(true);void loss;
+    const g=new Float64Array(729);
+    for(let k=0;k<CORP.M;k++){const x=CORP.xs[k],y=CORP.ys[k],p=cache[x];for(let j=0;j<27;j++)g[x*27+j]+=p[j]/CORP.M;g[x*27+y]-=1/CORP.M;}
+    for(let i=0;i<729;i++){g[i]+=lam*2*W[i]/729;W[i]-=lr*g[i];}
+  }
+  function show(){
+    $('#nu-lro').textContent=$('#nu-lr').value;$('#nu-sdo').textContent=(+$('#nu-sd').value).toFixed(1);$('#nu-lmo').textContent=LAMS[+$('#nu-lm').value];
+    const{cache,nll,loss}=evalNow(false);const P1=probs(1);let gap=0;for(let i=0;i<27;i++)for(let j=0;j<27;j++)gap=Math.max(gap,Math.abs(cache[i][j]-P1[i*27+j]));
+    const c1=nllOf(P1),c0=nllOf(probs(0));
+    $('#nu-loss').textContent=fmt(loss);$('#nu-pure').textContent=fmt(nll);$('#nu-c1').textContent=fmt(c1);$('#nu-c0').textContent=fmt(c0);$('#nu-gap').textContent=gap.toExponential(1);$('#nu-it').textContent=Math.max(0,hist.length-1);
+    plot($('#nu-c'),190,[{ys:hist.length?hist:[loss],color:COL.red}],{xmin:0,xmax:Math.max(1,hist.length-1),ymin:Math.floor(Math.min(c0,loss)*5-1)/5,ymax:Math.max(4,loss)+.05,xticks:[0,Math.max(1,hist.length-1)],hlines:[{y:Math.log(27),color:COL.mute,label:'log 27'},{y:c0,color:COL.green,label:'count α=0'}]});
+    const steps=hist.length-1;
+    $('#nu-note').innerHTML=steps<=0?(+$('#nu-sd').value===0?'σ = 0: all logits equal, so the start loss is exactly <b>log 27 = 3.296</b>.':'Start loss with σ = '+(+$('#nu-sd').value).toFixed(1)+': '+(nll>Math.log(27)?'<b>above</b> log 27. A confidently wrong model is punished more than one that knows nothing.':'near or below log 27.')):nll<c0-1e-9?'<b>Pure NLL is below the α = 0 floor?</b> That cannot happen on training data. Check the corpus.':Math.abs(nll-c1)<1e-9?'<b>Pure NLL equals the count model with α = 1 exactly.</b> Part 10: W = log P makes the softmax identical to the table.':`Pure NLL ${fmt(nll)} is at or above the α = 0 floor ${fmt(c0)}. Counting reaches the optimum in one pass, gradient descent approaches it. Raise λ and watch the pure NLL move toward 3.296: L2 acts like smoothing.`;
+  }
+  const run=n=>{for(let i=0;i<n;i++)step();show();};
+  $('#nu-1').onclick=()=>run(1);$('#nu-10').onclick=()=>run(10);$('#nu-100').onclick=()=>run(100);
+  $('#nu-r').onclick=()=>{init();show();};
+  $('#nu-eq').onclick=()=>{const P=probs(1);for(let i=0;i<729;i++)W[i]=Math.log(P[i]);hist=[];evalNow(true);show();};
+  $('#nu-sd').oninput=()=>{init();show();};$('#nu-lr').oninput=show;$('#nu-lm').oninput=show;
+  document.addEventListener('corpus',()=>{init();show();});
+  redraws.push(show);init();show();
+})();
+
+/* ============ LAB 11: context windows ============ */
+(function(){
+  const el=$('#lab-win');
+  el.innerHTML=`<h3>Window builder</h3>
+  <p class="hint">Pick block_size and the padding. Predict how many examples "emma" produces before you read the counter.</p>
+  <div class="row"><input type="text" id="w-in" value="emma" style="width:200px" aria-label="Name">
+    <label class="sl" style="max-width:200px">block_size <output id="w-bo"></output><input type="range" id="w-b" min="1" max="5" step="1" value="3"></label>
+    <label><input type="radio" name="w-p" value="a" checked> script: one <code>.</code> each side</label>
+    <label><input type="radio" name="w-p" value="b"> <code>block_size</code> dots at the start, one at the end</label></div>
+  <div class="stat"><div><b id="w-n">–</b><span>examples</span></div><div><b id="w-pad" style="font-size:16px;font-family:var(--mono)">–</b><span>padded word</span></div></div>
+  <div class="chips" id="w-ex"></div>
+  <div class="callout" id="w-note"></div>`;
+  function upd(){
+    const nm=$('#w-in').value.toLowerCase().replace(/[^a-z]/g,'').slice(0,16),B=+$('#w-b').value,m=$('input[name=w-p]:checked').value;$('#w-bo').textContent=B;
+    const t=m==='a'?'.'+nm+'.':'.'.repeat(B)+nm+'.';const ex=[];
+    for(let i=0;i<t.length-B;i++)ex.push([t.slice(i,i+B),t[i+B]]);
+    $('#w-n').textContent=ex.length;$('#w-pad').textContent=t;
+    $('#w-ex').innerHTML=ex.map(([c,y])=>`<span class="chip">[${[...c].join(' ')}] → <b style="color:var(--red)">${y}</b></span>`).join('');
+    const firstTargets=ex.length?ex.map(e=>e[1]).join(''):'';
+    $('#w-note').innerHTML=m==='a'?`Only one leading dot: the first ${Math.max(0,B-1)} letter(s) of the name are never targets, and the all-boundary context <code>[${Array(B).fill('.').join(' ')}]</code> never appears. Generation starts from it anyway.`:`Every letter is a target, and the start context <code>[${Array(B).fill('.').join(' ')}]</code> is trained. That is len(name) + 1 = ${nm.length+1} examples.`;
+  }
+  $$('input',el).forEach(i=>i.oninput=upd);upd();
+})();
+
+/* ============ LAB 12: shape ledger ============ */
+(function(){
+  const el=$('#lab-shape');
+  el.innerHTML=`<h3>Shape ledger</h3>
+  <p class="hint">Defaults match the script. Change T and see that only W1 grows. Tick "hide shapes" to predict each shape, then click a row to reveal it.</p>
+  <div class="row">
+    <label class="sl">B <output id="s-bo"></output><input type="range" id="s-b" min="1" max="64" value="8"></label>
+    <label class="sl">T (block_size) <output id="s-to"></output><input type="range" id="s-t" min="1" max="8" value="3"></label>
+    <label class="sl">emb_size <output id="s-eo"></output><input type="range" id="s-e" min="2" max="32" value="10"></label>
+    <label class="sl">hidden H <output id="s-ho"></output><input type="range" id="s-h" min="10" max="400" step="10" value="200"></label>
+    <label><input type="checkbox" id="s-hide"> hide shapes</label>
+  </div>
+  <div class="tablewrap"><table><thead><tr><th>Tensor</th><th>Shape</th><th>Role</th><th>Params</th></tr></thead><tbody id="s-tb"></tbody></table></div>
+  <div class="stat"><div><b id="s-tot">–</b><span>total parameters</span></div></div>`;
+  const rev=new Set();
+  function upd(){
+    const B=+$('#s-b').value,T=+$('#s-t').value,E=+$('#s-e').value,Hh=+$('#s-h').value,V=27;
+    ['b','t','e','h'].forEach(k=>$('#s-'+k+'o').textContent=$('#s-'+k).value);
+    const rows=[['xdata',`[${B}, ${T}]`,'IDs',0],['C',`[${V}, ${E}]`,'param',V*E],['C[xdata]',`[${B}, ${T}, ${E}]`,'activation',0],['embed (flat)',`[${B}, ${T*E}]`,'no params',0],['W1',`[${T*E}, ${Hh}]`,'param',T*E*Hh],['b1',`[${Hh}]`,'param',Hh],['l1 = embed@W1+b1',`[${B}, ${Hh}]`,'pre-activation',0],['h1 = tanh(l1)',`[${B}, ${Hh}]`,'activation',0],['W2',`[${Hh}, ${V}]`,'param',Hh*V],['b2',`[${V}]`,'param',V],['logits',`[${B}, ${V}]`,'scores',0],['loss','[]','scalar',0]];
+    const hide=$('#s-hide').checked;
+    $('#s-tb').innerHTML=rows.map((r,i)=>`<tr data-i="${i}" style="${hide?'cursor:pointer':''}"><td class="m">${r[0]}</td><td class="m">${hide&&!rev.has(i)?'<span class="warn">? click</span>':r[1]}</td><td>${r[2]==='param'?'<span class="pill r">param</span>':r[2]}</td><td class="m">${r[3]?(hide&&!rev.has(i)?'?':r[3]):''}</td></tr>`).join('');
+    $('#s-tot').textContent=rows.reduce((a,r)=>a+r[3],0).toLocaleString();
+  }
+  $$('input',el).forEach(i=>i.oninput=()=>{if(i.id==='s-hide')rev.clear();upd();});
+  $('#s-tb').onclick=e=>{const tr=e.target.closest('tr');if(tr&&$('#s-hide').checked){rev.add(+tr.dataset.i);upd();}};upd();
+})();
+
+/* ============ LAB 13: embedding gradient rows ============ */
+(function(){
+  const el=$('#lab-emb');
+  el.innerHTML=`<h3>Which rows of C get a gradient?</h3>
+  <p class="hint">Draw a mini-batch of windows from the corpus. Rows of C that were selected receive gradient, and a character used several times gets the contributions added. Every other row gets exactly zero.</p>
+  <div class="row"><label class="sl" style="max-width:200px">batch size B <output id="e-bo"></output><input type="range" id="e-b" min="1" max="64" value="8"></label><button class="btn" id="e-go">Draw a batch</button></div>
+  <div class="callout" id="e-note">Press the button.</div>
+  <div class="bars" id="e-bars"></div>`;
+  $('#e-b').oninput=()=>$('#e-bo').textContent=$('#e-b').value;$('#e-bo').textContent=8;
+  $('#e-go').onclick=()=>{
+    const B=+$('#e-b').value,cnt=new Array(27).fill(0);
+    for(let n=0;n<B;n++){const w=CORP.names[Math.floor(Math.random()*CORP.names.length)],t='.'+w+'.';const i=Math.floor(Math.random()*Math.max(1,t.length-3));for(let k=0;k<3;k++)cnt[stoi[t[i+k]]||0]++;}
+    const hit=cnt.filter(c=>c>0).length,mx=Math.max(...cnt);
+    $('#e-note').innerHTML=`<b>${hit} of 27 rows</b> of C touched by ${B*3} lookups. Most-used row: "<b>${CH[cnt.indexOf(mx)]}</b>" with <b>${mx}</b> contributions added into one row. <b>${27-hit}</b> rows get zero gradient.`;
+    $('#e-bars').innerHTML=cnt.map((c,i)=>`<div class="bar"><span>${CH[i]}</span><i class="${c?'':'p'}" style="width:${c?Math.max(3,c/mx*100):0}%"></i><span>${c?'+'+c:'0'}</span></div>`).join('');
+  };
+})();
+
+/* ============ LAB 14: lr schedule ============ */
+(function(){
+  const el=$('#lab-lr');
+  el.innerHTML=`<h3>The silent schedule bug</h3>
+  <p class="hint">Drag the training step. The fixed version tests <code>epoch</code>. The buggy version tests <code>i</code>, a leftover loop variable from the dataset-building loop.</p>
+  <label class="sl" style="max-width:520px">epoch <output id="lr-eo"></output><input type="range" id="lr-e" min="0" max="199999" step="1000" value="50000"></label>
+  <div class="stat"><div><b id="lr-ok">–</b><span>lr with epoch &lt; 100000</span></div><div><b id="lr-bug">–</b><span>lr with i &lt; 100000 (i = 7)</span></div></div>
+  <canvas id="lr-c"></canvas>
+  <div class="callout">No error is raised in either case. After adding a schedule, print <code>lr</code> at a few steps and confirm it changes.</div>`;
+  function draw(){
+    const e=+$('#lr-e').value;$('#lr-eo').textContent=e.toLocaleString();
+    $('#lr-ok').textContent=e<100000?0.1:0.01;$('#lr-bug').textContent=0.1;
+    const xs=[0,99999,100000,199999];
+    plot($('#lr-c'),170,[{xs,ys:[.1,.1,.01,.01],color:COL.green},{xs,ys:[.1,.1,.1,.1],color:COL.red,lw:3},{xs:[e],ys:[0],color:COL.yellow,marks:[{x:e,y:e<100000?.1:.01,color:COL.green}]}],{xmin:0,xmax:199999,ymin:0,ymax:.12,yticks:[0,.05,.1],xticks:[0,100000,199999],hlines:[]});
+  }
+  $('#lr-e').oninput=draw;draw();redraws.push(draw);
+})();
+
+/* ============ LAB 15: mini-batch noise ============ */
+(function(){
+  const el=$('#lab-batch');
+  el.innerHTML=`<h3>Why mini-batch loss is noisy</h3>
+  <p class="hint">Each dot is the count model's average loss on one random mini-batch of B pairs from the corpus. The line averages 20 batches at a time. Predict whether B = 64 is tighter than B = 8, and by how much.</p>
+  <div class="row"><label class="sl" style="max-width:260px">batch size B <output id="mb-bo"></output><input type="range" id="mb-b" min="1" max="256" value="8"></label><button class="btn" id="mb-go">Draw 300 batches</button></div>
+  <div class="stat"><div><b id="mb-mean">–</b><span>mean batch loss</span></div><div><b id="mb-sd">–</b><span>std of batch loss</span></div><div><b id="mb-full">–</b><span>full-corpus NLL</span></div></div>
+  <canvas id="mb-c"></canvas>`;
+  let last=null;
+  function draw(){
+    $('#mb-bo').textContent=$('#mb-b').value;if(!last)return;
+    const ys=last.ys,g=[];for(let i=0;i<ys.length;i+=20)g.push(ys.slice(i,i+20).reduce((a,b)=>a+b)/Math.min(20,ys.length-i));
+    plot($('#mb-c'),220,[{ys,color:COL.red,dots:true},{xs:g.map((_,i)=>i*20+10),ys:g,color:COL.yellow,lw:3}],{xmin:0,xmax:300,ymin:0,ymax:6,yticks:[0,2,4,6],xticks:[0,100,200,300],hlines:[{y:last.full,color:COL.green,label:'full corpus'}]});
+  }
+  $('#mb-go').onclick=()=>{
+    const B=+$('#mb-b').value,P=probs(1),ys=[],M=CORP.M;
+    for(let s=0;s<300;s++){let l=0;for(let k=0;k<B;k++){const i=Math.floor(Math.random()*M);l-=Math.log(P[CORP.xs[i]*27+CORP.ys[i]]);}ys.push(l/B);}
+    const mean=ys.reduce((a,b)=>a+b)/300,sd=Math.sqrt(ys.reduce((a,v)=>a+(v-mean)**2,0)/300);
+    last={ys,full:nllOf(P)};$('#mb-mean').textContent=mean.toFixed(3);$('#mb-sd').textContent=sd.toFixed(3);$('#mb-full').textContent=last.full.toFixed(3);draw();
+  };
+  $('#mb-b').oninput=()=>$('#mb-bo').textContent=$('#mb-b').value;$('#mb-bo').textContent=8;
+  redraws.push(draw);
+})();
+
+/* ============ LAB 16: linear collapse ============ */
+(function(){
+  const el=$('#lab-collapse');
+  el.innerHTML=`<h3>Two linear layers are one linear layer</h3>
+  <p class="hint">Random x, W1, b1, W2, b2. Compare the two-layer output with a single layer whose weights you multiply out by hand. Then put tanh in the middle.</p>
+  <div class="row"><button class="btn" id="cl-go">Randomize</button><label><input type="checkbox" id="cl-t"> tanh between layers</label></div>
+  <pre id="cl-out"></pre><div class="callout" id="cl-note"></div>`;
+  const mm=(A,B)=>A.map(r=>B[0].map((_,j)=>r.reduce((s,v,k)=>s+v*B[k][j],0)));
+  const add=(A,b)=>A.map(r=>r.map((v,j)=>v+b[j]));
+  const rnd=(r,c)=>Array.from({length:r},()=>Array.from({length:c},()=>+(Math.random()*2-1).toFixed(2)));
+  let d=null;
+  function run(){
+    if(!d||this===$('#cl-go'))d={x:rnd(1,3),W1:rnd(3,4),b1:rnd(1,4)[0],W2:rnd(4,2),b2:rnd(1,2)[0]};
+    const t=$('#cl-t').checked,l1=add(mm(d.x,d.W1),d.b1),h=t?l1.map(r=>r.map(Math.tanh)):l1,two=add(mm(h,d.W2),d.b2);
+    const W12=mm(d.W1,d.W2),bb=add(mm([d.b1],d.W2),d.b2)[0],one=add(mm(d.x,W12),bb);
+    const f=m=>'['+m[0].map(v=>v.toFixed(4).padStart(8)).join(', ')+']';
+    $('#cl-out').textContent=`two layers   (x·W1+b1)${t?' → tanh →':''}·W2+b2 = ${f(two)}\none layer    x·(W1·W2) + (b1·W2+b2)        = ${f(one)}`;
+    const eq=two[0].every((v,i)=>Math.abs(v-one[0][i])<1e-9);
+    $('#cl-note').innerHTML=eq?'<b>Identical.</b> The 4 hidden units added no capacity. This is exactly what the first version of 3 mlp.py did.':'<b>Different.</b> With tanh in the middle the hidden layer cannot be multiplied out, so depth now adds expressive power.';
+  }
+  $('#cl-go').onclick=run;$('#cl-t').onchange=run;run();
+})();
+
+/* ============ LAB 17: results ============ */
+(function(){
+  const el=$('#lab-results');
+  const R=[['v1 · schedule bug, linear',2.2841,'r','Schedule tested a leftover i, so lr stayed 0.1 for all 200,000 steps. Big steps keep the weights jittering around the minimum.'],['v2 · schedule fixed, linear',2.1691,'r','About 0.115 lower than v1. Smaller steps in the second half let the weights settle.'],['v3 · tanh added',2.0340,'r','About 0.135 lower than v2. The two linear layers had collapsed into one map. tanh lets hidden units respond to combinations of the three context characters.'],['MLP train (full split)',2.0133,'g','Agrees with the mini-batch average 2.0340. Both measure the training data.'],['MLP dev',2.4013,'y','About 0.39 above train. Mixes overfitting with an unshuffled split.'],['MLP test',2.4281,'y','Report once at the end. It must not be used to choose anything.'],['Count bigram (α=1, train)',2.4544,'g','Training NLL over all 228,146 pairs. Different examples from MLP dev and test.'],['Neural bigram (train, +L2)',2.4901,'g','Includes the 0.01·mean(w²) penalty and 100 steps of descent. Not the pure NLL.'],['Uniform log 27',3.2958,'y','The no-knowledge baseline.']];
+  el.innerHTML=`<h3>Every number from the lecture on one scale</h3>
+  <p class="hint">Bars start at zero. Click a row to read what it means. The white tick marks the uniform baseline.</p>
+  <div id="rs-rows"></div><div class="callout" id="rs-note">Click a bar.</div>`;
+  $('#rs-rows').innerHTML=R.map((r,i)=>`<div class="res-row" data-i="${i}" tabindex="0"><span>${r[0]}</span><span class="b"><i class="${r[2]==='r'?'':r[2]}" style="width:${r[1]/3.4*100}%"></i><em style="left:${3.2958/3.4*100}%"></em></span><span class="mono">${r[1].toFixed(4)}</span></div>`).join('');
+  const pick=row=>{$('#rs-note').innerHTML='<b>'+R[+row.dataset.i][0]+':</b> '+R[+row.dataset.i][3];};
+  $$('.res-row',el).forEach(r=>{r.onclick=()=>pick(r);r.onkeydown=e=>{if(e.key==='Enter')pick(r);};});
+})();
+
+/* ============ LAB 18: flashcards ============ */
+const FC=[
+['What does x.grad mean?','It is ∂L/∂x: how much the final scalar output changes per unit change in x, everything else fixed. A property of the whole graph.',1],
+['Is backprop a calculus algorithm or a graph algorithm?','Both. Calculus gives each node its local derivative. Reverse topological traversal decides when to apply them.',4],
+['Why is the final gradient seeded with 1?','∂L/∂L = 1. Every gradient is a product of local derivatives starting there. A seed of 0 makes everything 0.',4],
+['Why does topological order matter?','A node may push gradient to its inputs only after all its consumers have contributed to its grad. Reverse topological order guarantees it.',4],
+['Why must gradients accumulate?','A value used through several paths affects the output through each, and the total is the sum. = keeps only the last path. y = x + x gives 2.',4],
+['Why does reverse mode suit a scalar loss with many parameters?','One backward pass gives the derivative of the single output with respect to every input, at about one forward pass of cost.',4],
+['Why is the update outside the graph?','p.value += … edits a plain number. It is not a recorded operation. Inside the graph the next backward would differentiate through the optimizer.',5],
+['Why does calling backward() twice accumulate?','backward() only adds into grad and never clears it. Clearing is the caller\'s job (zero_grad).',4],
+['What probability does a bigram estimate?','P(next character | previous character): one row of 27 probabilities per previous character.',6],
+['What is lost by using only the previous character?','All earlier context. …ann and …kin look identical once they reach n.',6],
+['What does row i of the count matrix mean, and why must it sum to 1?','Row i counts each character that followed character i. After normalizing it is a distribution over the next character, which must total 1.',7],
+['Why is NLL a product turned into a sum?','Dataset probability is a product of conditionals. Log makes it a sum (no underflow), negation turns maximize into minimize.',8],
+['What should uniform-model NLL be?','log(V) = log 27 ≈ 3.296, since every token gets 1/V and −log(1/V) = log V.',8],
+['Why does α = 0 not show up in training NLL?','Training only evaluates pairs that exist, each with count ≥ 1. The zero cells are exactly the unevaluated pairs. They hurt only on new data.',8],
+['Why does one_hot(x) @ W select a row?','The one-hot has a single 1 at x, so the product is 1·W[x,:] plus zeros: row x of W.',9],
+['Why are logits not probabilities?','They can be negative and do not sum to 1. exp makes them positive, dividing by the row sum normalizes them. That is softmax.',9],
+['Why F.cross_entropy rather than exp, divide, log?','It fuses log-softmax with NLL via log-sum-exp, staying finite for large logits. It expects raw logits, so never softmax first.',10],
+['How are L2 regularization and smoothing related?','Both bias the model toward less extreme distributions. Pseudo-counts pull rows toward uniform. L2 pulls W toward 0, equal logits, uniform softmax.',10],
+['Why does generation feed the sampled character back in?','Each step\'s input is the previous output. The next distribution depends on the character just sampled, so it is sequential.',7],
+['What would a model with two previous characters require?','A count table of [27,27,27] (19,683 rows), or a wider one-hot input. The table grows as V^context.',11],
+['Why can a bigram never tell ann from kin, and how does the MLP fix it?','The bigram\'s only input is the previous character. The MLP takes a window of several characters, each embedded and concatenated.',11],
+['If context length is 3, what examples does "emma" give with proper padding?','...→e, ..e→m, .em→m, emm→a, mma→. : five examples, len(name) + 1.',11],
+['Why is embedding lookup a row selection, and why differentiable?','C[ids] copies rows. Backward adds each output gradient into the selected row. Unselected rows get zero, rows used twice get both added.',12],
+['Why does lengthening the context change only W1?','W1 is [T·C, H]. Doubling T doubles its first dimension. Hidden and output layers keep their shapes.',12],
+['Why is flattening not a learned layer?','It only reinterprets the same numbers as [B, T·C]. No parameters. Position is kept by where each embedding sits.',12],
+['Why does the forward pass need a nonlinearity between the layers?','(xW1+b1)W2+b2 = x(W1W2) + const: one linear map. Adding tanh lowered training loss from 2.1691 to 2.0340 in the latest run.',13],
+['Why is mini-batch loss noisy, and what to watch instead?','Each step sees a few random examples. Watch an average over many steps and the full-split loss under no_grad.',13],
+['Why does dev guide choices while test does not?','Choices made by looking at a split fit that split. Dev absorbs that. Test, looked at once, stays unbiased.',11],
+['Why can train loss keep falling while dev does not?','The model can fit quirks of the training examples. An unshuffled split can also make dev differ from train for reasons unrelated to overfitting.',13],
+['What does the fixed-window MLP still lack?','Anything beyond the last T characters, and a flexible way to weigh positions. Slot 0 and slot 2 have fixed, separate weights. Attention removes both limits.',14]
+];
+(function(){
+  const el=$('#lab-cards');
+  el.innerHTML=`<h3>Say it aloud, then reveal</h3>
+  <p class="hint">Answer out loud first. "Got it" earns 3 points and removes the card. "Missed" sends it to the back of the queue.</p>
+  <div class="stat"><div><b id="fc-m">0</b><span>mastered</span></div><div><b id="fc-l">30</b><span>left in queue</span></div><div><b id="fc-x">0</b><span>missed this session</span></div></div>
+  <div class="card"><small id="fc-src"></small><div class="cq" id="fc-q"></div><div class="ca" id="fc-a" hidden></div></div>
+  <div class="row"><button class="btn" id="fc-rev">Reveal answer</button><button class="btn" id="fc-ok" hidden style="background:var(--green);color:#000">Got it</button><button class="btn ghost" id="fc-no" hidden>Missed</button><button class="btn ghost" id="fc-sh">Shuffle</button></div>`;
+  let queue=FC.map((_,i)=>i).filter(i=>!S.fc[i]),missed=0;
+  const shuffle=()=>{queue.sort(()=>Math.random()-.5);show();};
+  function show(){
+    $('#fc-m').textContent=Object.keys(S.fc).length;$('#fc-l').textContent=queue.length;$('#fc-x').textContent=missed;
+    $('#fc-a').hidden=true;$('#fc-ok').hidden=$('#fc-no').hidden=true;$('#fc-rev').hidden=false;
+    if(!queue.length){$('#fc-q').textContent='Queue empty. Every card mastered.';$('#fc-src').textContent='Finish';$('#fc-rev').hidden=true;return;}
+    const c=FC[queue[0]];$('#fc-q').textContent=c[0];$('#fc-src').textContent='From Part '+c[2];$('#fc-a').textContent=c[1];
+  }
+  $('#fc-rev').onclick=()=>{$('#fc-a').hidden=false;$('#fc-ok').hidden=$('#fc-no').hidden=false;$('#fc-rev').hidden=true;};
+  $('#fc-ok').onclick=()=>{S.fc[queue.shift()]=1;save();header();show();};
+  $('#fc-no').onclick=()=>{queue.push(queue.shift());missed++;show();};
+  $('#fc-sh').onclick=shuffle;
+  show();
+})();
+
+/* ============ final classification ============ */
+function renderFinal(){
+  const el=$('#lab-final');if(!el)return;
+  const rows=[];let weak=[];
+  for(let n=1;n<=15;n++){
+    const qs=QUIZ[n];let got=0,tot=qs.length*25,missed=false,notdone=false;
+    qs.forEach(q=>{const r=S.q[q.id];if(r&&r.done){got+=r.pts;if(r.tries>0)missed=true;}else notdone=true;});
+    if(missed||notdone)weak.push(n);
+    rows.push(`<div class="row-p"><span style="width:76px;color:var(--mute)">Part ${n}</span><i><b style="width:${got/tot*100}%;background:${got===tot?'var(--purple)':'var(--green)'}"></b></i><span class="mono" style="width:70px;text-align:right">${got}/${tot}</span></div>`);
+  }
+  el.innerHTML=`<h3>Race classification</h3><p class="hint">Points: ${totalPts()} of ${MAXPTS}. Reread the Parts where you did not get a first-try sweep.</p>${rows.join('')}<div class="callout">${weak.length?'Parts to revisit: '+weak.map(n=>`<a href="#p${n}">${n}</a>`).join(', ')+'.':'<b>Clean sweep.</b> Every question first try. Pole position.'}</div><div class="row"><button class="btn ghost" id="fin-reset">Reset all progress</button><span class="hint" id="fin-msg"></span></div>`;
+  $('#fin-reset').onclick=function(){
+    if(!this.dataset.sure){this.dataset.sure=1;this.textContent='Click again to confirm';return;}
+    S={q:{},fc:{}};save();location.reload();
+  };
+}
+header();
+</script>
+</body>
+</html>

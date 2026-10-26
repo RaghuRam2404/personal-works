@@ -833,7 +833,7 @@ How this split is made:
 - It slices the list of **examples** (windows), not the list of words.
 - It does **not shuffle**, so dev and test are the last 20% of the examples in the order they appear in `names.txt`.
 
-Splitting by word first, after shuffling, keeps all windows of a name in one split and makes the three sets comparable. In this script, `xdev` and `xtest` are created but never used for a loss.
+Splitting by word first, after shuffling, keeps all windows of a name in one split and makes the three sets comparable. `xdev` and `xtest` are used for the held-out losses in Part 13.4.
 
 ---
 
@@ -873,10 +873,11 @@ Values from the script: `B = batch_size = 8`, `T = block_size = 3`, `emb_size = 
 | `embed` (flattened) | `[8, 30]` | Activation, no parameters |
 | `W1` | `[30, 200]` | Parameter, first dimension is `T * emb_size` |
 | `b1` | `[200]` | Parameter |
-| `l1 = embed @ W1 + b1` | `[8, 200]` | Hidden activation |
+| `l1 = embed @ W1 + b1` | `[8, 200]` | Hidden pre-activation |
+| `h1 = l1.tanh()` | `[8, 200]` | Hidden activation, values in (-1, 1) |
 | `W2` | `[200, 27]` | Parameter |
 | `b2` | `[27]` | Parameter |
-| `logits = l1 @ W2 + b2` | `[8, 27]` | One score per next character |
+| `logits = h1 @ W2 + b2` | `[8, 27]` | One score per next character |
 | `ydata` | `[8]` | Target IDs |
 | `loss` | `[]` | Scalar |
 
@@ -922,7 +923,8 @@ for epoch in range(epochs):
 
     embed  = C[xdata].view(-1, block_size * emb_size)
     l1     = embed @ W1 + b1
-    logits = l1 @ W2 + b2
+    h1     = l1.tanh()                                     # nonlinearity between the layers
+    logits = h1 @ W2 + b2
 
     loss = loss_fn(logits, ydata)                          # raw logits, no softmax
     losses.append(loss.item())
@@ -946,14 +948,52 @@ plt.plot(avg_losses)
 print(avg_losses[-1])
 ```
 
-`view(-1, 1000)` turns the 200,000 losses into 200 rows of 1000, and averaging each row gives 200 points for the plot. `avg_losses[-1]` is the average training mini-batch loss over the **last 1000 steps**. It is a training signal, not a dev or test loss.
+`view(-1, 1000)` turns the 200,000 losses into 200 rows of 1000, and averaging each row gives 200 points for the plot. `avg_losses[-1]` is the average training mini-batch loss over the **last 1000 steps**. It is a training signal, not a dev or test loss. The dev and test losses are computed separately in Part 13.4.
 
 ### 13.3 Two things to know about this loop
 
-- **No nonlinearity between the layers.** The forward pass is `l1 = embed @ W1 + b1`, then `logits = l1 @ W2 + b2`. Two linear layers with nothing between them compose into one (Part 5.1): `embed @ (W1 @ W2) + (b1 @ W2 + b2)`. The curriculum's forward pass puts `torch.tanh` on `l1`.
+- **A nonlinearity must sit between the layers.** The first version of the forward pass was `l1 = embed @ W1 + b1`, then `logits = l1 @ W2 + b2`. Two linear layers with nothing between them compose into one (Part 5.1): `embed @ (W1 @ W2) + (b1 @ W2 + b2)`, so the 200 hidden units added no capacity. The fix is one line, `h1 = l1.tanh()`, and the output layer then reads `h1` instead of `l1`.
+
+  Why it matters here: with `tanh` the hidden units can respond to *combinations* of the three context characters, not just add up one contribution per position. `tanh` also bounds every hidden value to (-1, 1). It has a flat region where `1 - tanh²` is near 0 (Part 2), so a unit whose pre-activation is large gets almost no gradient. The weights start as `randn` with standard deviation 1, so pre-activations can start large.
 - **The learning-rate schedule must test the loop counter.** The first version of the loop wrote `lr = 0.1 if i < 100000 else 0.01`. The loop variable is `epoch`, and `i` was a leftover from the dataset-building loop that stays small, so the condition was always true and `lr` stayed at 0.1 for all 200,000 steps. No error is raised. After the fix to `epoch < 100000`, the schedule works: `lr = 0.1` for the first 100,000 steps and `0.01` for the last 100,000. The results of both versions are in Part 14. After adding a schedule, print `lr` at a few steps to confirm it changes.
 
-### 13.4 Generation
+### 13.4 Train, dev and test loss
+
+After training, the script evaluates each **full** split once, with gradients turned off:
+
+```python
+def get_loss(data, target):
+    with torch.no_grad():
+        embed  = C[data].view(-1, block_size * emb_size)
+        h1     = (embed @ W1 + b1).tanh()
+        logits = h1 @ W2 + b2
+        loss   = loss_fn(logits, target)
+    return loss
+
+train_loss = get_loss(xtrain, ytrain)
+dev_loss   = get_loss(xdev,   ydev)
+test_loss  = get_loss(xtest,  ytest)
+```
+
+Same forward pass as training, but over every example of a split at once instead of 8 random ones, and under `torch.no_grad()` so no graph is built. The result is one exact number per split, not the noisy mini-batch average.
+
+Output:
+
+```
+train_loss = 2.0133    dev_loss = 2.4013    test_loss = 2.4281
+```
+
+How to read the three numbers:
+
+- **Train 2.0133** is the loss on the data the weights were updated on. It agrees with the mini-batch average printed during training (2.0340 in the same run), as it should: both measure the training data, one on 8-example samples from the last 1000 steps and one on the whole split.
+- **Dev 2.4013** is the number used to choose hyperparameters. It is higher than train by about 0.39.
+- **Test 2.4281** is for the final report only. It must not be used to choose anything. It is close to dev but a little higher (by about 0.03).
+
+**Why dev is higher than train.** A model fits the examples it trained on better than examples it has not seen, so some gap is expected. Here the gap has a second possible source: the split cuts the examples in file order without shuffling (Part 11.3), so dev and test come from a different part of `names.txt` than train. The script cannot separate overfitting from this distribution difference, because both would show up as the same gap. A shuffled, word-level split would remove the second cause.
+
+**Comparison with the bigram models.** The bigram losses in Part 9.6 (2.4544 count, 2.4901 neural with the L2 term) are training NLLs over all 228,146 pairs. They are not like-for-like with the MLP's dev and test losses, which come from held-out examples built by a different windowing (11.2). The MLP's *train* loss of 2.0133 is the figure closest in kind to those bigram numbers, and it is lower. A fair comparison needs all models evaluated on the same held-out split.
+
+### 13.5 Generation
 
 ```python
 out_n = 10
@@ -964,7 +1004,7 @@ for i in range(out_n):
         out, blocks = [], [0] * block_size            # start from three '.'
         while True:
             embed  = C[blocks[-3:]].view(-1, block_size * emb_size)
-            logits = (embed @ W1 + b1) @ W2 + b2
+            logits = ((embed @ W1 + b1).tanh()) @ W2 + b2
             probs  = F.softmax(logits, dim=1)
             idx    = torch.multinomial(probs, num_samples=1, replacement=True, generator=g).item()
             if idx == 0:
@@ -980,18 +1020,38 @@ The same loop as the bigram: sample a character, append it, and look at the last
 
 ## Part 14 — Results
 
-The same training run (200,000 steps, batch size 8) with the learning-rate schedule broken and then fixed. The printed value is `avg_losses[-1]`: the average mini-batch **training** loss over the last 1000 steps.
+The same training run (200,000 steps, batch size 8) in three versions. The printed value is `avg_losses[-1]`: the average mini-batch **training** loss over the last 1000 steps.
 
-| Version | `lr` actually used | `avg_losses[-1]` |
-|---|---|---:|
-| Schedule tested `i` (always true) | 0.1 for all 200,000 steps | 2.2841 |
-| Schedule tests `epoch` (fixed) | 0.1 for 100,000 steps, then 0.01 | **2.1691** |
+| Version | Forward pass | `lr` actually used | `avg_losses[-1]` |
+|---|---|---|---:|
+| 1. Schedule tested `i` (always true) | linear, no `tanh` | 0.1 for all 200,000 steps | 2.2841 |
+| 2. Schedule tests `epoch` (fixed) | linear, no `tanh` | 0.1 for 100,000 steps, then 0.01 | 2.1691 |
+| 3. `tanh` added | `h1 = l1.tanh()` | 0.1 for 100,000 steps, then 0.01 | **2.0340** |
 
-Lowering the learning rate for the second half lowers the loss by about 0.115. A large step is useful early, but with only 8 examples per step it keeps the weights jittering around the minimum. Smaller steps let them settle.
+An earlier run of version 3 printed 1.9462 and the latest run printed 2.0340. The code is the same. The runs differ because the embedding table `C` and the mini-batch sampling are not seeded (Part 13.1), so every run starts from different random numbers and sees different mini-batches. The table uses the latest run, the one that also produced the dev and test losses below.
 
-The bigram losses from Part 9.6 were 2.4544 (count) and 2.4901 (neural, with the L2 term, over all pairs). The MLP number is not like-for-like with those: they come from different example sets (the windowing in 11.2 produces fewer examples than the bigram pairs) and from different kinds of average (a last-1000-steps mini-batch average against a full-data average). The dev and test splits are not evaluated in the script, so there is no held-out number yet.
+What each change did:
 
-**Generated names** (10 names, seed 42). Before the fix (`lr` constant at 0.1, loss 2.2841):
+- **1 → 2, fixing the schedule: 2.2841 → 2.1691** (about 0.115 lower). A large step is useful early, but with only 8 examples per step it keeps the weights jittering around the minimum. Smaller steps let them settle.
+- **2 → 3, adding `tanh`: 2.1691 → 2.0340** (about 0.135 lower; 0.223 against the earlier 1.9462 run). Without `tanh` the two linear layers collapsed into one linear map (Part 13.3). With `tanh` the hidden layer is genuinely nonlinear, so the model can use combinations of the three context characters. This is the same reason Part 5 needs a nonlinearity between layers.
+
+The two runs of version 3 differ by about 0.09, which is comparable to the effect of the schedule fix (0.115). The direction of each change is consistent, but with one run per version the exact sizes are uncertain. Seeding `C` and `randint`, or averaging several runs, would settle it.
+
+**Held-out losses** (version 3, Part 13.4):
+
+| Split | Loss |
+|---|---:|
+| Train (full split) | 2.0133 |
+| Dev | 2.4013 |
+| Test | 2.4281 |
+
+These are the first held-out numbers for the MLP. The earlier note that the script gave no held-out number no longer applies. The training-versus-dev gap of about 0.39 is real and cannot be split into overfitting and the unshuffled-split effect without a shuffled word-level split (Part 13.4).
+
+The bigram losses from Part 9.6 were 2.4544 (count) and 2.4901 (neural, with the L2 term, over all pairs). Those are training NLLs on a different set of examples, so they are not like-for-like with the MLP's dev and test losses (Part 13.4).
+
+**Generated names** (10 names, seed 42), from each version.
+
+Version 1 (loss 2.2841):
 
 ```
 ynu
@@ -1006,7 +1066,7 @@ eniah
 ndennasze
 ```
 
-After the fix (loss 2.1691):
+Version 2 (loss 2.1691):
 
 ```
 idundenve
@@ -1021,7 +1081,41 @@ mmel
 byach
 ```
 
-The two lists are different because the weights differ, so sampling with the same seed gives different names. Both are name-like in places (`myna`, `rosmah`, `mikan`, `byach`) and not in others (`idundenve`, `illaynn`). A lower training loss does not make every sample look right. The model sees only the last 3 characters. It has no way to use anything earlier in the name, and it uses fixed, separate weights for each of the three positions. That limit is what attention removes later.
+Version 3, with `tanh`, latest run (train 2.0133, dev 2.4013, test 2.4281):
+
+```
+iyuselyn
+ismar
+idredyn
+sin
+milla
+mila
+joshwan
+ina
+iyah
+oda
+```
+
+Version 3, with `tanh`, earlier run (mini-batch loss 1.9462):
+
+```
+yjusten
+iya
+urbi
+urien
+uri
+ysia
+yne
+yossereli
+in
+uilachaden
+```
+
+The lists differ because the weights differ, so sampling with the same seed gives different names each time. Two runs of the **same code** also gave different names, because `C` and the mini-batches are not seeded (Part 13.1). Version 3's latest names are the most name-like of the sets: `milla`, `mila`, `joshwan`, `ismar` and `sin` all read as plausible names. Even so, the earlier run's names were less convincing with a similar loss, and ten samples are too few to judge by eye. A lower training loss does not guarantee that every sample looks right.
+
+One thing to keep in mind when reading the first letters: the windowing in 11.2 never trains the start context `[. . .]` (Part 11.2), yet generation starts from it. Both version 3 runs begin many names with vowels or `y` (`iyuselyn`, `ismar`, `idredyn`, `iyah`, `yjusten`, `urbi`), and that is a likely reason, but the script does not test it.
+
+The remaining limit is the fixed window: the model sees only the last 3 characters, with separate weights per position. That is what attention removes later.
 
 ---
 
@@ -1054,8 +1148,8 @@ These are the mistakes that show up when writing this code from scratch. Each on
 
 - **Pad with `block_size` boundary tokens.** With one leading `.`, the first letters are never targets and the all-boundary start context is never trained (Part 11.2).
 - **Split words, then build windows, and shuffle first.** Slicing unshuffled windows (Part 11.3) puts the tail of the file in dev and test.
-- **Evaluate a full dev split.** A mini-batch average (Part 13.2) is only a training signal.
-- **Two linear layers with nothing between them are one linear layer** (Part 13.3).
+- **Evaluate a full dev split.** A mini-batch average (Part 13.2) is only a training signal. Compute train, dev and test with a `no_grad` function over each whole split (Part 13.4).
+- **Two linear layers with nothing between them are one linear layer** (Part 13.3). Put `tanh` (or another nonlinearity) between them.
 - **A schedule must test the loop counter.** A leftover variable that stays small silently disables it (Part 13.3).
 - **Seed every random source.** Unseeded `C` and `randint` make runs unrepeatable (Part 13.1).
 - **Compare losses only on identical data and the same kind of average.**
@@ -1081,6 +1175,8 @@ These are the mistakes that show up when writing this code from scratch. Each on
 | Write the mini-batch training loop and explain why batch loss is noisy | Part 13.2 |
 | Explain why a nonlinearity is needed between the layers | Part 13.3 |
 | Read the printed loss correctly (mini-batch average, not dev or test) | Parts 13.2, 14 |
+| Compute full train, dev and test losses, and say what the train-dev gap means | Part 13.4 |
+| Explain what the `lr` schedule fix and the `tanh` each changed in the loss | Part 14 |
 
 ---
 
@@ -1162,7 +1258,7 @@ The bigram's only input is the previous character. The MLP takes a window of sev
 It only reinterprets the same numbers as `[B, T*C]`. It has no parameters, and position is kept by where each embedding sits.
 
 **26. Why does the forward pass need a nonlinearity between the two layers?**
-Without it, `(x W1 + b1) W2 + b2 = x (W1 W2) + const`, one linear map, so the hidden width adds no capacity. The forward pass in `3 mlp.py` has none.
+Without it, `(x W1 + b1) W2 + b2 = x (W1 W2) + const`, one linear map, so the hidden width adds no capacity. The first version of `3 mlp.py` had none. Adding `h1 = l1.tanh()` lowered the training loss from 2.1691 to 1.9462 (Part 14).
 
 **27. Why is mini-batch loss noisy, and what should be watched instead?**
 Each step sees only a few random examples. Watch an average over many steps, and the loss on a full split under `no_grad`.
