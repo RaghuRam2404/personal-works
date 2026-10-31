@@ -177,7 +177,7 @@ d_logits_exp = d_probs * logits_exp_sum_inv
 d_logits_exp_sum = -1*logits_exp_sum**-2 * d_logits_exp_sum_inv
 d_logits_exp += torch.ones_like(logits_exp_sum) * d_logits_exp_sum
 d_logits_reduced = logits_exp * d_logits_exp
-d_logits = d_logits_reduced.clone()
+d_logits = d_logits_reduced.clone() #don't just assign it, CLONE IT
 d_logits_max = -d_logits_reduced.sum(dim=1, keepdim=True)
 d_logits += (logits == logits_max).float() * d_logits_max
 d_b2 = d_logits.sum(dim=0, keepdim=True)
@@ -236,4 +236,192 @@ compare("d_W1", d_W1, W1.grad)
 compare("d_embedcat", d_embedcat, embedcat.grad)
 compare("d_embed", d_embed, embed.grad)
 compare("d_C", d_C, C.grad)
+# %%
+
+### ASSEMBLE THE TRAINING CODE
+
+epochs = 200000
+n_hidden = 64
+batch_size = 32
+emb_size = 10
+momentum = 0.001
+epsilon = 1e-5
+initial_lr = 0.1
+loss_fn = torch.nn.CrossEntropyLoss()
+
+g = torch.Generator().manual_seed(MANUAL_SEED)
+
+C = torch.randn(size=(nchars, emb_size), generator=g)
+W1 = torch.randn(size=(emb_size * block_size, n_hidden), generator=g)
+W1 = W1 * (5/3)/((emb_size * block_size) ** 0.5)
+
+b1 = torch.randn(size=(1,n_hidden), generator=g) * 0.01
+W2 = torch.randn(size=(n_hidden,nchars), generator=g) * 0.01
+b2 = torch.randn(size=(1,nchars), generator=g) * 0.01
+
+running_mean = torch.zeros(size=(1, n_hidden))
+running_std = torch.ones(size=(1,n_hidden))
+bngain = torch.ones(size=(1,n_hidden))
+bnbias = torch.zeros(size=(1,n_hidden))
+
+params = [C, W1, b1, W2, b2, bngain, bnbias]
+for param in params:
+    param.requires_grad_(True)
+
+loss_steps = 10000
+losses = []
+
+with torch.no_grad():
+    for epoch in range(epochs):
+        
+        #zero grad
+        for param in params:
+            param.grad = None
+            
+        idx = torch.randint(low=0, high=xtrain.shape[0], size=(batch_size,), generator=g)
+        xdata = xtrain[idx]
+        ydata = ytrain[idx]
+
+        #forward pass
+        embed = C[xdata] #done
+        embedcat = embed.view(-1, block_size*emb_size) #done
+        l1 = embedcat @ W1 + b1 #done
+        batch_mean = l1.mean(dim=0, keepdim=True) #done
+        batch_diff = l1 - batch_mean #done
+        batch_diff_sq = batch_diff ** 2 #done
+        batch_var = 1/(n-1) * batch_diff_sq.sum(dim=0, keepdim=True) #done
+        batch_std_inv = (batch_var + epsilon) ** -0.5 #done
+
+        running_mean = (1-momentum) * running_mean + momentum * batch_mean
+        running_std = (1-momentum) * running_std + momentum * batch_std_inv
+
+        centered_l1 = l1 - batch_mean #done
+        l1_norm = centered_l1 * batch_std_inv #done
+        h1_preact = bngain * l1_norm + bnbias #done
+        h1 = h1_preact.tanh() #done
+        logits = h1 @ W2 + b2 #done
+        logits_max = logits.max(dim=1, keepdim=True).values #done
+        logits_reduced = logits - logits_max #done
+        logits_exp = logits_reduced.exp() #done
+        logits_exp_sum = logits_exp.sum(dim=1, keepdim=True) #done
+        logits_exp_sum_inv = logits_exp_sum**-1 #done
+        probs = logits_exp * logits_exp_sum_inv #done
+        onehot_probs = probs[torch.arange(0, probs.shape[0]), ydata] #done
+        log_probs = onehot_probs.log() #done
+        loss = -log_probs.mean() #done
+        losses.append(loss)
+
+        d_log_probs = -torch.ones_like(log_probs)/len(log_probs)
+        d_onehot_probs = onehot_probs ** -1 * d_log_probs
+        d_probs = torch.zeros_like(probs)
+        d_probs[torch.arange(0, probs.shape[0]), ydata] = d_onehot_probs
+        d_logits_exp_sum_inv = (logits_exp * d_probs).sum(dim=1, keepdim=True)
+        d_logits_exp = d_probs * logits_exp_sum_inv
+        d_logits_exp_sum = -1*logits_exp_sum**-2 * d_logits_exp_sum_inv
+        d_logits_exp += torch.ones_like(logits_exp_sum) * d_logits_exp_sum
+        d_logits_reduced = logits_exp * d_logits_exp
+        d_logits = d_logits_reduced.clone() #don't just assign it, CLONE IT
+        d_logits_max = -d_logits_reduced.sum(dim=1, keepdim=True)
+        d_logits += (logits == logits_max).float() * d_logits_max
+        d_b2 = d_logits.sum(dim=0, keepdim=True)
+        d_W2 = h1.T @ d_logits
+        d_h1 = d_logits @ W2.T
+        d_h1_preact = (1-h1**2) * d_h1
+        d_bnbias = d_h1_preact.sum(dim=0, keepdim=True)
+        d_bngain = (l1_norm * d_h1_preact).sum(dim=0, keepdim=True)
+        d_l1_norm = d_h1_preact * bngain
+        d_batch_std_inv = (centered_l1 * d_l1_norm).sum(dim=0, keepdim=True)
+        d_centered_l1 = d_l1_norm * batch_std_inv
+        d_batch_mean = -1 * d_centered_l1.sum(dim=0, keepdim=True)
+        d_l1 = d_centered_l1.clone()
+        d_batch_var = -0.5 * (batch_var + epsilon) ** -1.5 * d_batch_std_inv
+        d_batch_diff_sq = (1/(n-1)) * torch.ones_like(batch_diff_sq) * d_batch_var
+        d_batch_diff = 2 * batch_diff * d_batch_diff_sq
+        d_batch_mean += -1 * d_batch_diff.sum(dim=0, keepdim=True)
+        d_l1 += d_batch_diff.clone()
+        d_l1 += torch.ones_like(l1)/l1.shape[0] * d_batch_mean
+        d_b1 = d_l1.sum(dim=0, keepdim=True)
+        d_W1 = embedcat.T @ d_l1
+        d_embedcat = d_l1 @ W1.T
+        d_embed = d_embedcat.view(-1, block_size, emb_size)
+        d_C = torch.zeros_like(C)
+        for i in range(xdata.shape[0]):
+            for j in range(xdata.shape[1]):
+                d_C[xdata[i,j]] += d_embed[i,j]
+
+        lr = initial_lr if epochs < 100000 else 0.01
+        grads = [d_C, d_W1, d_b1, d_W2, d_b2, d_bngain, d_bnbias]
+        for param, grad in zip(params, grads):
+            param += -lr * grad
+        
+        if epoch % loss_steps == 0 or epoch == epochs-1:
+            if epoch == 0 and epoch != epochs-1:
+                print(f"Initial Loss: {loss:.5f}")
+            else:
+                tloss = sum(losses[-loss_steps:])/loss_steps
+                print(f"Epoch: {epoch+1:6d}/{epochs:6d}, Loss: {tloss:.5f}")
+
+# %%
+@ torch.no_grad()
+def get_loss(data, targets):
+    embed = C[data]
+    embedcat = embed.view(-1, block_size*emb_size)
+    l1 = embedcat @ W1 + b1
+
+    centered_l1 = l1 - running_mean
+    l1_norm = centered_l1 * running_std
+    h1_preact = bngain * l1_norm + bnbias
+    h1 = h1_preact.tanh()
+    logits = h1 @ W2 + b2
+    
+    loss = torch.nn.CrossEntropyLoss()(logits, targets)
+    return loss
+
+train_loss = get_loss(xtrain, ytrain)
+dev_loss = get_loss(xdev, ydev)
+test_loss = get_loss(xtest, ytest)
+print(f"{train_loss=}, {dev_loss=} and {test_loss=}") 
+# train_loss=tensor(2.0497), dev_loss=tensor(2.3733) and test_loss=tensor(2.3974)
+# %%
+
+count = 10
+g = torch.Generator().manual_seed(MANUAL_SEED+10)
+
+with torch.no_grad():
+    for i in range(count):
+        context = [eow] * block_size
+        while True:
+            tc = context[-block_size:]
+            idxes = [stoi[c] for c in tc]
+
+            embed = C[idxes]
+            embedcat = embed.view(-1, block_size*emb_size)
+            l1 = embedcat @ W1 + b1
+        
+            centered_l1 = l1 - running_mean
+            l1_norm = centered_l1 * running_std
+            h1_preact = bngain * l1_norm + bnbias
+            h1 = h1_preact.tanh()
+            logits = h1 @ W2 + b2
+            prob = torch.nn.Softmax(dim=1)(logits)
+
+            idx = torch.multinomial(prob, 1, True, generator=g).item()
+            if idx == 0:
+                break
+            context.append(itos[idx])
+        print("".join(context[3:]))
+        
+"""
+el
+anickiniah
+huzuenid
+rlisswreliana
+mythaellen
+lim
+nikaleigh
+lman
+polani
+lhia
+"""
+
 # %%

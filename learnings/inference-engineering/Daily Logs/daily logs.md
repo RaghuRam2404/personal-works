@@ -284,3 +284,39 @@ Finished with the manual backprop without watching the video (as I have already 
 
 Tomorrow, make it a full runnable one and train the model and observe the losses. If possible, watch the remaining sections of the video, only after manual backprop implementation, get losses and print predictions.
 
+Remaining section of the video: https://youtu.be/q8SA3rM6ckI?t=5190
+Reference ipynb of Andrej: https://github.com/karpathy/nn-zero-to-hero/blob/master/lectures/makemore/makemore_part4_backprop.ipynb
+
+## 2026-10-27
+
+Timespent: 30 mins
+
+Woke up late. Finished the coding part. Video yet to be seen once. Will watch it tomorrow and try to wrap up till the session 7, take notes and get started with session 8's wavenet understanding
+
+## 2026-10-28
+
+Timespent: 1hour 15 mins
+
+Watched the video. Have a mental idea about how to implement the [wavenet](https://youtu.be/t3YJ5hKiMQ0). Do that tomorrow. Containerize everything, move everything to proper classes, implement the wavenet, take baseline readings to compare everything. If possible, try to answer the questions inthe [Month 4 curriculum](../Curriculum/Monthly%20Curriculum/Month4.md) file.
+
+## 2026-10-29
+
+Timespent: 30 mins
+
+Woke up late. Implemented the wavenet model, but the loss is converging fast to near 0, but dev/test loss are bad. There was a problem in creating dataset because of the more context length 8, which caused problems in name like "emma", so I had to pad 8 "."s at the beginning of each name. Documented the loss and predictions of plain model and wavenet model.
+
+Tomorrow, answer the questions in the curriculum and finish session 8 and 9.
+
+## 2026-10-30
+
+Timespent: 1 hour
+
+Finished session 8,9. Was confused what is session 10. So created detailed curriculum for the same. Then started session 10 and finished upto part 4 (out of 10 parts).
+
+Tomorrow, try to finish up more parts as I don't know how much time I'll take to get it done.
+
+## 2026-10-31
+
+Timespent: scattered 3 hours
+
+Finished session 11 and written notes (with AI). 
