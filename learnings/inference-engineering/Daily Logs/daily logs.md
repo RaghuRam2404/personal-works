@@ -319,4 +319,4 @@ Tomorrow, try to finish up more parts as I don't know how much time I'll take to
 
 Timespent: scattered 3 hours
 
-Finished session 11 and written notes (with AI). 
+Finished session 10 and written notes (with AI). I don't know about `single-head self-attention` concept of session 11. I need to understand what i should do in session 11 first tomorrow.
