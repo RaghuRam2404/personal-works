@@ -269,7 +269,7 @@ Built the batchnorm naively and in the same API format of PyTorch. Understood an
 
 Timespent: 2 hours
 
-Finished with the experiments and noted the same in the [Inferences decision tree.png](../Notes/Month%204/Inferences%20decision%20tree.png) image, [3 deep nn runs.md](../Month%204/3%20deep%20nn%20runs.md) file and in the [Notes4.md](../Notes/Notes%204.md) file as well.
+Finished with the experiments and noted the same in the [Inferences decision tree.png](../Notes/Month%204/Inferences%20decision%20tree.png) image, [3 deep nn runs.md](../Month%204/3%20deep%20nn%20runs.md) file and in the [Month4Notes/Month4NotesSession3-4.md](../Notes/Month4Notes/Month4NotesSession3-4.md) file as well.
 
 Mark it as end of session 3 and 4 of month 4. For session 5-7, watch backprop ninja video and do only the backprop and see the hand derivations carefully (no need to implement everything).
 
@@ -320,3 +320,19 @@ Tomorrow, try to finish up more parts as I don't know how much time I'll take to
 Timespent: scattered 3 hours
 
 Finished session 10 and written notes (with AI). I don't know about `single-head self-attention` concept of session 11. I need to understand what i should do in session 11 first tomorrow.
+
+## 2026-11-01
+
+Timespent: scattered hours
+
+Didn't learn anynthing today as I was confused about what to do exactly. Today I have rewritten session 11-13 clearly. 
+
+Tomorrow, wake up fast. I need to read part of [raschka's blog](https://sebastianraschka.com/blog/2023/self-attention-from-scratch.html) and atleast part1,2,3 .
+
+## 2026-11-02
+
+Timespent: 1 hour
+
+Finished implementing single head attention from raschka's blog and it was intuitive. Did part 2. 
+
+Tomorrow I should be able to do part 3-8 (if I woke up by 5).
