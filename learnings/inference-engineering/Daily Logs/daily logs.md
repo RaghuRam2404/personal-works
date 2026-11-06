@@ -325,7 +325,7 @@ Finished session 10 and written notes (with AI). I don't know about `single-head
 
 Timespent: scattered hours
 
-Didn't learn anynthing today as I was confused about what to do exactly. Today I have rewritten session 11-13 clearly. 
+Didn't learn anynthing today as I was confused about what to do exactly. Today I have rewritten session 11-13 clearly using https://gemini.google.com/app/c1e03068288c02b5 
 
 Tomorrow, wake up fast. I need to read part of [raschka's blog](https://sebastianraschka.com/blog/2023/self-attention-from-scratch.html) and atleast part1,2,3 .
 
@@ -336,3 +336,25 @@ Timespent: 1 hour
 Finished implementing single head attention from raschka's blog and it was intuitive. Did part 2. 
 
 Tomorrow I should be able to do part 3-8 (if I woke up by 5).
+
+## 2026-11-03
+
+Timespent: 1 hour
+
+Did part 3,4,5 and understood basic moving parts of the single head attention. Tomorrow I need to implement the loop_attention and finish off other parts of session 11 and get it done. I must wake up at 5:15 to 5:30 AM tomorrow.
+
+## 2026-11-04
+
+Timespent: 1.5hours
+
+Implemented the loop_attention and tested it with some random inputs. Tomorrow Let's start with session 12 to implement the vectorized attention (part 2) and test_attention_forward.py file (part 3). These 2 are clear targets
+
+## 2026-11-05
+
+Timespent: 1hour
+
+Yesterday night, I have written the test cases. Today morning moved those as pytest ones and ran it. I wrote upto 10 cases. For others, I used AI to write it and test it. Implemented the vectorized attention and understood that looped implementation gave me much more intuition about the moving parts of attention. 
+
+Tomorrow need to see Part 7 (benchmarking) and Part 9 (questions) for the single-head attention from Session 12. Write notes and mainly about input & output meaning of single-head attention. Then finish off and understand what session 13 is about
+
+This week, I am not waking up faster. I need to sleep today sooner and wake up fast and sit around 5:30 AM.

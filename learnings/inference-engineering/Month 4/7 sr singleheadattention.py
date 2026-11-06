@@ -30,7 +30,7 @@ W_query = torch.rand((dq, d), requires_grad=False)
 W_key = torch.rand((dk, d), requires_grad=False)
 W_value = torch.rand((dv, d), requires_grad=False)
 
-print(f"{W_query.shape=},\n{W_key.shape=},\n{W_value.shape=}\n")
+print(f"{W_query.shape=}, variance:{W_query.var()},\n{W_key.shape=}, variance:{W_key.var()},\n{W_value.shape=}, variance:{W_value.var()}\n")
 embed.shape
 
 # finding q,k,v for a single token at time T
@@ -45,7 +45,7 @@ print(f"{query_2.shape=},\n{key_2.shape=},\n{value_2.shape=}\n")
 query = embed @ W_query.T
 key = embed @ W_key.T
 value = embed @ W_value.T
-print(f"{query.shape=},\n{key.shape=},\n{value.shape=}\n")
+print(f"{query.shape=},{query.var()=},\n{key.shape=},{key.var()=},\n{value.shape=},{value.var()=}\n")
 
 omega_24 = torch.dot(query[1], key[4])
 print(omega_24) # scalar value
@@ -53,8 +53,11 @@ print(omega_24) # scalar value
 omega = query @ key.T #it is unnormalized
 print("\n======= Unnormalized attention weights")
 print(f"{omega[1]=}", "\n", omega.shape)
+print(f"{omega.var()=}")
 
-attention_weights = torch.softmax(omega/dk**0.5, dim=1)
+scaled_omega = omega/dk**0.5
+print(f"{scaled_omega.var()=}")
+attention_weights = torch.softmax(scaled_omega, dim=1)
 print("\n======= Normalized Attention weights")
 print(f"{attention_weights[1]=}","\n", attention_weights.shape)
 
