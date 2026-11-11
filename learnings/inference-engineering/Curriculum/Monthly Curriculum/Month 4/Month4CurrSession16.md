@@ -1,4 +1,4 @@
-[← Month 4 overview](<../Month4.md>) · [← Session 15](<Month4CurrSession15.md>)
+[← Month 4 overview](<../Month4.md>) · [← Session 15](<Month4CurrSession15.md>) · [Session 17 (optional) →](<Month4CurrSession17.md>)
 
 ## Session 16 — Train, evaluate, and defend
 

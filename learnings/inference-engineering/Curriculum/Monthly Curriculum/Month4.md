@@ -15,7 +15,7 @@ Month 3 already established scalar reverse-mode autodiff, bigram language models
 
 ## Workload and pacing
 
-This month is substantially denser than Month 3. It contains four lectures, manual tensor calculus, three attention implementations, a Transformer, tests, and a real training run. It is organized into **17 sequential sessions**.
+This month is substantially denser than Month 3. It contains four lectures, manual tensor calculus, three attention implementations, a Transformer, tests, and a real training run. It is organized into **17 sequential sessions**, plus one optional experimentation session (Session 17, RoPE).
 
 Most sessions are designed for roughly 2–3 focused hours. Manual BatchNorm backward and multi-head attention may need 3–4 hours. If a session exceeds the available time, stop at a marked checkpoint and resume it the next day; do not skip the explanation or test merely to preserve the word “month.”
 
@@ -172,6 +172,7 @@ Each session lives in its own file under [Month 4/](<Month 4/>). This file holds
 | [14](<Month 4/Month4CurrSession14.md>) | Lecture 7 | Complete decoder-only Transformer mental model |
 | [15](<Month 4/Month4CurrSession15.md>) | Assemble GPT | Tested from-scratch model and one-batch overfit |
 | [16](<Month 4/Month4CurrSession16.md>) | Train, evaluate, and defend | Checkpoint, samples, report, memory rebuild |
+| [17](<Month 4/Month4CurrSession17.md>) *(optional)* | Rotary position embeddings | Tested RoPE, learned vs RoPE vs none comparison, extrapolation result |
 
 ## What Month 4 achieves
 
@@ -199,10 +200,11 @@ Each session lives in its own file under [Month 4/](<Month 4/>). This file holds
 - **[Session 10](<Month 4/Month4CurrSession10.md>):** A runnable TinyShakespeare pipeline: character tokenizer, train/val split, shifted random-window batches, a bigram baseline, training with train/val loss, and generation (no attention yet).
 - **[Session 11](<Month 4/Month4CurrSession11.md>):** Single-head causal self-attention written with explicit Python loops, a hand-worked example it reproduces, and tests for six invariants.
 - **[Session 12](<Month 4/Month4CurrSession12.md>):** Vectorized causal attention proven identical to the loops by forward and gradient parity across 20 seeds, a behavioral leakage test, and a timing analysis.
-- **[Session 13](<Month 4/Month4CurrSession13.md>):** A reusable causal multi-head attention `nn.Module` with explicit head split/merge, one-head equivalence, head independence, causality and dropout tests, and a first timed from-memory rebuild.
+- **[Session 13](<Month 4/Month4CurrSession13.md>):** Grow Session 12 into multi-head attention step by step (loop over heads → head axis → `nn.Module`), then prove one-head equivalence, head independence, causality and dropout behavior, and do a first timed from-memory rebuild.
 - **[Session 14](<Month 4/Month4CurrSession14.md>):** Understand how embeddings, causal self-attention, feed-forward networks, residual streams, LayerNorm, and repeated blocks form a decoder-only Transformer.
 - **[Session 15](<Month 4/Month4CurrSession15.md>):** Assemble a tested decoder-only Transformer from your own attention module, including tiny-batch overfit and parameter-count checks.
 - **[Session 16](<Month 4/Month4CurrSession16.md>):** Train the character GPT, preserve a Month 5 baseline (checkpoint, samples, naive generation), write the report, and pass the oral examination and memory rebuild.
+- **[Session 17](<Month 4/Month4CurrSession17.md>) (optional):** Replace learned position embeddings with RoPE inside attention, prove its relative-position property with tests, compare learned vs RoPE vs no-position training, and measure length extrapolation as preparation for Month 5 KV caching.
 
 ### End-of-month outcome
 

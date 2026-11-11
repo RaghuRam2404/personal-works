@@ -358,3 +358,34 @@ Yesterday night, I have written the test cases. Today morning moved those as pyt
 Tomorrow need to see Part 7 (benchmarking) and Part 9 (questions) for the single-head attention from Session 12. Write notes and mainly about input & output meaning of single-head attention. Then finish off and understand what session 13 is about
 
 This week, I am not waking up faster. I need to sleep today sooner and wake up fast and sit around 5:30 AM.
+
+
+## 2026-11-06
+
+Timespent: 30 mins
+
+Sluggish day. Just finished part 7 and 9. WRitten notes with AI and modified the session13 curriculum for smoother transition. Tomorrow, I need to start with session 13 and finish first part asap.
+
+## 2026-11-07
+
+Timespent: 3 hours spread across the day
+
+Finished session 13 part 1 and 2. Implemented the multi-head attention and tested it with some random inputs. Tomorrow I need to write things in paper to see how can I avoid 'n_head' loop with vectorized implementation. Then put things together to do part 3 to part 7. Tomorrow is Diwali and i must sit and do things when the time is free.
+
+## 2026-11-08
+
+Timespent: 2 hour spread across the day
+
+Finished Session 13 with tests being written by AI and I wrote the core CausalSelfAttention class. Tomorrow, I need to start with session 14 and start watching Andrej's video atleast twice to get the gist of things. Then see what to do.
+
+## 2026-11-09 & 10
+
+Timespent: 2 hours spread across the 2 days
+
+Watched the Andrej's video once. I need to read the "Attention is all you need" paper and understand the moving parts of the Transformer. Then I need to watch the video again to get more intuition [https://arxiv.org/pdf/1706.03762v7](https://arxiv.org/pdf/1706.03762v7). Let's read it tomorrow morning. For the last week or so, I didn't wake up at 5AM. It's better to sleep early today.
+
+## 2026-11-11
+
+Timespent: 1 hour
+
+Finished reading the architecture part of the transformer paper and understood the encoder-decoder style and how it's done. Tomorrow I need to know about the parts which I am going to implement and it's shape architecture. It's much more important. Once that's done, I should be able to write code faster.
